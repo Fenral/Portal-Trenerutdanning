@@ -6,6 +6,8 @@
 
 **Architecture:** `portal/` er en Next.js modulær monolitt. Supabase Auth identifiserer brukeren; PostgreSQL/RLS avgjør hvilke rader brukeren kan lese og endre. Alle privilegerte handlinger går gjennom server actions som kaller små domenetjenester og skriver append-only audit-events.
 
+**Model policy:** Følg `docs/superpowers/plans/2026-08-30-modell-og-innsatsstyring.md`; klassifiser hver task N1–N4 før implementering.
+
 **Tech Stack:** Next.js, React, TypeScript strict, Supabase local CLI/PostgreSQL/Auth/Storage, Zod, Vitest, Testing Library, Playwright, axe-core og GitHub Actions.
 
 ---
