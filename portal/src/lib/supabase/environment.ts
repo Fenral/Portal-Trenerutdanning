@@ -24,3 +24,14 @@ export function getSupabaseSecretKey(): string {
 export function getApplicationUrl(): string {
   return requireEnvironmentValue("NEXT_PUBLIC_APP_URL");
 }
+
+export function isE2ETestMode(): boolean {
+  return (
+    process.env.NODE_ENV !== "production" &&
+    process.env.E2E_TEST_MODE === "true"
+  );
+}
+
+export function getE2EDemoPassword(): string {
+  return requireEnvironmentValue("E2E_DEMO_PASSWORD");
+}

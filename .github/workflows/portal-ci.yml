@@ -5,16 +5,43 @@ on:
     paths:
       - "portal/**"
       - ".github/workflows/portal-ci.yml"
+      - ".github/workflows/portal-nightly.yml"
   push:
     branches: [main, master]
     paths:
       - "portal/**"
       - ".github/workflows/portal-ci.yml"
+      - ".github/workflows/portal-nightly.yml"
 
 permissions:
   contents: read
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      browser: ${{ steps.filter.outputs.browser }}
+      database: ${{ steps.filter.outputs.database }}
+      dependencies: ${{ steps.filter.outputs.dependencies }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            database:
+              - 'portal/supabase/**'
+              - 'portal/src/features/access/**'
+              - 'portal/src/features/import/**'
+              - 'portal/src/features/people/**'
+            browser:
+              - 'portal/src/app/**'
+              - 'portal/src/components/**'
+              - 'portal/tests/e2e/**'
+            dependencies:
+              - 'portal/package.json'
+              - 'portal/pnpm-lock.yaml'
+
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -37,4 +64,80 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test:unit --run
       - run: pnpm build
+
+  database:
+    needs: changes
+    if: needs.changes.outputs.database == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: portal
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: portal/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm supabase start
+      - run: pnpm test:rls
+      - if: always()
+        run: pnpm supabase stop
+
+  browser:
+    needs: changes
+    if: needs.changes.outputs.browser == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: portal
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: portal/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm supabase start
+      - name: Configure local end-to-end environment
+        run: |
+          pnpm supabase status -o env > /tmp/supabase.env
+          set -a
+          source /tmp/supabase.env
+          set +a
+          printf 'NEXT_PUBLIC_SUPABASE_URL=%s\nNEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=%s\nSUPABASE_SECRET_KEY=%s\nNEXT_PUBLIC_APP_URL=http://127.0.0.1:3100\nE2E_TEST_MODE=true\nE2E_DEMO_PASSWORD=Nivaa-demo-2026!\n' "$API_URL" "$PUBLISHABLE_KEY" "$SECRET_KEY" > .env.local
+      - run: pnpm test:e2e
+      - if: always()
+        run: pnpm supabase stop
+
+  dependencies:
+    needs: changes
+    if: needs.changes.outputs.dependencies == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: portal
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: portal/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
       - run: pnpm audit --prod --audit-level high

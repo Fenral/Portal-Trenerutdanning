@@ -794,7 +794,7 @@ git commit -m "feat: add secure email invitation flow"
 - Test: `portal/tests/unit/courses/create-course-run.test.ts`
 - Test: `portal/tests/e2e/admin-courses.spec.ts`
 
-- [ ] **Step 1: Skriv failing kursvalidering**
+- [x] **Step 1: Skriv failing kursvalidering**
 
 ```ts
 import { describe, expect, it } from "vitest";
@@ -815,7 +815,7 @@ describe("course run", () => {
 Run: `pnpm vitest tests/unit/courses/create-course-run.test.ts --run`  
 Expected: FAIL.
 
-- [ ] **Step 2: Implementer schema og displayår**
+- [x] **Step 2: Implementer schema og displayår**
 
 ```ts
 import { z } from "zod";
@@ -840,11 +840,11 @@ export const CourseRunInput = z.object({
 Run: `pnpm vitest tests/unit/courses/create-course-run.test.ts --run`  
 Expected: PASS, 2 tests.
 
-- [ ] **Step 3: Implementer transaksjonell kursoppretting**
+- [x] **Step 3: Implementer transaksjonell kursoppretting**
 
 `createCourseRun` inserts run, ordered sessions, initial admin/course-lead assignment and `course.created` audit-event in one database function. If session 3 fails validation, no run remains. Server action validates with `CourseRunInput` and checks `course.manage` before calling the function.
 
-- [ ] **Step 4: Seed og E2E-test den avtalte demostrukturen**
+- [x] **Step 4: Seed og E2E-test den avtalte demostrukturen**
 
 `seed.sql` must create nine T1 locations, one T2 cohort, one T3 2026–2027 cohort, exact demonstration dates from the requirements, 15 fictional `.invalid` users and scoped course staff. `test-login/route.ts` accepts only allowlisted synthetic aliases when `E2E_TEST_MODE=true`; otherwise it calls `notFound()` before reading the alias. E2E asserts T1 expands/collapses and T3 shows six sessions across two years. A production-mode integration test expects `/test-login?as=admin` to return `404`.
 
@@ -857,7 +857,7 @@ pnpm playwright test tests/e2e/admin-courses.spec.ts
 
 Expected: PASS; `select count(*) from course_runs where template_id=(select id from course_templates where code='T1')` returns `9`.
 
-- [ ] **Step 5: Commit og full foundation-gate**
+- [x] **Step 5: Commit og full foundation-gate**
 
 Update `.github/workflows/portal-ci.yml` with a fast required job for format/lint/types/unit/build and path-filtered jobs: database/RLS when migrations or access/import/people code changes, Playwright/axe when app/components change, and dependency audit when lockfile/package changes. Add one nightly workflow that runs the full suite. Then run the full suite once for the Foundation gate:
 

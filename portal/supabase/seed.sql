@@ -1,0 +1,227 @@
+create temporary table demo_seed_users (
+  position smallint primary key,
+  display_name text not null,
+  email text not null,
+  club_name text not null
+) on commit drop;
+
+insert into demo_seed_users (position, display_name, email, club_name)
+values
+  (1, 'Ada Admin', 'admin.demo@nivaa.invalid', 'Norges Golfforbund'),
+  (2, 'Terje Trener 1', 'teacher.demo@nivaa.invalid', 'Oslo GK'),
+  (3, 'Lise Trener 2', 'lead.t2@nivaa.invalid', 'Elverum GK'),
+  (4, 'Liv Trener 3', 'lead.t3@nivaa.invalid', 'Losby GK'),
+  (5, 'Nora Nordmann', 'student.demo@nivaa.invalid', 'Fana GK'),
+  (6, 'Emil Berg', 'emil.berg@nivaa.invalid', 'Stavanger GK'),
+  (7, 'Selma Dahl', 'selma.dahl@nivaa.invalid', 'Onsøy GK'),
+  (8, 'Henrik Aas', 'henrik.aas@nivaa.invalid', 'Losby GK'),
+  (9, 'Thea Bakke', 'thea.bakke@nivaa.invalid', 'Stavanger GK'),
+  (10, 'Mina Eide', 'mina.eide@nivaa.invalid', 'Byneset GK'),
+  (11, 'Jakob Fjell', 'jakob.fjell@nivaa.invalid', 'Sandane GK'),
+  (12, 'Ingrid Gran', 'ingrid.gran@nivaa.invalid', 'Romerike GK'),
+  (13, 'Oskar Haug', 'oskar.haug@nivaa.invalid', 'Kristiansund og Omegn GK'),
+  (14, 'Sofie Iversen', 'sofie.iversen@nivaa.invalid', 'Grenland og Omegn GK'),
+  (15, 'Marius Kvale', 'marius.kvale@nivaa.invalid', 'Oslo GK');
+
+insert into auth.users (
+  instance_id,
+  id,
+  aud,
+  role,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  confirmation_token,
+  recovery_token,
+  email_change_token_new,
+  email_change,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  created_at,
+  updated_at
+)
+select
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  ('d0000000-0000-0000-0000-' || lpad(position::text, 12, '0'))::uuid,
+  'authenticated',
+  'authenticated',
+  email,
+  extensions.crypt('Nivaa-demo-2026!', extensions.gen_salt('bf')),
+  now(),
+  '',
+  '',
+  '',
+  '',
+  jsonb_build_object('provider', 'email', 'providers', jsonb_build_array('email')),
+  jsonb_build_object('full_name', display_name, 'email_verified', true),
+  now(),
+  now()
+from demo_seed_users;
+
+insert into auth.identities (
+  id,
+  user_id,
+  identity_data,
+  provider,
+  provider_id,
+  created_at,
+  updated_at
+)
+select
+  ('e0000000-0000-0000-0000-' || lpad(position::text, 12, '0'))::uuid,
+  ('d0000000-0000-0000-0000-' || lpad(position::text, 12, '0'))::uuid,
+  jsonb_build_object(
+    'sub',
+    ('d0000000-0000-0000-0000-' || lpad(position::text, 12, '0'))::uuid,
+    'email',
+    email,
+    'email_verified',
+    true,
+    'phone_verified',
+    false
+  ),
+  'email',
+  ('d0000000-0000-0000-0000-' || lpad(position::text, 12, '0')),
+  now(),
+  now()
+from demo_seed_users;
+
+insert into public.profiles (
+  id,
+  display_name,
+  normalized_email,
+  club_name,
+  birth_year
+)
+select
+  ('c0000000-0000-0000-0000-' || lpad(position::text, 12, '0'))::uuid,
+  display_name,
+  email,
+  club_name,
+  case when position in (7, 9) then 2009 else 1988 + position end
+from demo_seed_users;
+
+insert into public.user_accounts (user_id, profile_id, normalized_email)
+select
+  ('d0000000-0000-0000-0000-' || lpad(position::text, 12, '0'))::uuid,
+  ('c0000000-0000-0000-0000-' || lpad(position::text, 12, '0'))::uuid,
+  email
+from demo_seed_users;
+
+insert into public.course_templates (id, code, title, level)
+values
+  ('a1000000-0000-0000-0000-000000000001', 'T1', 'Trener 1', 1),
+  ('a1000000-0000-0000-0000-000000000002', 'T2', 'Trener 2', 2),
+  ('a1000000-0000-0000-0000-000000000003', 'T3', 'Trener 3', 3);
+
+insert into public.course_runs (
+  id,
+  template_id,
+  title,
+  start_year,
+  location_name,
+  starts_on,
+  ends_on,
+  status
+)
+values
+  ('b1010000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000001', 'Trener 1 · Kristiansund og Omegn GK', 2026, 'Kristiansund og Omegn GK', '2026-05-22', '2026-09-27', 'active'),
+  ('b1010000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000001', 'Trener 1 · Oslo GK', 2026, 'Oslo GK', '2026-05-29', '2026-09-20', 'active'),
+  ('b1010000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000001', 'Trener 1 · Onsøy GK', 2026, 'Onsøy GK', '2026-04-10', '2026-09-06', 'active'),
+  ('b1010000-0000-0000-0000-000000000004', 'a1000000-0000-0000-0000-000000000001', 'Trener 1 · Stavanger GK', 2026, 'Stavanger GK', '2026-04-17', '2026-09-06', 'active'),
+  ('b1010000-0000-0000-0000-000000000005', 'a1000000-0000-0000-0000-000000000001', 'Trener 1 · Fana GK', 2026, 'Fana GK', '2026-04-24', '2026-09-13', 'active'),
+  ('b1010000-0000-0000-0000-000000000006', 'a1000000-0000-0000-0000-000000000001', 'Trener 1 · Grenland og Omegn GK', 2026, 'Grenland og Omegn GK', '2026-04-10', '2026-09-13', 'active'),
+  ('b1010000-0000-0000-0000-000000000007', 'a1000000-0000-0000-0000-000000000001', 'Trener 1 · Romerike GK', 2026, 'Romerike GK', '2026-04-24', '2026-09-20', 'active'),
+  ('b1010000-0000-0000-0000-000000000008', 'a1000000-0000-0000-0000-000000000001', 'Trener 1 · Byneset GK', 2026, 'Byneset GK', '2026-05-22', '2026-09-27', 'active'),
+  ('b1010000-0000-0000-0000-000000000009', 'a1000000-0000-0000-0000-000000000001', 'Trener 1 · Sandane GK', 2026, 'Sandane GK', '2026-04-10', '2026-09-20', 'active'),
+  ('b1020000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000002', 'Trener 2 · 2026', 2026, 'Elverum', '2026-03-20', '2026-09-18', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000003', 'Trener 3 · 2026–2027', 2026, null, '2026-02-15', '2027-03-21', 'active');
+
+insert into public.course_sessions (
+  id,
+  course_run_id,
+  title,
+  starts_at,
+  ends_at,
+  location_text,
+  sort_order,
+  session_type,
+  is_required
+)
+values
+  ('f1010000-0000-0000-0001-000000000001', 'b1010000-0000-0000-0000-000000000001', 'Samling 1', '2026-05-22T09:00:00+02:00', '2026-05-24T16:00:00+02:00', 'Kristiansund og Omegn GK', 1, 'regular', true),
+  ('f1010000-0000-0000-0001-000000000002', 'b1010000-0000-0000-0000-000000000001', 'Ungdomsdriven', '2026-07-01T09:00:00+02:00', '2026-07-03T16:00:00+02:00', 'Hafjell GK', 2, 'youth_drive', false),
+  ('f1010000-0000-0000-0001-000000000003', 'b1010000-0000-0000-0000-000000000001', 'Samling 2', '2026-09-26T09:00:00+02:00', '2026-09-27T16:00:00+02:00', 'Kristiansund og Omegn GK', 3, 'regular', true),
+  ('f1010000-0000-0000-0002-000000000001', 'b1010000-0000-0000-0000-000000000002', 'Samling 1', '2026-05-29T09:00:00+02:00', '2026-05-31T16:00:00+02:00', 'Oslo GK', 1, 'regular', true),
+  ('f1010000-0000-0000-0002-000000000002', 'b1010000-0000-0000-0000-000000000002', 'Ungdomsdriven', '2026-07-01T09:00:00+02:00', '2026-07-03T16:00:00+02:00', 'Hafjell GK', 2, 'youth_drive', false),
+  ('f1010000-0000-0000-0002-000000000003', 'b1010000-0000-0000-0000-000000000002', 'Samling 2', '2026-09-19T09:00:00+02:00', '2026-09-20T16:00:00+02:00', 'Oslo GK', 3, 'regular', true),
+  ('f1010000-0000-0000-0003-000000000001', 'b1010000-0000-0000-0000-000000000003', 'Samling 1', '2026-04-10T09:00:00+02:00', '2026-04-12T16:00:00+02:00', 'Onsøy GK', 1, 'regular', true),
+  ('f1010000-0000-0000-0003-000000000002', 'b1010000-0000-0000-0000-000000000003', 'Ungdomsdriven', '2026-07-01T09:00:00+02:00', '2026-07-03T16:00:00+02:00', 'Hafjell GK', 2, 'youth_drive', false),
+  ('f1010000-0000-0000-0003-000000000003', 'b1010000-0000-0000-0000-000000000003', 'Samling 2', '2026-09-05T09:00:00+02:00', '2026-09-06T16:00:00+02:00', 'Onsøy GK', 3, 'regular', true),
+  ('f1010000-0000-0000-0004-000000000001', 'b1010000-0000-0000-0000-000000000004', 'Samling 1', '2026-04-17T09:00:00+02:00', '2026-04-19T16:00:00+02:00', 'Stavanger GK', 1, 'regular', true),
+  ('f1010000-0000-0000-0004-000000000002', 'b1010000-0000-0000-0000-000000000004', 'Ungdomsdriven', '2026-07-01T09:00:00+02:00', '2026-07-03T16:00:00+02:00', 'Hafjell GK', 2, 'youth_drive', false),
+  ('f1010000-0000-0000-0004-000000000003', 'b1010000-0000-0000-0000-000000000004', 'Samling 2', '2026-09-05T09:00:00+02:00', '2026-09-06T16:00:00+02:00', 'Stavanger GK', 3, 'regular', true),
+  ('f1010000-0000-0000-0005-000000000001', 'b1010000-0000-0000-0000-000000000005', 'Samling 1', '2026-04-24T09:00:00+02:00', '2026-04-26T16:00:00+02:00', 'Fana GK', 1, 'regular', true),
+  ('f1010000-0000-0000-0005-000000000002', 'b1010000-0000-0000-0000-000000000005', 'Ungdomsdriven', '2026-07-01T09:00:00+02:00', '2026-07-03T16:00:00+02:00', 'Hafjell GK', 2, 'youth_drive', false),
+  ('f1010000-0000-0000-0005-000000000003', 'b1010000-0000-0000-0000-000000000005', 'Samling 2', '2026-09-12T09:00:00+02:00', '2026-09-13T16:00:00+02:00', 'Fana GK', 3, 'regular', true),
+  ('f1010000-0000-0000-0006-000000000001', 'b1010000-0000-0000-0000-000000000006', 'Samling 1', '2026-04-10T09:00:00+02:00', '2026-04-12T16:00:00+02:00', 'Grenland og Omegn GK', 1, 'regular', true),
+  ('f1010000-0000-0000-0006-000000000002', 'b1010000-0000-0000-0000-000000000006', 'Ungdomsdriven', '2026-07-01T09:00:00+02:00', '2026-07-03T16:00:00+02:00', 'Hafjell GK', 2, 'youth_drive', false),
+  ('f1010000-0000-0000-0006-000000000003', 'b1010000-0000-0000-0000-000000000006', 'Samling 2', '2026-09-12T09:00:00+02:00', '2026-09-13T16:00:00+02:00', 'Grenland og Omegn GK', 3, 'regular', true),
+  ('f1010000-0000-0000-0007-000000000001', 'b1010000-0000-0000-0000-000000000007', 'Samling 1', '2026-04-24T09:00:00+02:00', '2026-04-26T16:00:00+02:00', 'Romerike GK', 1, 'regular', true),
+  ('f1010000-0000-0000-0007-000000000002', 'b1010000-0000-0000-0000-000000000007', 'Ungdomsdriven', '2026-07-01T09:00:00+02:00', '2026-07-03T16:00:00+02:00', 'Hafjell GK', 2, 'youth_drive', false),
+  ('f1010000-0000-0000-0007-000000000003', 'b1010000-0000-0000-0000-000000000007', 'Samling 2', '2026-09-19T09:00:00+02:00', '2026-09-20T16:00:00+02:00', 'Romerike GK', 3, 'regular', true),
+  ('f1010000-0000-0000-0008-000000000001', 'b1010000-0000-0000-0000-000000000008', 'Samling 1', '2026-05-22T09:00:00+02:00', '2026-05-24T16:00:00+02:00', 'Byneset GK', 1, 'regular', true),
+  ('f1010000-0000-0000-0008-000000000002', 'b1010000-0000-0000-0000-000000000008', 'Ungdomsdriven', '2026-07-01T09:00:00+02:00', '2026-07-03T16:00:00+02:00', 'Hafjell GK', 2, 'youth_drive', false),
+  ('f1010000-0000-0000-0008-000000000003', 'b1010000-0000-0000-0000-000000000008', 'Samling 2', '2026-09-26T09:00:00+02:00', '2026-09-27T16:00:00+02:00', 'Byneset GK', 3, 'regular', true),
+  ('f1010000-0000-0000-0009-000000000001', 'b1010000-0000-0000-0000-000000000009', 'Samling 1', '2026-04-10T09:00:00+02:00', '2026-04-12T16:00:00+02:00', 'Sandane GK', 1, 'regular', true),
+  ('f1010000-0000-0000-0009-000000000002', 'b1010000-0000-0000-0000-000000000009', 'Ungdomsdriven', '2026-07-01T09:00:00+02:00', '2026-07-03T16:00:00+02:00', 'Hafjell GK', 2, 'youth_drive', false),
+  ('f1010000-0000-0000-0009-000000000003', 'b1010000-0000-0000-0000-000000000009', 'Samling 2', '2026-09-19T09:00:00+02:00', '2026-09-20T16:00:00+02:00', 'Sandane GK', 3, 'regular', true),
+  ('f1020000-0000-0000-0000-000000000001', 'b1020000-0000-0000-0000-000000000001', 'Samling 1', '2026-03-20T13:00:00+01:00', '2026-03-20T18:00:00+01:00', 'Elverum / Terningen Arena', 1, 'regular', true),
+  ('f1020000-0000-0000-0000-000000000002', 'b1020000-0000-0000-0000-000000000001', 'Samling 2', '2026-05-01T09:00:00+02:00', '2026-05-03T16:00:00+02:00', 'Elverum Golfklubb', 2, 'regular', true),
+  ('f1020000-0000-0000-0000-000000000003', 'b1020000-0000-0000-0000-000000000001', 'Samling 3', '2026-09-18T09:00:00+02:00', '2026-09-18T16:00:00+02:00', 'Elverum Golfklubb', 3, 'regular', true),
+  ('f1030000-0000-0000-0000-000000000001', 'b1030000-0000-0000-0000-000000000001', 'Samling 1', '2026-02-15T09:00:00+01:00', '2026-02-15T16:00:00+01:00', 'I forlengelse av fellessamling 1', 1, 'regular', true),
+  ('f1030000-0000-0000-0000-000000000002', 'b1030000-0000-0000-0000-000000000001', 'Samling 2', '2026-03-13T09:00:00+01:00', '2026-03-15T16:00:00+01:00', null, 2, 'regular', true),
+  ('f1030000-0000-0000-0000-000000000003', 'b1030000-0000-0000-0000-000000000001', 'Samling 3', '2026-05-08T09:00:00+02:00', '2026-05-10T16:00:00+02:00', null, 3, 'regular', true),
+  ('f1030000-0000-0000-0000-000000000004', 'b1030000-0000-0000-0000-000000000001', 'Samling 4', '2026-09-20T09:00:00+02:00', '2026-09-20T16:00:00+02:00', 'I forlengelse av fellessamling 2', 4, 'regular', true),
+  ('f1030000-0000-0000-0000-000000000005', 'b1030000-0000-0000-0000-000000000001', 'Samling 5', '2027-02-07T09:00:00+01:00', '2027-02-07T16:00:00+01:00', 'I forbindelse med fellessamling 3', 5, 'regular', true),
+  ('f1030000-0000-0000-0000-000000000006', 'b1030000-0000-0000-0000-000000000001', 'Samling 6', '2027-03-19T09:00:00+01:00', '2027-03-21T16:00:00+01:00', null, 6, 'regular', true);
+
+insert into public.role_assignments (
+  profile_id,
+  role,
+  course_template_id,
+  course_run_id,
+  granted_by
+)
+values
+  ('c0000000-0000-0000-0000-000000000001', 'administrator', null, null, 'c0000000-0000-0000-0000-000000000001'),
+  ('c0000000-0000-0000-0000-000000000002', 'course_teacher', 'a1000000-0000-0000-0000-000000000001', null, 'c0000000-0000-0000-0000-000000000001'),
+  ('c0000000-0000-0000-0000-000000000003', 'course_lead', null, 'b1020000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000001'),
+  ('c0000000-0000-0000-0000-000000000004', 'course_lead', null, 'b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000001');
+
+insert into public.enrollments (course_run_id, profile_id, status)
+values
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000005', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000006', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000007', 'active'),
+  ('b1020000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000008', 'active'),
+  ('b1020000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000009', 'active'),
+  ('b1020000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000010', 'active'),
+  ('b1010000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000011', 'active'),
+  ('b1010000-0000-0000-0000-000000000002', 'c0000000-0000-0000-0000-000000000012', 'active'),
+  ('b1010000-0000-0000-0000-000000000003', 'c0000000-0000-0000-0000-000000000013', 'active'),
+  ('b1010000-0000-0000-0000-000000000004', 'c0000000-0000-0000-0000-000000000014', 'active'),
+  ('b1010000-0000-0000-0000-000000000005', 'c0000000-0000-0000-0000-000000000015', 'active');
+
+insert into public.role_assignments (
+  profile_id,
+  role,
+  course_run_id,
+  granted_by
+)
+select
+  enrollment.profile_id,
+  'student',
+  enrollment.course_run_id,
+  'c0000000-0000-0000-0000-000000000001'
+from public.enrollments as enrollment;

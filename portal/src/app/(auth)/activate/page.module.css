@@ -3,13 +3,7 @@
   min-height: 100vh;
   place-items: center;
   padding: clamp(1rem, 4vw, 3rem);
-  background:
-    radial-gradient(
-      circle at 82% 12%,
-      var(--nivaa-primary-soft),
-      transparent 28rem
-    ),
-    var(--nivaa-canvas);
+  background: var(--nivaa-canvas);
 }
 
 .card {

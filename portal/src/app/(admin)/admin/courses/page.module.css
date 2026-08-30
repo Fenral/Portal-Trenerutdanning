@@ -1,0 +1,232 @@
+.shell {
+  width: min(calc(100% - 2rem), var(--nivaa-content-max));
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 5rem) 0;
+}
+
+.hero {
+  display: grid;
+  align-items: end;
+  padding-bottom: var(--nivaa-space-section);
+  border-bottom: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-spacious);
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.hero h1 {
+  margin-bottom: var(--nivaa-space-default);
+}
+
+.hero p:not(.eyebrow) {
+  max-width: 47rem;
+  margin-bottom: 0;
+  color: var(--nivaa-text-muted);
+}
+
+.eyebrow,
+.kicker {
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-label);
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  margin-bottom: var(--nivaa-space-default);
+}
+
+.summary {
+  display: flex;
+  padding: var(--nivaa-space-comfortable) 0;
+  gap: var(--nivaa-space-spacious);
+}
+
+.summary span {
+  color: var(--nivaa-text-muted);
+}
+
+.summary strong {
+  margin-right: var(--nivaa-space-tight);
+  color: var(--nivaa-on-surface);
+  font-size: 1.5rem;
+}
+
+.t1Details,
+.courseGroup {
+  overflow: hidden;
+  margin-bottom: var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+}
+
+.t1Details summary {
+  display: flex;
+  min-height: 5.5rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--nivaa-space-comfortable);
+  gap: var(--nivaa-space-default);
+  cursor: pointer;
+  list-style: none;
+}
+
+.t1Details summary::-webkit-details-marker {
+  display: none;
+}
+
+.t1Details summary strong,
+.t1Details summary span {
+  display: block;
+}
+
+.t1Details[open] summary {
+  border-bottom: 1px solid var(--nivaa-border);
+}
+
+.summaryHint {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.t1Grid {
+  display: grid;
+  padding: var(--nivaa-space-comfortable);
+  gap: var(--nivaa-space-default);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.locationCard {
+  min-width: 0;
+  padding: var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-canvas);
+}
+
+.locationCard > div,
+.groupHeading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--nivaa-space-default);
+}
+
+.locationCard h2 {
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+
+.locationCard > div > span {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+  white-space: nowrap;
+}
+
+.courseGroup {
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.groupHeading {
+  padding-bottom: var(--nivaa-space-comfortable);
+  border-bottom: 1px solid var(--nivaa-border);
+}
+
+.groupHeading h2 {
+  margin-bottom: 0;
+}
+
+.kicker {
+  margin-bottom: var(--nivaa-space-tight);
+}
+
+.groupMeta {
+  display: grid;
+  justify-items: end;
+}
+
+.groupMeta strong {
+  font-size: 1.125rem;
+}
+
+.groupMeta span {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.sessions {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: 0;
+  list-style: none;
+}
+
+.sessions li {
+  display: grid;
+  padding: var(--nivaa-space-default) 0;
+  border-bottom: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-micro) var(--nivaa-space-default);
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.sessions li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.sessions span {
+  font-weight: 650;
+}
+
+.sessions strong {
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sessions small {
+  color: var(--nivaa-text-muted);
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 48rem) {
+  .hero {
+    align-items: start;
+    grid-template-columns: 1fr;
+  }
+
+  .hero :global(.nivaa-button) {
+    justify-self: start;
+  }
+
+  .t1Grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 32rem) {
+  .summary {
+    display: grid;
+    gap: var(--nivaa-space-tight);
+  }
+
+  .groupHeading,
+  .locationCard > div {
+    display: grid;
+  }
+
+  .groupMeta {
+    justify-items: start;
+  }
+
+  .sessions li {
+    grid-template-columns: 1fr;
+  }
+
+  .sessions strong {
+    white-space: normal;
+  }
+}
