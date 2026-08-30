@@ -8,6 +8,14 @@ test("administrator sees collapsible T1 and the two-year T3 plan", async ({
   await expect(
     page.getByRole("heading", { name: "Kursgjennomføringer" }),
   ).toBeVisible();
+  await expect(page.getByText("TRENERLØFTET", { exact: true })).toBeVisible();
+  const primaryNavigation = page.getByRole("navigation", {
+    name: "Hovedmeny",
+  });
+  await expect(primaryNavigation).toBeVisible();
+  await expect(
+    primaryNavigation.getByRole("link", { name: "Kurs" }),
+  ).toHaveAttribute("aria-current", "page");
 
   const t1Group = page.getByTestId("t1-course-group");
   const osloCourse = t1Group.getByRole("heading", {
@@ -33,4 +41,25 @@ test("administrator sees collapsible T1 and the two-year T3 plan", async ({
     page.getByRole("heading", { name: "Ny kursgjennomføring" }),
   ).toBeVisible();
   await expect(page.getByLabel("Kursleder")).toBeVisible();
+});
+
+test("administrator navigation stays usable on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/test-login?as=admin");
+
+  const primaryNavigation = page.getByRole("navigation", {
+    name: "Hovedmeny",
+  });
+  await expect(primaryNavigation).toBeVisible();
+  await expect(
+    primaryNavigation.getByRole("link", { name: "Kurs" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Kursgjennomføringer" }),
+  ).toBeVisible();
+
+  const documentWidth = await page.evaluate(
+    () => document.documentElement.scrollWidth,
+  );
+  expect(documentWidth).toBeLessThanOrEqual(390);
 });
