@@ -570,7 +570,7 @@ git commit -m "feat: add core course and audit schema"
 **Files:**
 - Create: `portal/src/features/access/permissions.ts`
 - Create: `portal/src/features/access/authorize.ts`
-- Create: `portal/supabase/migrations/20260901100000_rls.sql`
+- Create: `portal/supabase/migrations/20260830200442_rls.sql`
 - Test: `portal/tests/unit/access/permissions.test.ts`
 - Test: `portal/supabase/tests/002_rls.test.sql`
 
@@ -633,30 +633,30 @@ export function can(role: Role, permission: Permission): boolean {
 ```
 
 Run: `pnpm vitest tests/unit/access/permissions.test.ts --run`  
-Expected: PASS, 2 tests.
+Expected: PASS, 3 tests, including the server authorization guard.
 
 - [ ] **Step 3: Implementer databasefunksjoner som speiler matrisen**
 
-Create `portal/supabase/migrations/20260901100000_rls.sql` with `security definer` helpers `current_profile_id()` (maps `auth.uid()` through `user_accounts`), `is_administrator()`, `has_course_role(course_run_id, roles[])` and `is_enrolled(course_run_id)`. Enable RLS on all core tables. Policies must enforce:
+Create `portal/supabase/migrations/20260830200442_rls.sql` with `security definer` helpers in the non-exposed `private` schema: `current_profile_id()` (maps `auth.uid()` through `user_accounts`), `has_global_role(role)`, `is_administrator()`, `has_course_role(course_run_id, roles[])` and `is_enrolled(course_run_id)`. Every helper must check `(select auth.uid())`, use `set search_path = ''`, qualify every relation, revoke default execution and grant only `USAGE`/`EXECUTE` to `authenticated`. RLS is already enabled on all core tables; grant only `SELECT` on the six tables used by the portal. Policies must enforce:
 
 ```sql
 create policy profiles_self_or_course_staff_select on public.profiles
 for select to authenticated using (
-  id = public.current_profile_id()
-  or public.is_administrator()
+  id = (select private.current_profile_id())
+  or (select private.is_administrator())
   or exists (
     select 1
     from public.enrollments e
     where e.profile_id = profiles.id
-      and public.has_course_role(e.course_run_id, array['course_teacher','course_lead']::public.portal_role[])
+      and private.has_course_role(e.course_run_id, array['course_teacher','course_lead']::public.portal_role[])
   )
 );
 
 create policy enrollments_self_or_staff_select on public.enrollments
 for select to authenticated using (
-  profile_id = public.current_profile_id()
-  or public.is_administrator()
-  or public.has_course_role(course_run_id, array['course_teacher','course_lead']::public.portal_role[])
+  profile_id = (select private.current_profile_id())
+  or (select private.is_administrator())
+  or private.has_course_role(course_run_id, array['course_teacher','course_lead']::public.portal_role[])
 );
 ```
 
@@ -672,8 +672,8 @@ In `002_rls.test.sql`, create two courses, one student per course, one teacher a
 - admin sees both;
 - authenticated cannot update/delete `audit_events`.
 
-Run: `pnpm supabase db reset && pnpm test:rls`  
-Expected: PASS; changing teacher A policy to `true` makes the cross-course negative test fail.
+Run: `pnpm supabase db reset --local --no-seed && pnpm test:rls`
+Expected: PASS, 48 assertions; changing teacher A policy to `true` makes the cross-course negative test fail.
 
 - [ ] **Step 5: Commit**
 
