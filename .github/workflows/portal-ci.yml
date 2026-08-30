@@ -1,0 +1,40 @@
+name: portal-ci
+
+on:
+  pull_request:
+    paths:
+      - "portal/**"
+      - ".github/workflows/portal-ci.yml"
+  push:
+    branches: [main, master]
+    paths:
+      - "portal/**"
+      - ".github/workflows/portal-ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: portal
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: portal/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test:unit --run
+      - run: pnpm build
+      - run: pnpm audit --prod --audit-level high

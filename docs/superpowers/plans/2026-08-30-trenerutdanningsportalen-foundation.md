@@ -29,7 +29,7 @@
 - Create: `portal/vitest.config.ts`
 - Create: `portal/playwright.config.ts`
 - Create: `portal/src/app/page.tsx`
-- Create: `portal/tests/unit/smoke.test.ts`
+- Create: `portal/tests/unit/smoke.test.tsx`
 - Create: `.github/workflows/portal-ci.yml`
 
 - [ ] **Step 1: Opprett appen med låst package manager**
@@ -49,7 +49,7 @@ Expected: `portal/pnpm-lock.yaml` finnes og `pnpm install --frozen-lockfile` avs
 
 - [ ] **Step 2: Skriv en failing smoke-test før startsiden endres**
 
-Create `portal/tests/unit/smoke.test.ts`:
+Create `portal/tests/unit/smoke.test.tsx`:
 
 ```ts
 import { render, screen } from "@testing-library/react";
@@ -67,7 +67,7 @@ describe("portal shell", () => {
 });
 ```
 
-Run: `pnpm vitest tests/unit/smoke.test.ts --run`  
+Run: `pnpm vitest tests/unit/smoke.test.tsx --run`
 Expected: FAIL fordi standard Next.js-side ikke har de fire navnene.
 
 - [ ] **Step 3: Implementer minste startside som gjør testen grønn**
@@ -100,7 +100,7 @@ Add scripts to `portal/package.json`:
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test:unit": "vitest tests/unit",
     "test:integration": "vitest tests/integration",
     "test:rls": "supabase test db",
@@ -109,7 +109,7 @@ Add scripts to `portal/package.json`:
 }
 ```
 
-Run: `pnpm vitest tests/unit/smoke.test.ts --run`  
+Run: `pnpm vitest tests/unit/smoke.test.tsx --run`
 Expected: PASS, 1 test.
 
 - [ ] **Step 4: Legg inn CI som ikke kan omgå kvalitetsporten**
@@ -122,7 +122,7 @@ on:
   pull_request:
     paths: ["portal/**", ".github/workflows/portal-ci.yml"]
   push:
-    branches: [main]
+    branches: [main, master]
 jobs:
   verify:
     runs-on: ubuntu-latest
