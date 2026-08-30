@@ -690,12 +690,17 @@ git commit -m "feat: enforce scoped portal permissions"
 - Create: `portal/src/features/access/invitations/claim-invitation.ts`
 - Create: `portal/src/features/notifications/transport.ts`
 - Create: `portal/src/features/notifications/console-transport.ts`
+- Create: `portal/src/lib/supabase/admin.ts`
+- Create: `portal/src/lib/supabase/server.ts`
 - Create: `portal/src/app/(auth)/activate/page.tsx`
+- Create: `portal/src/app/(auth)/activate/actions.ts`
 - Create: `portal/src/app/(auth)/auth/callback/route.ts`
+- Create: `portal/supabase/migrations/*_invitation_flow.sql`
+- Test: `portal/supabase/tests/003_invitations.test.sql`
 - Test: `portal/tests/unit/access/invitations.test.ts`
 - Test: `portal/tests/e2e/invitation.spec.ts`
 
-- [ ] **Step 1: Skriv failing test for normalisering, utløp og e-postbinding**
+- [x] **Step 1: Skriv failing test for normalisering, utløp og e-postbinding**
 
 Create `portal/tests/unit/access/invitations.test.ts`:
 
@@ -720,7 +725,7 @@ describe("invitation claim", () => {
 Run: `pnpm vitest tests/unit/access/invitations.test.ts --run`  
 Expected: FAIL med manglende funksjon.
 
-- [ ] **Step 2: Implementer ren validering og tokenhåndtering**
+- [x] **Step 2: Implementer ren validering og tokenhåndtering**
 
 Create `claim-invitation.ts`:
 
@@ -740,14 +745,14 @@ export function validateInvitationClaim(invitation: Invitation, email: string, n
 }
 ```
 
-Create `create-invitation.ts` using `crypto.randomBytes(32).toString('base64url')`; store only `sha256(rawToken)`. In the same transaction enqueue `/activate?token=<rawToken>` as an `invitation.email` event in `outbox_events` with one unique invitation idempotency key. `NotificationTransport` is called only by a worker; test mode drains the event through `ConsoleNotificationTransport`. Never log raw token or email.
+Create `create-invitation.ts` using `crypto.randomBytes(32).toString('base64url')`; store only `sha256(rawToken)`. In the same transaction enqueue an `invitation.email` event whose payload contains only `invitationId`, with one unique invitation idempotency key. The raw token and exact email may only exist in request/worker memory while `NotificationTransport` sends the message. The recovery worker in Operations Task 3 must rotate the hash before a retry and invalidate the previous link. `ConsoleNotificationTransport` emits masked metadata only and must never log raw token, activation URL or exact email.
 
 Run: `pnpm vitest tests/unit/access/invitations.test.ts --run`  
 Expected: PASS, 2 tests.
 
-- [ ] **Step 3: Implementer aktiveringsreisen**
+- [x] **Step 3: Implementer aktiveringsreisen**
 
-`/activate` validates the hash server-side, displays only masked email, triggers Supabase email OTP for the exact invitation email and stores token in an HttpOnly, SameSite=Lax, Secure cookie for 20 minutes. Callback verifies authenticated email, claims invitation in one transaction, creates or reuses a stable profile, links the Supabase identity through `user_accounts`, creates enrollment/role assignment and writes `invitation.claimed` audit event.
+`/activate` validates the hash server-side, displays only masked email, triggers Supabase email OTP for the exact invitation email and stores token in an HttpOnly, SameSite=Lax cookie for 20 minutes (`Secure` is mandatory outside local HTTP development). Callback verifies the authenticated Supabase user and email inside the database transaction, claims the invitation with a row lock, creates or reuses a stable profile, links the Supabase identity through `user_accounts`, creates enrollment/role assignment and writes `invitation.claimed` audit event.
 
 Use this transaction signature in `claim-invitation.ts`:
 
@@ -763,14 +768,14 @@ export type ClaimInvitationCommand = Readonly<{
 
 Return only `{ status: "claimed", destination: string }` or a typed public error; database errors are logged by correlation ID without PII.
 
-- [ ] **Step 4: E2E-test privat og intern e-post samt produksjonsavslag**
+- [x] **Step 4: E2E-test privat og intern e-post samt produksjonsavslag**
 
 Test two invitations (`@gmail.com`, `@golfforbundet.no`), wrong-email rejection, reuse rejection and expired-link refresh. Add build-time test proving `ConsoleNotificationTransport` throws when `NODE_ENV=production`.
 
 Run: `pnpm playwright test tests/e2e/invitation.spec.ts`  
 Expected: PASS; exactly one profile and one enrollment per invitation.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add portal/src/features/access/invitations portal/src/features/notifications portal/src/app/\(auth\) portal/tests

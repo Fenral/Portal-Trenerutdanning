@@ -1,0 +1,59 @@
+.shell {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 3rem);
+  background:
+    radial-gradient(
+      circle at 82% 12%,
+      var(--nivaa-primary-soft),
+      transparent 28rem
+    ),
+    var(--nivaa-canvas);
+}
+
+.card {
+  width: min(100%, 40rem);
+  padding: clamp(1.5rem, 5vw, 3.5rem);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+}
+
+.eyebrow {
+  margin-bottom: var(--nivaa-space-default);
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-label);
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lead {
+  max-width: 34rem;
+  margin-bottom: var(--nivaa-space-spacious);
+  color: var(--nivaa-text-muted);
+  font-size: 1.0625rem;
+}
+
+.lead strong {
+  color: var(--nivaa-on-surface);
+}
+
+.actions {
+  display: flex;
+  margin-bottom: var(--nivaa-space-default);
+}
+
+.help {
+  margin-bottom: 0;
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+@media (max-width: 30rem) {
+  .actions :global(.nivaa-button) {
+    width: 100%;
+  }
+}

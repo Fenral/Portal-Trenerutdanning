@@ -24,7 +24,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <html className={manrope.variable} lang="nb">
+    <html className={manrope.variable} data-scroll-behavior="smooth" lang="nb">
       <body>
         <a className="nivaa-skip-link" href="#main-content">
           Hopp til hovedinnhold

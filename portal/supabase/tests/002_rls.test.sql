@@ -255,7 +255,15 @@ select results_eq(
   'student sees only own enrollment'
 );
 select results_eq(
-  $$select id from public.course_runs order by id$$,
+  $$
+    select id
+    from public.course_runs
+    where id in (
+      '40000000-0000-0000-0000-000000000001',
+      '40000000-0000-0000-0000-000000000002'
+    )
+    order by id
+  $$,
   $$values ('40000000-0000-0000-0000-000000000001'::uuid)$$,
   'active student sees only own course run'
 );
@@ -290,7 +298,15 @@ select results_eq(
   'course teacher sees participants in course A but not course B'
 );
 select results_eq(
-  $$select id from public.enrollments order by id$$,
+  $$
+    select id
+    from public.enrollments
+    where id in (
+      '60000000-0000-0000-0000-000000000001',
+      '60000000-0000-0000-0000-000000000002'
+    )
+    order by id
+  $$,
   $$values ('60000000-0000-0000-0000-000000000001'::uuid)$$,
   'course teacher sees enrollment in course A but not course B'
 );
@@ -322,7 +338,15 @@ select is_empty(
   'editor cannot read participant enrollments without a course role'
 );
 select results_eq(
-  $$select id from public.course_runs order by id$$,
+  $$
+    select id
+    from public.course_runs
+    where id in (
+      '40000000-0000-0000-0000-000000000001',
+      '40000000-0000-0000-0000-000000000002'
+    )
+    order by id
+  $$,
   $$
     values
       ('40000000-0000-0000-0000-000000000001'::uuid),
@@ -355,7 +379,15 @@ select results_eq(
   'administrator can read participants across courses'
 );
 select results_eq(
-  $$select id from public.enrollments order by id$$,
+  $$
+    select id
+    from public.enrollments
+    where id in (
+      '60000000-0000-0000-0000-000000000001',
+      '60000000-0000-0000-0000-000000000002'
+    )
+    order by id
+  $$,
   $$
     values
       ('60000000-0000-0000-0000-000000000001'::uuid),
