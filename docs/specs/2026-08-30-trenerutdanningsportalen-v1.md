@@ -22,13 +22,13 @@ V1 skal erstatte fragmentert oppfølging og dokumentinnlevering. Den skal ikke e
 
 ## 3. Aktører og rettigheter
 
-| Rolle | Omfang | Tillatelser i V1 |
-|---|---|---|
-| Student | Egne aktive kurs | Se pensum og presentasjoner, gjennomføre aktiviteter, quiz og prøve, føre praksis, levere/utbedre oppgaver, se egne frister, progresjon, oppmøte og diplom. Ser ikke progresjon fra tidligere år. |
-| Kurslærer | Eksplisitt tildelte kursgjennomføringer | Se kontaktdata og progresjon for deltakerne i kurset, vurdere oppgaver og praksis, føre oppmøte/fravær, gi ny individuell frist, sende påminnelse og se rapporter for kurset. |
-| Kursleder | Eksplisitt tildelte kursgjennomføringer | Alt kurslærer kan, samt tildele flere lærere, invitere deltakere, markere deltaker som trukket og gjenåpne tilgang. |
-| Redaktør | Tildelte innholdsområder | Opprette kladd, redigere, versjonere og publisere pensum og presentasjoner direkte. Kan ikke administrere deltakere uten separat rolle. |
-| Administrator | Hele portalen | Opprette kurs, gi roller, importere, se alle data, håndtere duplikater, overstyre fullføring, rapportere og bruke AI-søk. Flere personer kan være administrator. |
+| Rolle         | Omfang                                  | Tillatelser i V1                                                                                                                                                                                                        |
+| ------------- | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Student       | Egne aktive kurs                        | Se publisert pensum og publiserte filer/ressurser, gjennomføre aktiviteter, quiz og prøve, føre praksis, levere/utbedre oppgaver, se egne frister, progresjon, oppmøte og diplom. Ser ikke progresjon fra tidligere år. |
+| Kurslærer     | Eksplisitt tildelte kursgjennomføringer | Se kontaktdata og progresjon for deltakerne i kurset, vurdere oppgaver og praksis, føre oppmøte/fravær, gi ny individuell frist, sende påminnelse, se rapporter og laste opp kullressurser som kladd.                   |
+| Kursleder     | Eksplisitt tildelte kursgjennomføringer | Alt kurslærer kan, samt tildele flere lærere, invitere deltakere, markere deltaker som trukket, gjenåpne tilgang og publisere filer/ressurser til eget kull.                                                            |
+| Redaktør      | Tildelte innholdsområder                | Opprette kladd, redigere, versjonere og publisere masterpensum og masterressurser direkte. Kan ikke administrere deltakere uten separat rolle.                                                                          |
+| Administrator | Hele portalen                           | Opprette kurs, gi roller, importere, se alle data, håndtere duplikater, overstyre fullføring, rapportere og bruke AI-søk. Flere personer kan være administrator.                                                        |
 
 Rettigheter lagres som eksplisitte rolleoppdrag med omfang (`system`, `course_template` eller `course_run`). Rolle og omfang skal kontrolleres på server og i databasens radnivåsikkerhet; skjulte knapper er aldri sikkerhetsgrensen.
 
@@ -44,34 +44,34 @@ Rettigheter lagres som eksplisitte rolleoppdrag med omfang (`system`, `course_te
 
 Demodata skal bruke tabellene under og minst 15 tydelig fiktive studenter. Dette er demonstrasjonsdata; produksjonsdatoer opprettes og endres av administrator.
 
-| Trener 1-kurssted 2026 | Samling 1 | Samling 2 |
-|---|---|---|
-| Kristiansund og Omegn GK | 22.–24. mai | 26.–27. september |
-| Oslo GK | 29.–31. mai | 19.–20. september |
-| Onsøy GK | 10.–12. april | 5.–6. september |
-| Stavanger GK | 17.–19. april | 5.–6. september |
-| Fana GK | 24.–26. april | 12.–13. september |
-| Grenland og Omegn GK | 10.–12. april | 12.–13. september |
-| Romerike GK | 24.–26. april | 19.–20. september |
-| Byneset GK | 22.–24. mai | 26.–27. september |
-| Sandane GK | 10.–12. april | 19.–20. september |
+| Trener 1-kurssted 2026   | Samling 1     | Samling 2         |
+| ------------------------ | ------------- | ----------------- |
+| Kristiansund og Omegn GK | 22.–24. mai   | 26.–27. september |
+| Oslo GK                  | 29.–31. mai   | 19.–20. september |
+| Onsøy GK                 | 10.–12. april | 5.–6. september   |
+| Stavanger GK             | 17.–19. april | 5.–6. september   |
+| Fana GK                  | 24.–26. april | 12.–13. september |
+| Grenland og Omegn GK     | 10.–12. april | 12.–13. september |
+| Romerike GK              | 24.–26. april | 19.–20. september |
+| Byneset GK               | 22.–24. mai   | 26.–27. september |
+| Sandane GK               | 10.–12. april | 19.–20. september |
 
 Ungdomsdriven er en ekstra samling 1.–3. juli for påmeldte 15–19-åringer og tilhører ikke ett ordinært kurssted.
 
-| Trener 2-demodato 2026 | Detalj |
-|---|---|
-| 20. mars kl. 13–18 | Elverum/Terningen Arena |
-| 1.–3. mai | Elverum Golfklubb |
-| 18. september | Elverum Golfklubb |
+| Trener 2-demodato 2026 | Detalj                  |
+| ---------------------- | ----------------------- |
+| 20. mars kl. 13–18     | Elverum/Terningen Arena |
+| 1.–3. mai              | Elverum Golfklubb       |
+| 18. september          | Elverum Golfklubb       |
 
-| Trener 3-demodato | Detalj |
-|---|---|
-| 15. februar 2026 | Forlengelse av fellessamling 1 |
-| 13.–15. mars 2026 | Golf, idrettsspesifikk |
-| 8.–10. mai 2026 | Golf, idrettsspesifikk |
-| 20. september 2026 | Forlengelse av fellessamling 2 |
-| 7. februar 2027 | I forbindelse med fellessamling 3 |
-| 19.–21. mars 2027 | Golf, idrettsspesifikk |
+| Trener 3-demodato  | Detalj                            |
+| ------------------ | --------------------------------- |
+| 15. februar 2026   | Forlengelse av fellessamling 1    |
+| 13.–15. mars 2026  | Golf, idrettsspesifikk            |
+| 8.–10. mai 2026    | Golf, idrettsspesifikk            |
+| 20. september 2026 | Forlengelse av fellessamling 2    |
+| 7. februar 2027    | I forbindelse med fellessamling 3 |
+| 19.–21. mars 2027  | Golf, idrettsspesifikk            |
 
 ## 5. Studentopplevelse
 
@@ -90,18 +90,22 @@ Studenten skal alltid kunne svare på hva som skal gjøres, hvor det gjøres og 
 ### 6.1 Innholdstyper
 
 - Kort nettside med strukturert riktekst, bilde, fil og eksterne lenker.
+- Interaktiv scrollmodul bygget av de samme godkjente innholdsblokkene og en stegvis sekvens. Mobil viser samme innhold i stabil, stablet form; desktop kan bruke scrollstyrte overganger.
 - Video fra godkjent URL eller opplastet fil. Engelskspråklige Trackman-videoer kan være obligatoriske når de forklarer fagbegreper.
-- Undervisningspresentasjon som egen, versjonert ressurs. Presentasjonen kan publiseres til lærere og valgfritt deles med studenter.
+- Undervisningspresentasjon eller annen filressurs som opplastet PDF, PowerPoint, Excel eller godkjent dokumenttype. PDF kan forhåndsvises; alle godkjente filtyper kan lastes ned. Publikum velges per ressurs som `kun lærere` eller `lærere og studenter`.
 - Quiz eller kontrollspørsmål i eller etter en modul.
 - Innleveringsoppgave, kunnskapsprøve, praksiskrav, oppmøtekrav og manuell kontroll som egne aktivitetstyper.
 
-Pensum og undervisningspresentasjon er separate publiseringsenheter. En pensumside trenger ikke ha en presentasjon. V1 støtter PowerPoint som kildefil/ressurs; interaktiv scrollytelling, 3D-modell og avansert animasjon planlegges som V1.1 etter at pilotmodulen «Ballfluktslover og balltreff» er validert.
+Pensum og undervisningspresentasjon er separate publiseringsenheter. En pensumside trenger ikke ha en presentasjon, og én modul kan ha mange filer. V1 bygger ikke en full presentasjonseditor: presentasjoner produseres normalt eksternt og lastes opp. Ressurser vises under relevant modul og samles automatisk i «Filer og ressurser». Interaktive scrollmoduler er med i V1 gjennom et begrenset, gjenbrukbart blokkbibliotek; 3D-modell og fri presentasjons-/animasjonsflate er senere muligheter.
 
 ### 6.2 Versjonering
 
 - Hver ressurs har én redigerbar kladd og null eller én aktiv publisert versjon.
 - Publisering lager et uforanderlig øyeblikksbilde med forfatter, tidspunkt og endringsnotat.
-- Pågående studenter fortsetter på versjonen som er bundet til kursgjennomføringen, med mindre administrator eksplisitt oppgraderer kullet.
+- Kursgjennomføringen låses til eksplisitte innholds- og filversjoner når læringsløpet publiseres til kullet.
+- Pågående studenter fortsetter på bundet versjon, med mindre administrator eksplisitt oppgraderer kullet etter forhåndsvisning. En allerede registrert fullføring beholdes alltid ved versjonsoppdatering.
+- Felles masterinnhold kan ha nivåspesifikke tillegg. Tidligere fullført masterdel godskrives; studenten gjennomfører bare nivåtillegget.
+- En ny mediefil oppretter en ny versjon. Eksisterende publisering beholder gammel fil til redaktør eller kursleder eksplisitt publiserer/binder den nye.
 - Tilbakeføring lager en ny publisert versjon basert på en eldre; historikk slettes ikke.
 
 ## 7. Læringsregler
@@ -245,13 +249,13 @@ Minst disse intensjonene skal støttes: individuell progresjon, kullsnitt, antal
 
 Planen stopper ved porten dersom beviset mangler; utvikleren skal ikke gjette.
 
-| Port | Seneste dato | Bevis | Eier |
-|---|---|---|---|
-| G1 Checkin-format | 4. september 2026 | Redigert originaleksport med alle faktiske kolonneoverskrifter og eksempel på privat betaling, klubbfaktura og Ungdomsdriven. | NGF |
-| G2 Infrastruktur/personvern | 11. september 2026 | Godkjent EU-hosting, e-postleverandør, databehandleravtaler og behandlingsgrunnlag for mindreårige. | NGF + personvernansvarlig |
-| G3 Diplom | 18. september 2026 | Diplommal, tillatt font, signaturregler og plassering av navn/kurs/dato. | NGF |
-| G4 Innholdsinventar | 18. september 2026 | Liste over V1-moduler, eiere, eksisterende filer, obligatorisk/valgfritt og avhengigheter. | Fagansvarlig |
-| G5 Produksjonsdrift | 30. oktober 2026 | Navngitt produkteier, supportansvarlig, hendelsesrutine og godkjent backup-/gjenopprettingsmål. | NGF |
+| Port                        | Seneste dato       | Bevis                                                                                                                         | Eier                      |
+| --------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| G1 Checkin-format           | 4. september 2026  | Redigert originaleksport med alle faktiske kolonneoverskrifter og eksempel på privat betaling, klubbfaktura og Ungdomsdriven. | NGF                       |
+| G2 Infrastruktur/personvern | 11. september 2026 | Godkjent EU-hosting, e-postleverandør, databehandleravtaler og behandlingsgrunnlag for mindreårige.                           | NGF + personvernansvarlig |
+| G3 Diplom                   | 18. september 2026 | Diplommal, tillatt font, signaturregler og plassering av navn/kurs/dato.                                                      | NGF                       |
+| G4 Innholdsinventar         | 18. september 2026 | Liste over V1-moduler, eiere, eksisterende filer, obligatorisk/valgfritt og avhengigheter.                                    | Fagansvarlig              |
+| G5 Produksjonsdrift         | 30. oktober 2026   | Navngitt produkteier, supportansvarlig, hendelsesrutine og godkjent backup-/gjenopprettingsmål.                               | NGF                       |
 
 ## 18. Utenfor V1
 
@@ -259,7 +263,7 @@ Planen stopper ved porten dersom beviset mangler; utvikleren skal ikke gjette.
 - Egen betaling, faktura, refusjon eller påmeldingsmotor.
 - Checkin API/webhooks; Excel-import er V1-baseline.
 - Engelsk grensesnitt og full innholdsoversettelse.
-- 3D-visning av golfkølle, avansert scrollytelling og adaptiv læring.
+- 3D-visning av golfkølle, fri presentasjonseditor, direkte Claude-API i portalen og adaptiv læring.
 - Fri AI-analyse, prediksjon av frafall eller vurdering av studentprestasjon.
 - Kursrom før eksplisitt go/no-go.
 

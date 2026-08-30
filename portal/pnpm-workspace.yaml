@@ -1,3 +1,12 @@
+allowBuilds:
+  esbuild: true
+  msw: true
+  unrs-resolver: false
+
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+
+overrides:
+  "@asamuzakjp/css-color>@csstools/css-color-parser": 4.2.1
+  "@typescript-eslint/eslint-plugin>ignore": 7.0.6

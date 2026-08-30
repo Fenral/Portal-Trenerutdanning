@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Gjøre det mulig å redigere og publisere versjonert pensum/presentasjoner, gjennomføre et modulbasert læringsløp og dokumentere quiz, innlevering, praksis, oppmøte, fullføring og diplom.
+**Goal:** Gjøre det mulig å redigere og publisere versjonert pensum, korte sider og scrollmoduler, laste opp og publisere eksterne filressurser, gjennomføre et modulbasert læringsløp og dokumentere quiz, innlevering, praksis, oppmøte, fullføring og diplom.
 
-**Architecture:** Innhold lagres som versjonerte, strukturerte dokumenter; kursgjennomføringen bindes eksplisitt til publiserte versjoner. Læringshendelser lagres separat fra innhold slik at en publisering aldri omskriver studenthistorikk. Progresjon og sluttgodkjenning beregnes av rene domenefunksjoner og materialiseres transaksjonelt for raske oversikter.
+**Architecture:** Ferdig pensum lagres som versjonerte, strukturerte dokumenter med et begrenset blokkbibliotek. Presentasjoner og andre dokumenter lagres som separate, versjonerte filressurser; V1 bygger ikke en intern presentasjonseditor. Kursgjennomføringen bindes eksplisitt til publiserte innholds- og filversjoner. Læringshendelser lagres separat slik at publisering aldri omskriver studenthistorikk eller fjerner en allerede oppnådd fullføring. Progresjon og sluttgodkjenning beregnes av rene domenefunksjoner og materialiseres transaksjonelt for raske oversikter.
 
 **Tech Stack:** Next.js server components/actions, PostgreSQL/Supabase Storage, TipTap JSON, Zod, Vitest, Playwright, React-PDF og Nivå Klassisk Premium.
 
@@ -12,16 +12,17 @@
 
 ## Filansvar
 
-- `portal/src/features/content/`: innholdsitem, revisjon, publisering, presentasjon og filressurs.
+- `portal/src/features/content/`: innholdsitem, kort/scroll-dokument, revisjon, publisering og filressurs.
 - `portal/src/features/learning/`: modul/aktivitet, avhengighet, tilgang, progresjon og anbefalt neste aktivitet.
 - `portal/src/features/assessment/`: quiz, forsøk, innlevering, vurdering og fristoverstyring.
 - `portal/src/features/practice/`: praksisføringer, 45/9-timersregler, innsendings- og godkjenningsstatus.
 - `portal/src/features/attendance/`: enkelttimer, 80-prosentkrav og universitetskontroll.
 - `portal/src/features/completion/`: sluttregler, diplomjobb og feiring.
 
-### Task 1: Opprett versjonert innholdsmodell
+### Task 1: Opprett versjonert innholds- og filmodell
 
 **Files:**
+
 - Create: `portal/supabase/migrations/20260915090000_content.sql`
 - Create: `portal/src/features/content/types.ts`
 - Create: `portal/src/features/content/document-schema.ts`
@@ -30,7 +31,7 @@
 - Test: `portal/tests/unit/files/scan-upload.test.ts`
 - Test: `portal/supabase/tests/010_content_versions.test.sql`
 
-- [ ] **Step 1: Skriv failing test for støttede blokker og bokmål**
+- [x] **Step 1: Skriv failing test for korte sider, scrollsekvenser, filmetadata og bokmål**
 
 Create `portal/tests/unit/content/document-schema.test.ts`:
 
@@ -42,17 +43,59 @@ describe("ContentDocument", () => {
   it("accepts structured Bokmål content and a permitted Trackman embed", () => {
     const result = ContentDocument.parse({
       locale: "nb-NO",
+      format: "short_page",
       blocks: [
         { type: "heading", level: 2, text: "Ballfluktslover" },
-        { type: "paragraph", text: "Ballens startretning påvirkes først og fremst av køllebladet." },
-        { type: "video", provider: "trackman", url: "https://ondemand.trackmangolf.com/example", required: true },
+        {
+          type: "paragraph",
+          text: "Ballens startretning påvirkes først og fremst av køllebladet.",
+        },
+        {
+          type: "video",
+          provider: "trackman",
+          url: "https://ondemand.trackmangolf.com/example",
+          required: true,
+        },
       ],
     });
     expect(result.blocks).toHaveLength(3);
   });
 
+  it("accepts a reusable scroll sequence with a stable mobile fallback", () => {
+    const result = ContentDocument.parse({
+      locale: "nb-NO",
+      format: "scroll_story",
+      blocks: [
+        {
+          type: "interactive_sequence",
+          desktopMode: "scroll",
+          mobileMode: "stacked",
+          steps: [
+            {
+              id: "startretning",
+              title: "Startretning",
+              text: "Køllebladet påvirker startretningen.",
+            },
+            {
+              id: "kurve",
+              title: "Kurve",
+              text: "Forholdet mellom blad og svingbane påvirker kurven.",
+            },
+          ],
+        },
+      ],
+    });
+    expect(result.format).toBe("scroll_story");
+  });
+
   it("rejects arbitrary script and unsupported locale", () => {
-    expect(() => ContentDocument.parse({ locale: "en-US", blocks: [{ type: "html", value: "<script>alert(1)</script>" }] })).toThrow();
+    expect(() =>
+      ContentDocument.parse({
+        locale: "en-US",
+        format: "short_page",
+        blocks: [{ type: "html", value: "<script>alert(1)</script>" }],
+      }),
+    ).toThrow();
   });
 });
 ```
@@ -60,39 +103,96 @@ describe("ContentDocument", () => {
 Run: `pnpm vitest tests/unit/content/document-schema.test.ts --run`  
 Expected: FAIL med manglende schema.
 
-- [ ] **Step 2: Implementer en eksplisitt blokk-union**
+- [x] **Step 2: Implementer en eksplisitt blokk-union**
 
 Create `portal/src/features/content/document-schema.ts`:
 
 ```ts
 import { z } from "zod";
 
-const Heading = z.object({ type: z.literal("heading"), level: z.union([z.literal(2), z.literal(3)]), text: z.string().min(1).max(180) });
-const Paragraph = z.object({ type: z.literal("paragraph"), text: z.string().min(1).max(10_000) });
-const Image = z.object({ type: z.literal("image"), assetId: z.string().uuid(), alt: z.string().min(1).max(240), caption: z.string().max(500).optional() });
-const File = z.object({ type: z.literal("file"), assetId: z.string().uuid(), label: z.string().min(1).max(120) });
-const ExternalLink = z.object({ type: z.literal("external_link"), url: z.string().url(), label: z.string().min(1).max(120) });
-const Video = z.object({ type: z.literal("video"), provider: z.enum(["youtube", "trackman", "uploaded"]), url: z.string().url(), required: z.boolean() });
-const Callout = z.object({ type: z.literal("callout"), tone: z.enum(["info", "practice", "warning"]), title: z.string().min(1).max(120), text: z.string().min(1).max(2_000) });
+const Heading = z.object({
+  type: z.literal("heading"),
+  level: z.union([z.literal(2), z.literal(3)]),
+  text: z.string().min(1).max(180),
+});
+const Paragraph = z.object({
+  type: z.literal("paragraph"),
+  text: z.string().min(1).max(10_000),
+});
+const Image = z.object({
+  type: z.literal("image"),
+  assetId: z.string().uuid(),
+  alt: z.string().min(1).max(240),
+  caption: z.string().max(500).optional(),
+});
+const File = z.object({
+  type: z.literal("file"),
+  assetId: z.string().uuid(),
+  label: z.string().min(1).max(120),
+});
+const ExternalLink = z.object({
+  type: z.literal("external_link"),
+  url: z.string().url(),
+  label: z.string().min(1).max(120),
+});
+const Video = z.object({
+  type: z.literal("video"),
+  provider: z.enum(["youtube", "trackman", "uploaded"]),
+  url: z.string().url(),
+  required: z.boolean(),
+});
+const Callout = z.object({
+  type: z.literal("callout"),
+  tone: z.enum(["info", "practice", "warning"]),
+  title: z.string().min(1).max(120),
+  text: z.string().min(1).max(2_000),
+});
+const InteractiveSequence = z.object({
+  type: z.literal("interactive_sequence"),
+  desktopMode: z.enum(["scroll", "next_previous"]),
+  mobileMode: z.literal("stacked"),
+  steps: z
+    .array(
+      z.object({
+        id: z.string().regex(/^[a-z0-9-]+$/),
+        title: z.string().min(1).max(120),
+        text: z.string().min(1).max(2_000),
+        assetId: z.string().uuid().optional(),
+      }),
+    )
+    .min(2)
+    .max(30),
+});
 
-export const ContentBlock = z.discriminatedUnion("type", [Heading, Paragraph, Image, File, ExternalLink, Video, Callout]);
+export const ContentBlock = z.discriminatedUnion("type", [
+  Heading,
+  Paragraph,
+  Image,
+  File,
+  ExternalLink,
+  Video,
+  Callout,
+  InteractiveSequence,
+]);
 export const ContentDocument = z.object({
   locale: z.literal("nb-NO"),
+  format: z.enum(["short_page", "scroll_story"]),
   blocks: z.array(ContentBlock).min(1).max(200),
 });
 export type ContentDocument = z.infer<typeof ContentDocument>;
 ```
 
 Run: `pnpm vitest tests/unit/content/document-schema.test.ts --run`  
-Expected: PASS, 2 tests.
+Expected: PASS, 3 tester.
 
-- [ ] **Step 3: Opprett innhold, revisjoner, assets og kursbindinger**
+- [x] **Step 3: Opprett innhold, revisjoner, assets og kursbindinger**
 
 Migration must define the following tables. Implement `scan-upload.ts` as a fail-closed adapter to the Gate G2-approved EU ClamAV endpoint: `clean` permits promotion from private quarantine, `infected`, timeout, malformed response and unavailable scanner reject promotion and emit only correlation/error code. Unit tests mock all five outcomes. Media uploads must pass magic-byte/MIME validation and this scanner before a `media_assets` row becomes available to content:
 
 ```sql
-create type public.content_kind as enum ('lesson','presentation','quiz','assignment','practice_requirement','attendance_requirement','knowledge_test');
+create type public.content_kind as enum ('lesson','quiz','assignment','practice_requirement','attendance_requirement','knowledge_test');
 create type public.revision_status as enum ('draft','published','superseded');
+create type public.resource_audience as enum ('teachers','course_members');
 
 create table public.content_items (
   id uuid primary key default gen_random_uuid(),
@@ -132,6 +232,31 @@ create table public.media_assets (
   created_at timestamptz not null default now()
 );
 
+create table public.resource_items (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  description text,
+  audience public.resource_audience not null,
+  content_item_id uuid references public.content_items(id),
+  course_run_id uuid references public.course_runs(id),
+  created_by uuid not null references public.profiles(id),
+  created_at timestamptz not null default now()
+);
+
+create table public.resource_revisions (
+  id uuid primary key default gen_random_uuid(),
+  resource_item_id uuid not null references public.resource_items(id),
+  revision_number integer not null check (revision_number > 0),
+  status public.revision_status not null,
+  media_asset_id uuid not null references public.media_assets(id),
+  change_note text not null,
+  created_by uuid not null references public.profiles(id),
+  created_at timestamptz not null default now(),
+  published_by uuid references public.profiles(id),
+  published_at timestamptz,
+  unique(resource_item_id, revision_number)
+);
+
 create table public.course_content_bindings (
   course_run_id uuid not null references public.course_runs(id),
   content_item_id uuid not null references public.content_items(id),
@@ -140,31 +265,41 @@ create table public.course_content_bindings (
   bound_by uuid not null references public.profiles(id),
   primary key(course_run_id, content_item_id)
 );
+
+create table public.course_resource_bindings (
+  course_run_id uuid not null references public.course_runs(id),
+  resource_item_id uuid not null references public.resource_items(id),
+  resource_revision_id uuid not null references public.resource_revisions(id),
+  bound_at timestamptz not null default now(),
+  bound_by uuid not null references public.profiles(id),
+  primary key(course_run_id, resource_item_id)
+);
 ```
 
-Add a trigger that rejects UPDATE/DELETE when `old.status in ('published','superseded')`; only status transition `published → superseded` through the publishing function is allowed.
+Add partial unique indexes for one draft and one published revision per content/resource item. Add a trigger that rejects UPDATE/DELETE when `old.status in ('published','superseded')`; only status transition `published → superseded` through the publishing function is allowed. Course bindings always reference the explicitly published revision. A later rebind never changes historical activity completions.
 
-- [ ] **Step 4: Test uforanderlighet og én publisert versjon**
+- [x] **Step 4: Test uforanderlighet og én publisert versjon**
 
-pgTAP must prove direct update of a published document fails, second draft fails, publish transaction supersedes old version and course binding remains on the explicitly selected revision.
+pgTAP must prove direct update of a published document or resource fails, second draft fails, publish transaction supersedes old version, course bindings remain on explicitly selected revisions and a rebind cannot delete or rewrite an existing completion.
 
 Run: `pnpm supabase db reset && pnpm test:rls`  
 Expected: PASS; attempting `update content_revisions set document='{}' where status='published'` raises `published_revision_is_immutable`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add portal/supabase portal/src/features/content portal/tests/unit/content
 git commit -m "feat: add immutable versioned content model"
 ```
 
-### Task 2: Implementer kladd, publisering og separat presentasjon
+### Task 2: Implementer kladd, publisering og separate filressurser
 
 **Files:**
+
 - Create: `portal/src/features/content/publish-content.ts`
 - Create: `portal/src/features/content/update-draft.ts`
 - Create: `portal/src/app/(editor)/editor/content/[itemId]/page.tsx`
-- Create: `portal/src/app/(editor)/editor/content/[itemId]/PresentationPanel.tsx`
+- Create: `portal/src/app/(editor)/editor/content/[itemId]/ResourcePanel.tsx`
 - Test: `portal/tests/unit/content/publish-content.test.ts`
 - Test: `portal/tests/e2e/editor-publish.spec.ts`
 
@@ -176,7 +311,13 @@ import { planPublication } from "@/features/content/publish-content";
 
 describe("planPublication", () => {
   it("requires an explicit change note and creates a new immutable revision", () => {
-    expect(planPublication({ currentRevision: 2, changeNote: "Oppdatert illustrasjon", hasDraft: true })).toEqual({
+    expect(
+      planPublication({
+        currentRevision: 2,
+        changeNote: "Oppdatert illustrasjon",
+        hasDraft: true,
+      }),
+    ).toEqual({
       nextRevision: 3,
       supersedeRevision: 2,
       changeNote: "Oppdatert illustrasjon",
@@ -184,7 +325,13 @@ describe("planPublication", () => {
   });
 
   it("rejects publish without a draft", () => {
-    expect(() => planPublication({ currentRevision: 2, changeNote: "Ingen endring", hasDraft: false })).toThrow("Ingen kladd å publisere");
+    expect(() =>
+      planPublication({
+        currentRevision: 2,
+        changeNote: "Ingen endring",
+        hasDraft: false,
+      }),
+    ).toThrow("Ingen kladd å publisere");
   });
 });
 ```
@@ -195,7 +342,11 @@ Expected: FAIL.
 - [ ] **Step 2: Implementer ren publiseringsplan og databasefunksjon**
 
 ```ts
-export function planPublication(input: { currentRevision: number | null; changeNote: string; hasDraft: boolean }) {
+export function planPublication(input: {
+  currentRevision: number | null;
+  changeNote: string;
+  hasDraft: boolean;
+}) {
   if (!input.hasDraft) throw new Error("Ingen kladd å publisere");
   const changeNote = input.changeNote.trim();
   if (changeNote.length < 3) throw new Error("Endringsnotat er påkrevd");
@@ -211,11 +362,11 @@ Database function `publish_content(item_id, actor_id, change_note)` locks all re
 
 - [ ] **Step 3: Bygg redaktørflaten uten autosave til publisert**
 
-Run `pnpm add @tiptap/react @tiptap/starter-kit` and commit the updated lockfile. Editor page has persistent status `Kladd`, `Publisert vN` and `Sist endret`. Save updates only draft. Publish opens confirmation with change note and affected active course runs. PresentationPanel can link zero or one `presentation` item and has its own draft/published status plus `Del med studenter` setting.
+Run `pnpm add @tiptap/react @tiptap/starter-kit` and commit the updated lockfile. Editor page has persistent status `Kladd`, `Publisert vN` and `Sist endret`. Save updates only draft. Publish opens confirmation with change note and affected active course runs. `ResourcePanel` can link zero, one or many file resources. Each resource has independent draft/published status, audience (`kun lærere` eller `lærere og studenter`), preview/download metadata and version history. Course teachers may upload a draft for their course; course lead publishes to that course; only editor/admin publishes master resources.
 
 - [ ] **Step 4: E2E-test at student ikke ser kladd**
 
-Test edits title from `Ballfluktslover` to `Ballens startretning`, saves draft, verifies student still sees old title, publishes with note, upgrades the demo course binding and verifies student sees new title. Also verify lesson publishes without presentation and presentation can be shared separately.
+Test edits title from `Ballfluktslover` to `Ballens startretning`, saves draft, verifies student still sees old title, publishes with note, upgrades the demo course binding and verifies student sees new title without losing an existing completion. Also verify a lesson publishes without files, many resources can be attached, a teacher-only resource stays hidden from students, PDF is previewable/downloadable and PowerPoint/Excel are downloadable.
 
 Run: `pnpm playwright test tests/e2e/editor-publish.spec.ts`  
 Expected: PASS; version history shows both revisions.
@@ -230,6 +381,7 @@ git commit -m "feat: add draft and publish workflow"
 ### Task 3: Opprett læringsstruktur, avhengigheter og progresjonsmotor
 
 **Files:**
+
 - Create: `portal/supabase/migrations/20260922090000_learning.sql`
 - Create: `portal/src/features/learning/progress.ts`
 - Create: `portal/src/features/learning/access.ts`
@@ -250,11 +402,19 @@ describe("calculateProgress", () => {
       { id: "b", required: true, weight: 2 },
       { id: "c", required: false, weight: 10 },
     ];
-    expect(calculateProgress(activities, new Set(["a", "c"]))).toEqual({ completedWeight: 1, totalWeight: 3, percentage: 33 });
+    expect(calculateProgress(activities, new Set(["a", "c"]))).toEqual({
+      completedWeight: 1,
+      totalWeight: 3,
+      percentage: 33,
+    });
   });
 
   it("returns zero for an empty unpublished path", () => {
-    expect(calculateProgress([], new Set())).toEqual({ completedWeight: 0, totalWeight: 0, percentage: 0 });
+    expect(calculateProgress([], new Set())).toEqual({
+      completedWeight: 0,
+      totalWeight: 0,
+      percentage: 0,
+    });
   });
 });
 ```
@@ -265,13 +425,26 @@ Expected: FAIL.
 - [ ] **Step 2: Implementer ren, deterministisk progresjon**
 
 ```ts
-export type ProgressActivity = Readonly<{ id: string; required: boolean; weight: number }>;
+export type ProgressActivity = Readonly<{
+  id: string;
+  required: boolean;
+  weight: number;
+}>;
 
-export function calculateProgress(activities: readonly ProgressActivity[], completed: ReadonlySet<string>) {
+export function calculateProgress(
+  activities: readonly ProgressActivity[],
+  completed: ReadonlySet<string>,
+) {
   const required = activities.filter((activity) => activity.required);
-  const totalWeight = required.reduce((sum, activity) => sum + activity.weight, 0);
-  const completedWeight = required.filter((activity) => completed.has(activity.id)).reduce((sum, activity) => sum + activity.weight, 0);
-  const percentage = totalWeight === 0 ? 0 : Math.round((completedWeight / totalWeight) * 100);
+  const totalWeight = required.reduce(
+    (sum, activity) => sum + activity.weight,
+    0,
+  );
+  const completedWeight = required
+    .filter((activity) => completed.has(activity.id))
+    .reduce((sum, activity) => sum + activity.weight, 0);
+  const percentage =
+    totalWeight === 0 ? 0 : Math.round((completedWeight / totalWeight) * 100);
   return { completedWeight, totalWeight, percentage };
 }
 ```
@@ -290,7 +463,10 @@ Migration adds `learning_paths`, `modules`, `activities`, `activity_prerequisite
 ```ts
 type ActivityAccess =
   | { state: "open" }
-  | { state: "locked"; missing: readonly { activityId: string; title: string }[] };
+  | {
+      state: "locked";
+      missing: readonly { activityId: string; title: string }[];
+    };
 ```
 
 Tests must cover `steg 1 før steg 2`, all required lessons before knowledge test, optional activity not blocking and circular dependency rejected at publish time.
@@ -308,6 +484,7 @@ git commit -m "feat: add learning path and progress engine"
 ### Task 4: Implementer læringsspiller og fullføringsmodus
 
 **Files:**
+
 - Create: `portal/src/app/(student)/student/courses/[courseRunId]/page.tsx`
 - Create: `portal/src/app/(student)/student/courses/[courseRunId]/activities/[activityId]/page.tsx`
 - Create: `portal/src/features/learning/complete-activity.ts`
@@ -319,12 +496,20 @@ git commit -m "feat: add learning path and progress engine"
 ```ts
 import { test, expect } from "@playwright/test";
 
-test("student sees one next action and a reason for locked knowledge test", async ({ page }) => {
+test("student sees one next action and a reason for locked knowledge test", async ({
+  page,
+}) => {
   await page.goto("/test-login?as=student-nora");
-  await expect(page.getByRole("heading", { name: "Fortsett der du slapp" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Planlegging av treningsøkt" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Fortsett der du slapp" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Planlegging av treningsøkt" }),
+  ).toBeVisible();
   await page.getByRole("link", { name: "Kunnskapsprøve" }).click();
-  await expect(page.getByText("Fullfør Ballfluktslover og Balltreff først")).toBeVisible();
+  await expect(
+    page.getByText("Fullfør Ballfluktslover og Balltreff først"),
+  ).toBeVisible();
 });
 ```
 
@@ -356,6 +541,7 @@ git commit -m "feat: add accessible student learning player"
 ### Task 5: Implementer quiz og kunnskapsprøve
 
 **Files:**
+
 - Create: `portal/supabase/migrations/20261001090000_quiz.sql`
 - Create: `portal/src/features/assessment/quiz/grade-attempt.ts`
 - Create: `portal/src/features/assessment/quiz/attempt-policy.ts`
@@ -372,12 +558,20 @@ import { gradeAttempt, nextAttemptAt } from "@/features/assessment/quiz";
 
 describe("quiz", () => {
   it("grades against immutable question versions", () => {
-    expect(gradeAttempt([{ questionId: "q1", correctOptionId: "b", points: 1 }], [{ questionId: "q1", optionId: "b" }], 100)).toEqual({ earned: 1, possible: 1, percent: 100, passed: true });
+    expect(
+      gradeAttempt(
+        [{ questionId: "q1", correctOptionId: "b", points: 1 }],
+        [{ questionId: "q1", optionId: "b" }],
+        100,
+      ),
+    ).toEqual({ earned: 1, possible: 1, percent: 100, passed: true });
   });
 
   it("applies delay only after a failed attempt when configured", () => {
     const now = new Date("2026-10-01T10:00:00Z");
-    expect(nextAttemptAt({ passed: false, delayHours: 24 }, now)?.toISOString()).toBe("2026-10-02T10:00:00.000Z");
+    expect(
+      nextAttemptAt({ passed: false, delayHours: 24 }, now)?.toISOString(),
+    ).toBe("2026-10-02T10:00:00.000Z");
     expect(nextAttemptAt({ passed: false, delayHours: 0 }, now)).toBeNull();
   });
 });
@@ -413,6 +607,7 @@ git commit -m "feat: add auto-graded quizzes and retry policy"
 ### Task 6: Implementer innlevering, vurderingsskala og ny frist
 
 **Files:**
+
 - Create: `portal/supabase/migrations/20261005090000_assignments.sql`
 - Create: `portal/src/features/assessment/assignments/state-machine.ts`
 - Create: `portal/src/features/assessment/assignments/submit.ts`
@@ -428,12 +623,18 @@ import { transitionSubmission } from "@/features/assessment/assignments/state-ma
 
 describe("assignment state", () => {
   it("allows revision and resubmission without overwriting history", () => {
-    expect(transitionSubmission("submitted", "request_revision")).toBe("revision_required");
-    expect(transitionSubmission("revision_required", "resubmit")).toBe("submitted");
+    expect(transitionSubmission("submitted", "request_revision")).toBe(
+      "revision_required",
+    );
+    expect(transitionSubmission("revision_required", "resubmit")).toBe(
+      "submitted",
+    );
   });
 
   it("does not let a student approve their own work", () => {
-    expect(() => transitionSubmission("submitted", "student_approve")).toThrow("Ugyldig overgang");
+    expect(() => transitionSubmission("submitted", "student_approve")).toThrow(
+      "Ugyldig overgang",
+    );
   });
 });
 ```
@@ -448,7 +649,11 @@ Allowed transitions: `draft→submitted`, `submitted→approved|revision_require
 ```ts
 type AssessmentResult =
   | { scale: "pass_fail"; value: "approved" | "not_approved"; comment: string }
-  | { scale: "letter"; value: "A" | "B" | "C" | "D" | "E" | "F"; comment: string };
+  | {
+      scale: "letter";
+      value: "A" | "B" | "C" | "D" | "E" | "F";
+      comment: string;
+    };
 ```
 
 - [ ] **Step 3: Opprett submissions, versions, reviews og deadline overrides**
@@ -472,6 +677,7 @@ git commit -m "feat: add versioned assignment assessment"
 ### Task 7: Implementer elektronisk praksis og godkjenningsflyt
 
 **Files:**
+
 - Create: `portal/supabase/migrations/20261009090000_practice.sql`
 - Create: `portal/src/features/practice/totals.ts`
 - Create: `portal/src/features/practice/state-machine.ts`
@@ -484,17 +690,33 @@ git commit -m "feat: add versioned assignment assessment"
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { calculatePracticeTotals, canSubmitPractice } from "@/features/practice/totals";
+import {
+  calculatePracticeTotals,
+  canSubmitPractice,
+} from "@/features/practice/totals";
 
 describe("practice totals", () => {
   it("allows submission at 45 total hours with at most 9 planning hours", () => {
-    const totals = calculatePracticeTotals([{ minutes: 2160, category: "delivery" }, { minutes: 540, category: "planning" }]);
-    expect(totals).toEqual({ totalMinutes: 2700, planningMinutes: 540, deliveryMinutes: 2160 });
+    const totals = calculatePracticeTotals([
+      { minutes: 2160, category: "delivery" },
+      { minutes: 540, category: "planning" },
+    ]);
+    expect(totals).toEqual({
+      totalMinutes: 2700,
+      planningMinutes: 540,
+      deliveryMinutes: 2160,
+    });
     expect(canSubmitPractice(totals)).toEqual({ ok: true });
   });
 
   it("rejects 45 hours when planning exceeds 9 hours", () => {
-    expect(canSubmitPractice({ totalMinutes: 2700, planningMinutes: 600, deliveryMinutes: 2100 })).toEqual({ ok: false, reason: "planning_limit" });
+    expect(
+      canSubmitPractice({
+        totalMinutes: 2700,
+        planningMinutes: 600,
+        deliveryMinutes: 2100,
+      }),
+    ).toEqual({ ok: false, reason: "planning_limit" });
   });
 });
 ```
@@ -527,6 +749,7 @@ git commit -m "feat: add electronic practice workflow"
 ### Task 8: Implementer oppmøte, sluttregler og diplom
 
 **Files:**
+
 - Create: `portal/supabase/migrations/20261013090000_completion.sql`
 - Create: `portal/src/features/attendance/percentage.ts`
 - Create: `portal/src/features/completion/evaluate-completion.ts`
@@ -543,12 +766,42 @@ import { evaluateCompletion } from "@/features/completion/evaluate-completion";
 
 describe("course completion", () => {
   it("requires 100 percent, 80 percent attendance, practice and university for T3", () => {
-    expect(evaluateCompletion({ level: 3, progress: 100, attendance: 79.9, practiceApproved: true, universityCompleted: true })).toEqual({ complete: false, missing: ["attendance"] });
-    expect(evaluateCompletion({ level: 3, progress: 100, attendance: 80, practiceApproved: true, universityCompleted: true })).toEqual({ complete: true, missing: [] });
+    expect(
+      evaluateCompletion({
+        level: 3,
+        progress: 100,
+        attendance: 79.9,
+        practiceApproved: true,
+        universityCompleted: true,
+      }),
+    ).toEqual({ complete: false, missing: ["attendance"] });
+    expect(
+      evaluateCompletion({
+        level: 3,
+        progress: 100,
+        attendance: 80,
+        practiceApproved: true,
+        universityCompleted: true,
+      }),
+    ).toEqual({ complete: true, missing: [] });
   });
 
   it("does not block T1 completion on absent Youth Drive", () => {
-    expect(evaluateCompletion({ level: 1, progress: 100, attendance: 80, practiceApproved: true, universityCompleted: null, youthDriveSelected: true, youthDriveAttended: false })).toEqual({ complete: true, missing: [], adminTasks: ["invoice_youth_drive_difference"] });
+    expect(
+      evaluateCompletion({
+        level: 1,
+        progress: 100,
+        attendance: 80,
+        practiceApproved: true,
+        universityCompleted: null,
+        youthDriveSelected: true,
+        youthDriveAttended: false,
+      }),
+    ).toEqual({
+      complete: true,
+      missing: [],
+      adminTasks: ["invoice_youth_drive_difference"],
+    });
   });
 });
 ```
@@ -583,6 +836,7 @@ git commit -m "feat: complete courses and issue diplomas"
 ### Task 9: Kjør vertikal Learning/CMS-gate
 
 **Files:**
+
 - Create: `portal/tests/e2e/vertical-learning-slice.spec.ts`
 - Create: `portal/docs/evidence/learning-cms-gate.md`
 
