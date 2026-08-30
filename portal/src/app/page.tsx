@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main>
+    <main id="main-content">
       <h1>Trenerutdanning</h1>
       <nav aria-label="Demo-roller">
         <Link href="/student">Student</Link>

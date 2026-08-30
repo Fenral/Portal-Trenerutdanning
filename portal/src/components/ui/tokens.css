@@ -1,0 +1,66 @@
+:root {
+  color-scheme: light;
+
+  --nivaa-canvas: #f7f9f8;
+  --nivaa-surface: #ffffff;
+  --nivaa-surface-subtle: #f1f4f2;
+  --nivaa-on-surface: #10221b;
+  --nivaa-text-muted: #5f6b65;
+  --nivaa-primary: #39724e;
+  --nivaa-on-primary: #ffffff;
+  --nivaa-primary-hover: #2f6242;
+  --nivaa-primary-active: #285438;
+  --nivaa-primary-soft: #e6ece8;
+  --nivaa-on-primary-soft: #214c34;
+  --nivaa-border: #e1e7e3;
+  --nivaa-border-strong: #c6d0ca;
+  --nivaa-focus: #315bce;
+  --nivaa-disabled: #e8ece9;
+  --nivaa-on-disabled: #7a847f;
+  --nivaa-success: #2f6b49;
+  --nivaa-success-soft: #e5f1e9;
+  --nivaa-warning: #8a5a13;
+  --nivaa-warning-soft: #f8efd9;
+  --nivaa-error: #a43e35;
+  --nivaa-error-soft: #f7e8e5;
+  --nivaa-info: #2f6973;
+  --nivaa-info-soft: #e3eff1;
+  --nivaa-ai: #405cf5;
+  --nivaa-on-ai: #ffffff;
+  --nivaa-ai-soft: #e9ecff;
+  --nivaa-on-ai-soft: #2f43bd;
+
+  --nivaa-font-ui:
+    var(--font-manrope), "Avenir Next", "Segoe UI", Helvetica, Arial, sans-serif;
+  --nivaa-font-size-display: 3rem;
+  --nivaa-font-size-h1: 2.25rem;
+  --nivaa-font-size-h2: 1.75rem;
+  --nivaa-font-size-h3: 1.125rem;
+  --nivaa-font-size-body-lg: 1.125rem;
+  --nivaa-font-size-body: 1rem;
+  --nivaa-font-size-body-sm: 0.875rem;
+  --nivaa-font-size-label: 0.8125rem;
+  --nivaa-font-size-caption: 0.75rem;
+
+  --nivaa-space-micro: 0.25rem;
+  --nivaa-space-tight: 0.5rem;
+  --nivaa-space-compact: 0.75rem;
+  --nivaa-space-default: 1rem;
+  --nivaa-space-comfortable: 1.5rem;
+  --nivaa-space-spacious: 2rem;
+  --nivaa-space-section: 3rem;
+  --nivaa-space-page: 4rem;
+  --nivaa-space-hero: 6rem;
+
+  --nivaa-radius-control: 0.5rem;
+  --nivaa-radius-field: 0.625rem;
+  --nivaa-radius-inner: 0.75rem;
+  --nivaa-radius-surface: 1rem;
+  --nivaa-radius-pill: 999px;
+
+  --nivaa-shadow-card: 0 8px 24px rgba(16, 34, 27, 0.05);
+  --nivaa-shadow-menu: 0 16px 40px rgba(16, 34, 27, 0.08);
+  --nivaa-content-max: 80rem;
+  --nivaa-sidebar-width: 15rem;
+  --nivaa-transition-fast: 140ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}

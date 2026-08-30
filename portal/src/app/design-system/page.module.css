@@ -1,0 +1,107 @@
+.page {
+  min-height: 100vh;
+  padding: clamp(1.5rem, 6vw, 4rem);
+}
+
+.shell {
+  width: min(100%, 68rem);
+  margin-inline: auto;
+}
+
+.backLink {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  margin-block-end: var(--nivaa-space-spacious);
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 700;
+  text-underline-offset: 0.25rem;
+}
+
+.intro {
+  max-width: 49rem;
+  margin-block-end: clamp(2.5rem, 7vw, 5rem);
+}
+
+.intro h1 {
+  max-width: 14ch;
+  margin-block-end: var(--nivaa-space-comfortable);
+}
+
+.intro p {
+  max-width: 65ch;
+  margin-block-end: 0;
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-lg);
+  line-height: 1.6;
+}
+
+.board {
+  overflow: hidden;
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+}
+
+.specimen {
+  display: grid;
+  padding: clamp(1.5rem, 5vw, 3rem);
+  gap: var(--nivaa-space-spacious);
+  grid-template-columns: minmax(11rem, 0.7fr) minmax(0, 1.3fr);
+}
+
+.specimen + .specimen {
+  border-top: 1px solid var(--nivaa-border);
+}
+
+.copy h2 {
+  margin-block-end: var(--nivaa-space-compact);
+}
+
+.copy p {
+  max-width: 35ch;
+  margin-block-end: 0;
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.example {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  align-self: center;
+  gap: var(--nivaa-space-compact);
+}
+
+.wrap {
+  flex-wrap: wrap;
+}
+
+.progressStack {
+  display: grid;
+  width: 100%;
+  gap: var(--nivaa-space-comfortable);
+}
+
+@media (max-width: 43rem) {
+  .page {
+    padding-inline: var(--nivaa-space-default);
+  }
+
+  .intro {
+    margin-block-end: var(--nivaa-space-section);
+  }
+
+  .specimen {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .example {
+    align-self: auto;
+  }
+
+  .example :global(.nivaa-button) {
+    width: 100%;
+  }
+}
