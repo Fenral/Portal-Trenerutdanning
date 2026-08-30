@@ -329,7 +329,7 @@ git commit -m "feat: codify Nivaa design system"
 
 **Files:**
 - Create: `portal/supabase/config.toml`
-- Create: `portal/supabase/migrations/20260901090000_core.sql`
+- Create: `portal/supabase/migrations/20260830190811_core.sql`
 - Create: `portal/src/features/audit/types.ts`
 - Test: `portal/supabase/tests/001_core_schema.test.sql`
 
@@ -339,7 +339,7 @@ Create `portal/supabase/tests/001_core_schema.test.sql`:
 
 ```sql
 begin;
-select plan(10);
+select plan(12);
 select has_table('public', 'profiles');
 select has_table('public', 'user_accounts');
 select has_table('public', 'role_assignments');
@@ -350,21 +350,31 @@ select has_table('public', 'enrollments');
 select has_table('public', 'invitations');
 select has_table('public', 'audit_events');
 select has_table('public', 'outbox_events');
+select ok(
+  case when to_regclass('public.audit_events') is null then false
+  else not has_table_privilege('authenticated', 'public.audit_events', 'UPDATE') end,
+  'authenticated cannot update audit_events'
+);
+select ok(
+  case when to_regclass('public.audit_events') is null then false
+  else not has_table_privilege('authenticated', 'public.audit_events', 'DELETE') end,
+  'authenticated cannot delete audit_events'
+);
 select * from finish();
 rollback;
 ```
 
 Run: `pnpm supabase start && pnpm test:rls`  
-Expected: FAIL, alle ti tabeller mangler.
+Expected: FAIL, alle 12 kontrakter mangler.
 
 - [ ] **Step 2: Implementer enums, tabeller og constraints**
 
-Create `portal/supabase/migrations/20260901090000_core.sql` with:
+Create `portal/supabase/migrations/20260830190811_core.sql` with:
 
 ```sql
 create extension if not exists pgcrypto;
 create type public.portal_role as enum ('student','course_teacher','course_lead','editor','administrator');
-create type public.enrollment_status as enum ('invited','active','withdrawn','reopened','completed');
+create type public.enrollment_status as enum ('invited','active','withdrawn','completed');
 
 create table public.profiles (
   id uuid primary key default gen_random_uuid(),
@@ -372,7 +382,7 @@ create table public.profiles (
   normalized_email text not null,
   phone text,
   club_name text,
-  birth_year smallint check (birth_year between 1900 and extract(year from now())::int),
+  birth_year smallint check (birth_year between 1900 and 2100),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -470,7 +480,11 @@ create table public.audit_events (
   after_data jsonb
 );
 
-revoke update, delete on public.audit_events from authenticated;
+-- Reopening is an audit action that returns the enrollment to `active`;
+-- it is not a durable enrollment status.
+
+-- Enable RLS and revoke anon/authenticated before any policies are added.
+-- The audit table also has a trigger that rejects UPDATE and DELETE for every role.
 
 create table public.outbox_events (
   id uuid primary key default gen_random_uuid(),
@@ -535,12 +549,12 @@ export type AuditEvent = Readonly<{
 }>;
 ```
 
-Run: `pnpm supabase db reset && pnpm test:rls`  
-Expected: PASS, 10 tests.
+Run: `pnpm supabase db reset --local --no-seed && pnpm test:rls`
+Expected: PASS, 12 tests.
 
-- [ ] **Step 4: Bevis at audit-loggen ikke kan endres av authenticated**
+- [ ] **Step 4: Kjør målrettet databasekontroll**
 
-Add two pgTAP assertions that `authenticated` lacks UPDATE and DELETE on `audit_events`. Run `pnpm test:rls`; expected PASS, 10 tests.
+Run `pnpm supabase db lint --local --schema public,private --level warning --fail-on error` and `pnpm supabase db advisors --local --type all --level warn --fail-on error`; expected no issues.
 
 - [ ] **Step 5: Commit**
 
