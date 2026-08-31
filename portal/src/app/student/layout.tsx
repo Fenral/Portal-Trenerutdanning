@@ -19,6 +19,7 @@ export default async function StudentLayout({
 
   return (
     <StudentShell
+      courseRunId={identity.courseRunId}
       courseTitle={identity.courseTitle}
       userName={identity.displayName}
     >

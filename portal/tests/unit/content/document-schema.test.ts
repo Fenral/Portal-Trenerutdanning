@@ -80,4 +80,38 @@ describe("ContentDocument", () => {
       }),
     ).toThrow();
   });
+
+  it("requires uploaded video to reference a protected media asset", () => {
+    const result = ContentDocument.parse({
+      locale: "nb-NO",
+      format: "short_page",
+      blocks: [
+        {
+          type: "video",
+          provider: "uploaded",
+          assetId: "a2300000-0000-0000-0000-000000000001",
+          required: true,
+        },
+      ],
+    });
+
+    expect(result.blocks[0]).toMatchObject({
+      provider: "uploaded",
+      assetId: "a2300000-0000-0000-0000-000000000001",
+    });
+    expect(() =>
+      ContentDocument.parse({
+        locale: "nb-NO",
+        format: "short_page",
+        blocks: [
+          {
+            type: "video",
+            provider: "uploaded",
+            url: "https://example.com/unprotected-video.mp4",
+            required: true,
+          },
+        ],
+      }),
+    ).toThrow();
+  });
 });

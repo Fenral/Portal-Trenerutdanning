@@ -493,7 +493,7 @@ git commit -m "feat: add learning path and progress engine"
 - Create: `portal/src/features/learning/ContentRenderer.tsx`
 - Test: `portal/tests/e2e/student-learning.spec.ts`
 
-- [ ] **Step 1: Skriv failing E2E for én tydelig neste handling**
+- [x] **Step 1: Skriv failing E2E for én tydelig neste handling**
 
 ```ts
 import { test, expect } from "@playwright/test";
@@ -518,22 +518,22 @@ test("student sees one next action and a reason for locked knowledge test", asyn
 Run: `pnpm playwright test tests/e2e/student-learning.spec.ts`  
 Expected: FAIL fordi rutene mangler.
 
-- [ ] **Step 2: Render bare allowlistede blokker**
+- [x] **Step 2: Render bare allowlistede blokker**
 
 `ContentRenderer` switches exhaustively on `ContentBlock.type`; external links receive `rel="noopener noreferrer"`; uploaded media uses signed, short-lived URL; video iframe uses provider-specific allowlist and descriptive title. No raw HTML block exists.
 
-- [ ] **Step 3: Implementer fullføringsmodus**
+- [x] **Step 3: Implementer fullføringsmodus**
 
 Activities support `manual`, `reach_end`, `quiz_pass`, `submission_approved`, `practice_approved`, `attendance_met`. Short pages may require explicit «Marker som fullført» or `reach_end`; scrollsider lar studenten gå videre. Video completion records explicit continuation, not surveillance-based anti-cheat. `completeActivity` rechecks prerequisites and active enrollment server-side before insert.
 
-- [ ] **Step 4: Gjør studentreisen responsiv og UU-testet**
+- [x] **Step 4: Gjør studentreisen responsiv og UU-testet**
 
 Follow `DESIGN.md`: next action first, total percentage, modules as `x av y`, no circular progress. Test at navigation, video alternative, focus order and locked explanation work at 390 px and 1280 px. Run axe.
 
 Run: `pnpm playwright test tests/e2e/student-learning.spec.ts`  
 Expected: PASS and 0 serious/critical axe findings.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add portal/src/app/\(student\) portal/src/features/learning portal/tests/e2e/student-learning.spec.ts

@@ -16,6 +16,11 @@ describe("synthetic test login", () => {
       email: "admin.demo@nivaa.invalid",
       destination: "/admin/courses",
     });
+    expect(resolveTestLogin(true, () => "student-emil")).toEqual({
+      status: "allowed",
+      email: "emil.berg@nivaa.invalid",
+      destination: "/student",
+    });
     expect(resolveTestLogin(true, () => "unknown")).toEqual({
       status: "invalid",
     });

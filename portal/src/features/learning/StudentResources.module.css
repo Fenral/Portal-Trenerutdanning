@@ -1,0 +1,103 @@
+.resources {
+  position: sticky;
+  top: 6rem;
+  padding: var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+}
+
+.eyebrow {
+  margin-bottom: var(--nivaa-space-tight);
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.resources h2 {
+  margin-bottom: var(--nivaa-space-comfortable);
+}
+
+.resources ul {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: var(--nivaa-space-default);
+  list-style: none;
+}
+
+.resources li {
+  display: grid;
+  padding-bottom: var(--nivaa-space-default);
+  border-bottom: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-compact);
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+}
+
+.fileCopy {
+  display: grid;
+  min-width: 0;
+}
+
+.fileCopy strong,
+.fileCopy span,
+.fileCopy small {
+  overflow-wrap: anywhere;
+}
+
+.fileCopy span,
+.fileCopy small {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-caption);
+}
+
+.fileIcon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border-radius: var(--nivaa-radius-control);
+  background: var(--nivaa-primary-soft);
+  color: var(--nivaa-on-primary-soft);
+  font-size: var(--nivaa-font-size-label);
+  font-weight: 800;
+}
+
+.fileActions {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  grid-column: 2;
+  gap: var(--nivaa-space-comfortable);
+}
+
+.fileActions a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 700;
+  text-underline-offset: 0.2rem;
+}
+
+.noResources,
+.accessNote {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.accessNote {
+  margin: var(--nivaa-space-comfortable) 0 0;
+  padding-top: var(--nivaa-space-default);
+  border-top: 1px solid var(--nivaa-border);
+}
+
+@media (max-width: 64rem) {
+  .resources {
+    position: static;
+  }
+}

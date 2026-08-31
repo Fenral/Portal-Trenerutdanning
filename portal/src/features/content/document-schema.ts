@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+const DatabaseId = z
+  .string()
+  .trim()
+  .regex(/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i);
+
 const Heading = z.object({
   type: z.literal("heading"),
   level: z.union([z.literal(2), z.literal(3)]),
@@ -13,14 +18,14 @@ const Paragraph = z.object({
 
 const Image = z.object({
   type: z.literal("image"),
-  assetId: z.string().uuid(),
+  assetId: DatabaseId,
   alt: z.string().trim().min(1).max(240),
   caption: z.string().trim().max(500).optional(),
 });
 
 const File = z.object({
   type: z.literal("file"),
-  assetId: z.string().uuid(),
+  assetId: DatabaseId,
   label: z.string().trim().min(1).max(120),
 });
 
@@ -49,11 +54,36 @@ const Video = z
   .object({
     type: z.literal("video"),
     provider: z.enum(["youtube", "trackman", "uploaded"]),
-    url: z.string().url(),
+    url: z.string().url().optional(),
+    assetId: DatabaseId.optional(),
     required: z.boolean(),
   })
   .superRefine((value, context) => {
     if (value.provider === "uploaded") {
+      if (!value.assetId) {
+        context.addIssue({
+          code: "custom",
+          message: "Opplastet video må peke på en mediefil",
+          path: ["assetId"],
+        });
+      }
+
+      if (value.url) {
+        context.addIssue({
+          code: "custom",
+          message: "Opplastet video kan ikke bruke ekstern URL",
+          path: ["url"],
+        });
+      }
+      return;
+    }
+
+    if (!value.url) {
+      context.addIssue({
+        code: "custom",
+        message: "Ekstern video må ha en URL",
+        path: ["url"],
+      });
       return;
     }
 
@@ -63,6 +93,14 @@ const Video = z
         code: "custom",
         message: "Videoleverandør og vertsnavn samsvarer ikke",
         path: ["url"],
+      });
+    }
+
+    if (value.assetId) {
+      context.addIssue({
+        code: "custom",
+        message: "Ekstern video kan ikke peke på en opplastet mediefil",
+        path: ["assetId"],
       });
     }
   });
@@ -85,7 +123,7 @@ const InteractiveSequence = z
           id: z.string().regex(/^[a-z0-9-]+$/),
           title: z.string().trim().min(1).max(120),
           text: z.string().trim().min(1).max(2_000),
-          assetId: z.string().uuid().optional(),
+          assetId: DatabaseId.optional(),
         }),
       )
       .min(2)

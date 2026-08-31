@@ -54,6 +54,7 @@ type MediaAssetRow = Readonly<{
 export type StudentIdentityView = Readonly<{
   displayName: string;
   courseTitle: string;
+  courseRunId: string | null;
 }>;
 
 export type StudentContentCard = Readonly<{
@@ -130,6 +131,7 @@ export async function loadStudentIdentity(
   return {
     displayName: profileResult.data?.display_name ?? "Student",
     courseTitle: coursesResult.data?.[0]?.title ?? "Aktivt kurs",
+    courseRunId: coursesResult.data?.[0]?.id ?? null,
   };
 }
 
@@ -211,13 +213,20 @@ export async function loadStudentContentCatalog(
 export async function loadStudentContent(
   client: SupabaseClient,
   itemId: string,
+  courseRunId?: string,
 ): Promise<StudentContentView | null> {
-  const { data: bindingData, error: bindingError } = await client
+  let bindingQuery = client
     .from("course_content_bindings")
     .select("course_run_id,content_item_id,content_revision_id")
     .eq("content_item_id", itemId)
-    .limit(1)
-    .maybeSingle();
+    .limit(1);
+
+  if (courseRunId) {
+    bindingQuery = bindingQuery.eq("course_run_id", courseRunId);
+  }
+
+  const { data: bindingData, error: bindingError } =
+    await bindingQuery.maybeSingle();
   assertNoQueryError(bindingError);
 
   if (!bindingData) return null;

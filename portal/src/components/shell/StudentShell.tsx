@@ -14,14 +14,6 @@ type NavigationItem = Readonly<{
   href?: string;
 }>;
 
-const navigation: readonly NavigationItem[] = [
-  { label: "Hjem", icon: "home", href: "/student" },
-  { label: "Læringsløp", icon: "learning", href: "/student/content" },
-  { label: "Praksis", icon: "practice" },
-  { label: "Innleveringer", icon: "submissions" },
-  { label: "Hjelp", icon: "help" },
-];
-
 function Icon({ name }: { name: IconName }) {
   if (name === "learning") {
     return (
@@ -78,14 +70,29 @@ function initialsFor(name: string): string {
 
 export function StudentShell({
   children,
+  courseRunId,
   courseTitle,
   userName,
 }: Readonly<{
   children: ReactNode;
+  courseRunId: string | null;
   courseTitle: string;
   userName: string;
 }>) {
   const pathname = usePathname();
+  const navigation: readonly NavigationItem[] = [
+    { label: "Hjem", icon: "home", href: "/student" },
+    {
+      label: "Læringsløp",
+      icon: "learning",
+      href: courseRunId
+        ? `/student/courses/${courseRunId}`
+        : "/student/content",
+    },
+    { label: "Praksis", icon: "practice" },
+    { label: "Innleveringer", icon: "submissions" },
+    { label: "Hjelp", icon: "help" },
+  ];
 
   return (
     <div className={styles.frame}>
@@ -103,7 +110,10 @@ export function StudentShell({
               const isCurrent =
                 item.href === "/student"
                   ? pathname === item.href
-                  : Boolean(item.href && pathname.startsWith(item.href));
+                  : item.label === "Læringsløp"
+                    ? pathname.startsWith("/student/courses") ||
+                      pathname.startsWith("/student/content")
+                    : Boolean(item.href && pathname.startsWith(item.href));
 
               return (
                 <li key={item.label}>

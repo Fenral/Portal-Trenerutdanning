@@ -1,0 +1,206 @@
+.page {
+  width: min(100%, 78rem);
+  margin-inline: auto;
+  padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1rem, 4vw, 3.5rem) 5rem;
+}
+
+.backLink {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  margin-bottom: var(--nivaa-space-spacious);
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 700;
+  text-underline-offset: 0.25rem;
+}
+
+.hero {
+  display: grid;
+  align-items: end;
+  padding-bottom: var(--nivaa-space-section);
+  border-bottom: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-section);
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.hero h1 {
+  max-width: 18ch;
+  margin-bottom: var(--nivaa-space-compact);
+}
+
+.hero > div:first-child > p:last-child {
+  max-width: 62ch;
+  margin-bottom: 0;
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-lg);
+}
+
+.eyebrow {
+  margin-bottom: var(--nivaa-space-tight);
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.activityStatus {
+  display: flex;
+  min-width: 11rem;
+  align-items: center;
+  padding: var(--nivaa-space-default);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-surface);
+  gap: var(--nivaa-space-compact);
+}
+
+.activityStatus > span {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-primary-soft);
+  color: var(--nivaa-primary);
+  font-weight: 800;
+}
+
+.activityStatus[data-completed="true"] > span {
+  background: var(--nivaa-success-soft);
+  color: var(--nivaa-success);
+}
+
+.activityStatus div {
+  display: grid;
+}
+
+.activityStatus small {
+  color: var(--nivaa-text-muted);
+}
+
+.successMessage,
+.errorMessage {
+  margin: var(--nivaa-space-comfortable) 0 0;
+  padding: var(--nivaa-space-default);
+  border-left: 0.25rem solid var(--nivaa-success);
+  border-radius: 0 var(--nivaa-radius-inner) var(--nivaa-radius-inner) 0;
+  background: var(--nivaa-success-soft);
+}
+
+.errorMessage {
+  border-color: var(--nivaa-danger);
+  background: var(--nivaa-danger-soft);
+}
+
+.contentGrid {
+  display: grid;
+  align-items: start;
+  padding-top: var(--nivaa-space-section);
+  gap: var(--nivaa-space-comfortable);
+  grid-template-columns: minmax(0, 1fr) minmax(17rem, 22rem);
+}
+
+.mainColumn {
+  display: grid;
+  min-width: 0;
+  gap: var(--nivaa-space-comfortable);
+}
+
+.lesson,
+.verifiedActivity,
+.completion {
+  padding: clamp(1.5rem, 5vw, 3.5rem);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+}
+
+.verifiedActivity h2,
+.verifiedActivity p:last-child,
+.completion h2,
+.completion p:last-child {
+  margin-bottom: 0;
+}
+
+.verifiedActivity > p:last-child,
+.completion > div > p:last-child {
+  color: var(--nivaa-text-muted);
+}
+
+.completion {
+  display: grid;
+  align-items: end;
+  gap: var(--nivaa-space-comfortable);
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.completion form {
+  margin: 0;
+}
+
+.locked {
+  display: grid;
+  max-width: 45rem;
+  justify-items: start;
+  padding: clamp(2rem, 6vw, 4rem);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+}
+
+.lockIcon {
+  display: grid;
+  width: 3.5rem;
+  height: 3.5rem;
+  place-items: center;
+  margin-bottom: var(--nivaa-space-comfortable);
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-surface-subtle);
+  color: var(--nivaa-text-muted);
+  font-size: 1.5rem;
+}
+
+.locked h1 {
+  margin-bottom: var(--nivaa-space-default);
+}
+
+.locked > p:not(.eyebrow) {
+  color: var(--nivaa-text-muted);
+}
+
+.lockReason {
+  margin-bottom: var(--nivaa-space-tight);
+  color: var(--nivaa-on-surface) !important;
+  font-size: var(--nivaa-font-size-body-lg);
+  font-weight: 750;
+}
+
+.locked :global(.nivaa-button) {
+  margin-top: var(--nivaa-space-default);
+}
+
+@media (max-width: 64rem) {
+  .contentGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 42rem) {
+  .hero,
+  .completion {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .activityStatus {
+    min-width: 0;
+  }
+
+  .completion :global(.nivaa-button) {
+    width: 100%;
+  }
+}
