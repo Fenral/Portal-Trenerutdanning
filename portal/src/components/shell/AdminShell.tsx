@@ -20,7 +20,7 @@ const navigationItems: readonly NavigationItem[] = [
   { label: "Kurs", icon: "courses", href: "/admin/courses" },
   { label: "Deltakere", icon: "people" },
   { label: "Innhold", icon: "content", href: "/editor/content" },
-  { label: "Rapporter", icon: "reports" },
+  { label: "Rapporter", icon: "reports", href: "/admin/reports" },
   { label: "Innstillinger", icon: "settings" },
 ];
 
@@ -100,7 +100,8 @@ export function AdminShell({
 }) {
   const pathname = usePathname();
   const availableNavigationItems = navigationItems.map((item) =>
-    roleLabel === "Redaktør" && item.label === "Kurs"
+    roleLabel === "Redaktør" &&
+    (item.label === "Kurs" || item.label === "Rapporter")
       ? { ...item, href: undefined }
       : item,
   );

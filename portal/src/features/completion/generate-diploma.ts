@@ -1,3 +1,6 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+
 import { PDFDocument, StandardFonts, type PDFFont, rgb } from "pdf-lib";
 
 export type DiplomaInput = Readonly<{
@@ -16,6 +19,13 @@ export type DiplomaContent = Readonly<{
   templateVersion: string;
 }>;
 
+export type DiplomaTemplate = Readonly<{
+  level: 1 | 2 | 3;
+  filename: `trener-${1 | 2 | 3}.jpg`;
+  recipientY: number;
+  completedDateY: number;
+}>;
+
 const MONTHS = [
   "januar",
   "februar",
@@ -30,6 +40,29 @@ const MONTHS = [
   "november",
   "desember",
 ] as const;
+
+const A4_PORTRAIT: [number, number] = [595.28, 841.89];
+
+const TEMPLATES: Readonly<Record<1 | 2 | 3, DiplomaTemplate>> = {
+  1: {
+    level: 1,
+    filename: "trener-1.jpg",
+    recipientY: 458,
+    completedDateY: 344,
+  },
+  2: {
+    level: 2,
+    filename: "trener-2.jpg",
+    recipientY: 458,
+    completedDateY: 344,
+  },
+  3: {
+    level: 3,
+    filename: "trener-3.jpg",
+    recipientY: 426,
+    completedDateY: 317,
+  },
+};
 
 function completedAtNoonUtc(value: string) {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
@@ -73,6 +106,17 @@ function fitSize(
   return size;
 }
 
+export function diplomaTemplateForCourse(courseTitle: string): DiplomaTemplate {
+  const match = /(?:trener\s*|t)([123])(?:\b|\s|·|–|-)/i.exec(courseTitle);
+  const level = match ? Number(match[1]) : 0;
+
+  if (level !== 1 && level !== 2 && level !== 3) {
+    throw new Error("DIPLOMA_LEVEL_NOT_SUPPORTED");
+  }
+
+  return TEMPLATES[level];
+}
+
 export function buildDiplomaContent(input: DiplomaInput): DiplomaContent {
   const completedAt = completedAtNoonUtc(input.completedOn);
 
@@ -87,18 +131,18 @@ export function buildDiplomaContent(input: DiplomaInput): DiplomaContent {
 
 export async function generateDiploma(input: DiplomaInput) {
   const content = buildDiplomaContent(input);
+  const template = diplomaTemplateForCourse(content.course);
   const stableDate = completedAtNoonUtc(input.completedOn);
+  const templateBytes = await readFile(
+    path.join(process.cwd(), "public", "diplomas", template.filename),
+  );
   const pdf = await PDFDocument.create();
   const regular = await pdf.embedFont(StandardFonts.Helvetica);
   const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
-  const page = pdf.addPage([841.89, 595.28]);
+  const background = await pdf.embedJpg(Uint8Array.from(templateBytes));
+  const page = pdf.addPage(A4_PORTRAIT);
   const { width, height } = page.getSize();
-
-  const ink = rgb(16 / 255, 34 / 255, 27 / 255);
-  const green = rgb(57 / 255, 114 / 255, 78 / 255);
-  const softGreen = rgb(230 / 255, 236 / 255, 232 / 255);
-  const canvas = rgb(247 / 255, 249 / 255, 248 / 255);
-  const muted = rgb(89 / 255, 105 / 255, 98 / 255);
+  const ink = rgb(20 / 255, 28 / 255, 25 / 255);
 
   pdf.setTitle(`Diplom - ${content.recipient}`);
   pdf.setAuthor("Norges Golfforbund");
@@ -110,120 +154,29 @@ export async function generateDiploma(input: DiplomaInput) {
   pdf.setKeywords([
     "Norges Golfforbund",
     "Trenerløftet",
-    content.course,
+    `Trener ${template.level}`,
     content.certificateNumber,
   ]);
   pdf.setCreationDate(stableDate);
   pdf.setModificationDate(stableDate);
 
-  page.drawRectangle({ x: 0, y: 0, width, height, color: canvas });
-  page.drawRectangle({
-    x: 28,
-    y: 28,
-    width: width - 56,
-    height: height - 56,
-    borderColor: green,
-    borderWidth: 2,
-  });
-  page.drawRectangle({
-    x: 44,
-    y: 44,
-    width: width - 88,
-    height: height - 88,
-    borderColor: softGreen,
-    borderWidth: 1,
-  });
+  page.drawImage(background, { x: 0, y: 0, width, height });
 
-  page.drawText("TRENERLØFTET", {
-    x: 64,
-    y: height - 83,
-    size: 11,
-    font: bold,
-    color: green,
-  });
-  page.drawText("NORGES GOLFFORBUND", {
-    x: width - 194,
-    y: height - 83,
-    size: 9,
-    font: bold,
-    color: muted,
-  });
-
-  page.drawText("DIPLOM", {
-    x: centeredX("DIPLOM", bold, 48, width),
-    y: 410,
-    size: 48,
-    font: bold,
-    color: ink,
-  });
-  page.drawText("tildeles", {
-    x: centeredX("tildeles", regular, 14, width),
-    y: 370,
-    size: 14,
-    font: regular,
-    color: muted,
-  });
-
-  const recipientSize = fitSize(content.recipient, bold, 36, 23, width - 180);
+  const recipientSize = fitSize(content.recipient, bold, 21, 14, width - 145);
   page.drawText(content.recipient, {
     x: centeredX(content.recipient, bold, recipientSize, width),
-    y: 310,
+    y: template.recipientY,
     size: recipientSize,
-    font: bold,
-    color: green,
-  });
-
-  page.drawLine({
-    start: { x: 190, y: 287 },
-    end: { x: width - 190, y: 287 },
-    thickness: 1,
-    color: softGreen,
-  });
-
-  page.drawText("for fullført trenerutdanning", {
-    x: centeredX("for fullført trenerutdanning", regular, 14, width),
-    y: 248,
-    size: 14,
-    font: regular,
-    color: muted,
-  });
-  const courseSize = fitSize(content.course, bold, 25, 18, width - 190);
-  page.drawText(content.course, {
-    x: centeredX(content.course, bold, courseSize, width),
-    y: 205,
-    size: courseSize,
     font: bold,
     color: ink,
   });
 
-  page.drawRectangle({
-    x: width / 2 - 115,
-    y: 115,
-    width: 230,
-    height: 44,
-    color: softGreen,
-  });
-  page.drawText(`Fullført ${content.completedDate}`, {
-    x: centeredX(`Fullført ${content.completedDate}`, bold, 11, width),
-    y: 132,
-    size: 11,
-    font: bold,
-    color: green,
-  });
-
-  page.drawText(`Diplomnr. ${content.certificateNumber}`, {
-    x: 64,
-    y: 66,
-    size: 8,
+  page.drawText(content.completedDate, {
+    x: centeredX(content.completedDate, regular, 13, width),
+    y: template.completedDateY,
+    size: 13,
     font: regular,
-    color: muted,
-  });
-  page.drawText(`Mal ${content.templateVersion}`, {
-    x: width - 132,
-    y: 66,
-    size: 8,
-    font: regular,
-    color: muted,
+    color: ink,
   });
 
   return pdf.save({ useObjectStreams: false });
