@@ -800,3 +800,136 @@ join (
 )
   on completion.profile_id = enrollment.profile_id
 where enrollment.course_run_id = 'b1030000-0000-0000-0000-000000000001';
+
+insert into public.question_versions (
+  id,
+  question_key,
+  version_number,
+  prompt,
+  options,
+  correct_option_id,
+  points,
+  created_by,
+  created_at,
+  published_at
+)
+values
+  (
+    'a4100000-0000-0000-0000-000000000001',
+    'ballstart',
+    1,
+    'Hva påvirker ballens startretning mest ved et sentrert treff?',
+    '[{"id":"a","label":"Køllehodets hastighet"},{"id":"b","label":"Køllebladets retning i treffet"},{"id":"c","label":"Spillerens oppstilling alene"}]'::jsonb,
+    'b',
+    1,
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T10:20:00+02:00',
+    '2026-08-20T10:25:00+02:00'
+  ),
+  (
+    'a4100000-0000-0000-0000-000000000002',
+    'draw-path',
+    1,
+    'Hvilken kombinasjon kan gi en draw for en høyrehendt spiller?',
+    '[{"id":"a","label":"Svingbanen går mer mot høyre enn køllebladet peker"},{"id":"b","label":"Svingbanen går mer mot venstre enn køllebladet peker"},{"id":"c","label":"Kølleblad og svingbane peker alltid helt likt"}]'::jsonb,
+    'a',
+    1,
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T10:20:00+02:00',
+    '2026-08-20T10:25:00+02:00'
+  ),
+  (
+    'a4100000-0000-0000-0000-000000000003',
+    'practice-planning-share',
+    1,
+    'Hvor stor del av praksiskravet kan registreres som planlegging?',
+    '[{"id":"a","label":"10 prosent"},{"id":"b","label":"15 prosent"},{"id":"c","label":"20 prosent"}]'::jsonb,
+    'c',
+    1,
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T10:20:00+02:00',
+    '2026-08-20T10:25:00+02:00'
+  ),
+  (
+    'a4100000-0000-0000-0000-000000000004',
+    'attendance-requirement',
+    1,
+    'Hva er minimumskravet til oppmøte i Trenerløypa?',
+    '[{"id":"a","label":"70 prosent"},{"id":"b","label":"80 prosent"},{"id":"c","label":"90 prosent"}]'::jsonb,
+    'b',
+    1,
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T10:20:00+02:00',
+    '2026-08-20T10:25:00+02:00'
+  ),
+  (
+    'a4100000-0000-0000-0000-000000000005',
+    'practice-hours',
+    1,
+    'Hvor mange praksistimer må være registrert før praksisen kan sendes inn?',
+    '[{"id":"a","label":"45 timer"},{"id":"b","label":"35 timer"},{"id":"c","label":"25 timer"}]'::jsonb,
+    'a',
+    1,
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T10:20:00+02:00',
+    '2026-08-20T10:25:00+02:00'
+  );
+
+insert into public.quiz_definitions (
+  id,
+  activity_id,
+  revision_number,
+  title,
+  pass_percent,
+  max_attempts,
+  retry_delay_hours,
+  is_published,
+  created_by,
+  created_at,
+  published_at
+)
+values (
+  'a4000000-0000-0000-0000-000000000001',
+  'a3200000-0000-0000-0000-000000000006',
+  1,
+  'Kunnskapsprøve',
+  80,
+  null,
+  24,
+  true,
+  'c0000000-0000-0000-0000-000000000001',
+  '2026-08-20T10:20:00+02:00',
+  '2026-08-20T10:25:00+02:00'
+);
+
+insert into public.quiz_question_links (
+  quiz_definition_id,
+  question_version_id,
+  sort_order
+)
+values
+  (
+    'a4000000-0000-0000-0000-000000000001',
+    'a4100000-0000-0000-0000-000000000001',
+    1
+  ),
+  (
+    'a4000000-0000-0000-0000-000000000001',
+    'a4100000-0000-0000-0000-000000000002',
+    2
+  ),
+  (
+    'a4000000-0000-0000-0000-000000000001',
+    'a4100000-0000-0000-0000-000000000003',
+    3
+  ),
+  (
+    'a4000000-0000-0000-0000-000000000001',
+    'a4100000-0000-0000-0000-000000000004',
+    4
+  ),
+  (
+    'a4000000-0000-0000-0000-000000000001',
+    'a4100000-0000-0000-0000-000000000005',
+    5
+  );

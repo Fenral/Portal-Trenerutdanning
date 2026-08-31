@@ -33,6 +33,13 @@ function activityHref(
   learningPath: StudentLearningPathView,
   activity: StudentLearningActivity,
 ): string {
+  if (
+    activity.completionMode === "quiz_pass" &&
+    activity.access.state === "open"
+  ) {
+    return `/student/quiz/${activity.id}`;
+  }
+
   return `/student/courses/${learningPath.courseRunId}/activities/${activity.id}`;
 }
 

@@ -20,6 +20,10 @@ const syntheticAliases: Readonly<Record<string, TestLoginIdentity>> = {
     email: "emil.berg@nivaa.invalid",
     destination: "/student",
   },
+  "student-selma": {
+    email: "selma.dahl@nivaa.invalid",
+    destination: "/student",
+  },
 };
 
 export type TestLoginResolution =

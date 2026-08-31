@@ -112,7 +112,8 @@ export function StudentShell({
                   ? pathname === item.href
                   : item.label === "Læringsløp"
                     ? pathname.startsWith("/student/courses") ||
-                      pathname.startsWith("/student/content")
+                      pathname.startsWith("/student/content") ||
+                      pathname.startsWith("/student/quiz")
                     : Boolean(item.href && pathname.startsWith(item.href));
 
               return (

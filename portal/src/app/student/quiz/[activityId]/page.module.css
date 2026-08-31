@@ -1,0 +1,359 @@
+.page {
+  width: min(100%, 78rem);
+  margin-inline: auto;
+  padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1rem, 4vw, 3.5rem) 5rem;
+}
+
+.backLink {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  margin-bottom: var(--nivaa-space-spacious);
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 700;
+  text-underline-offset: 0.25rem;
+}
+
+.hero {
+  display: grid;
+  align-items: end;
+  padding-bottom: var(--nivaa-space-section);
+  border-bottom: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-section);
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.hero h1 {
+  max-width: 17ch;
+  margin-bottom: var(--nivaa-space-compact);
+}
+
+.hero > div:first-child > p:last-child {
+  max-width: 60ch;
+  margin-bottom: 0;
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-lg);
+}
+
+.eyebrow {
+  margin-bottom: var(--nivaa-space-tight);
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.passMark {
+  display: grid;
+  min-width: 10rem;
+  padding-left: var(--nivaa-space-comfortable);
+  border-left: 1px solid var(--nivaa-border-strong);
+}
+
+.passMark strong {
+  color: var(--nivaa-on-surface);
+  font-size: 2.25rem;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+.passMark span {
+  margin-top: var(--nivaa-space-tight);
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.result {
+  display: grid;
+  align-items: center;
+  margin-top: var(--nivaa-space-comfortable);
+  padding: var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-warning);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-warning-soft);
+  gap: var(--nivaa-space-default);
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.result[data-passed="true"] {
+  border-color: var(--nivaa-success);
+  background: var(--nivaa-success-soft);
+}
+
+.resultIcon {
+  display: grid;
+  width: 3.5rem;
+  height: 3.5rem;
+  place-items: center;
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-surface);
+  color: var(--nivaa-warning);
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.result[data-passed="true"] .resultIcon {
+  color: var(--nivaa-success);
+}
+
+.result h2,
+.result p:last-child {
+  margin-bottom: 0;
+}
+
+.result .eyebrow {
+  color: currentColor;
+}
+
+.notice {
+  margin-top: var(--nivaa-space-comfortable);
+  padding: var(--nivaa-space-default);
+  border-left: 0.25rem solid var(--nivaa-error);
+  border-radius: 0 var(--nivaa-radius-inner) var(--nivaa-radius-inner) 0;
+  background: var(--nivaa-error-soft);
+}
+
+.layout {
+  display: grid;
+  align-items: start;
+  padding-top: var(--nivaa-space-section);
+  gap: var(--nivaa-space-comfortable);
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+}
+
+.quizForm {
+  min-width: 0;
+}
+
+.questionList {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: var(--nivaa-space-default);
+  list-style: none;
+}
+
+.question {
+  min-width: 0;
+  margin: 0;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+}
+
+.question legend {
+  display: grid;
+  width: 100%;
+  align-items: start;
+  padding: 0;
+  gap: var(--nivaa-space-default);
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  color: var(--nivaa-on-surface);
+  font-size: var(--nivaa-font-size-body-lg);
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.questionNumber {
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.options {
+  display: grid;
+  margin-top: var(--nivaa-space-comfortable);
+  padding-left: 3.5rem;
+  gap: var(--nivaa-space-tight);
+}
+
+.option {
+  position: relative;
+  display: grid;
+  min-height: 3.5rem;
+  align-items: center;
+  padding: var(--nivaa-space-compact) var(--nivaa-space-default);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-canvas);
+  cursor: pointer;
+  gap: var(--nivaa-space-compact);
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  transition:
+    border-color var(--nivaa-transition-fast),
+    background-color var(--nivaa-transition-fast);
+}
+
+.option:hover {
+  border-color: var(--nivaa-border-strong);
+  background: var(--nivaa-primary-soft);
+}
+
+.option:has(input:checked) {
+  border-color: var(--nivaa-primary);
+  background: var(--nivaa-primary-soft);
+}
+
+.option:has(input:focus-visible) {
+  outline: 3px solid var(--nivaa-focus);
+  outline-offset: 2px;
+}
+
+.option:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.radioMark {
+  display: grid;
+  width: 1.125rem;
+  height: 1.125rem;
+  place-items: center;
+  border: 1.5px solid var(--nivaa-border-strong);
+  border-radius: 50%;
+  background: var(--nivaa-surface);
+}
+
+.option input:checked + .radioMark {
+  border: 0.3rem solid var(--nivaa-primary);
+}
+
+.submitBar {
+  position: sticky;
+  bottom: var(--nivaa-space-default);
+  display: grid;
+  align-items: center;
+  margin-top: var(--nivaa-space-comfortable);
+  padding: var(--nivaa-space-default) var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-border-strong);
+  border-radius: var(--nivaa-radius-surface);
+  background: color-mix(in srgb, var(--nivaa-surface) 94%, transparent);
+  box-shadow: var(--nivaa-shadow-menu);
+  gap: var(--nivaa-space-default);
+  grid-template-columns: minmax(0, 1fr) auto;
+  backdrop-filter: blur(12px);
+}
+
+.submitBar div {
+  display: grid;
+  gap: var(--nivaa-space-micro);
+}
+
+.submitBar span {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.aside {
+  position: sticky;
+  top: calc(4.5rem + var(--nivaa-space-comfortable));
+  display: grid;
+  gap: var(--nivaa-space-default);
+}
+
+.aside section {
+  padding: var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+}
+
+.aside h2 {
+  margin-bottom: var(--nivaa-space-comfortable);
+  font-size: var(--nivaa-font-size-h3);
+}
+
+.aside dl {
+  display: grid;
+  margin: 0;
+}
+
+.aside dl div {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--nivaa-space-compact) 0;
+  border-top: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-default);
+}
+
+.aside dt {
+  color: var(--nivaa-text-muted);
+}
+
+.aside dd {
+  margin: 0;
+  color: var(--nivaa-on-surface);
+  font-weight: 750;
+}
+
+.attemptStatus {
+  border-color: var(--nivaa-primary) !important;
+  background: var(--nivaa-primary-soft) !important;
+}
+
+.attemptStatus strong {
+  display: block;
+  margin-bottom: var(--nivaa-space-tight);
+}
+
+.attemptStatus p {
+  margin: 0;
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+@media (max-width: 64rem) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .aside {
+    position: static;
+    grid-row: 1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 42rem) {
+  .hero,
+  .submitBar,
+  .aside {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .passMark {
+    padding-top: var(--nivaa-space-default);
+    padding-left: 0;
+    border-top: 1px solid var(--nivaa-border-strong);
+    border-left: 0;
+  }
+
+  .options {
+    padding-left: 0;
+  }
+
+  .question legend {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .submitBar {
+    position: static;
+  }
+
+  .submitBar :global(.nivaa-button) {
+    width: 100%;
+  }
+}
