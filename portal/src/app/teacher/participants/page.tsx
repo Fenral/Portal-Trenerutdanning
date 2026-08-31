@@ -1,9 +1,7 @@
-import Link from "next/link";
-
 import { loadTeacherParticipants } from "@/features/attendance/teacher-data";
-import { participantProgressSignal } from "@/features/demo/participants";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+import { ParticipantList } from "./participant-list";
 import styles from "./participants.module.css";
 
 export const dynamic = "force-dynamic";
@@ -23,43 +21,7 @@ export default async function TeacherParticipantsPage() {
         <strong>{participants.length} deltakere</strong>
       </header>
 
-      <section aria-label="Deltakerliste" className={styles.participantList}>
-        {participants.map((participant) => {
-          const signal = participantProgressSignal(
-            participant.progressPercentage,
-          );
-
-          return (
-            <article
-              className={styles.participantRow}
-              key={participant.enrollmentId}
-            >
-              <div>
-                <strong>{participant.studentName}</strong>
-                <small>
-                  {participant.clubName} · {participant.courseTitle}
-                </small>
-              </div>
-              <span data-tone={signal.tone}>{signal.label}</span>
-              <div className={styles.metric}>
-                <small>Progresjon</small>
-                <strong>{participant.progressPercentage} %</strong>
-              </div>
-              <div className={styles.metric}>
-                <small>Oppmøte</small>
-                <strong>{participant.attendancePercentage} %</strong>
-              </div>
-              <Link
-                aria-label={`Åpne ${participant.studentName}`}
-                className="nivaa-button nivaa-button--secondary"
-                href={`/teacher/participants/${participant.enrollmentId}`}
-              >
-                Åpne
-              </Link>
-            </article>
-          );
-        })}
-      </section>
+      <ParticipantList participants={participants} />
     </main>
   );
 }

@@ -31,6 +31,19 @@ type ParticipantAttendanceViewProps = Readonly<{
     clubName: string;
     progressPercentage: number;
     sessions: readonly AttendanceSession[];
+    modules: readonly Readonly<{
+      id: string;
+      title: string;
+      completedCount: number;
+      totalCount: number;
+      percentage: number;
+      activities: readonly Readonly<{
+        id: string;
+        title: string;
+        completed: boolean;
+        required: boolean;
+      }>[];
+    }>[];
   }>;
   notice?: string;
 }>;
@@ -193,6 +206,54 @@ export function ParticipantAttendanceView({
             : "Oppmøtet kunne ikke lagres. Kontroller fraværstimene."}
         </p>
       ) : null}
+
+      <section className={styles.moduleSection}>
+        <div className={styles.sectionIntro}>
+          <div>
+            <p className={styles.eyebrow}>Detaljert læringsstatus</p>
+            <h2>Modulprogresjon</h2>
+          </div>
+          <p>
+            Klikk på en modul for å se hva som er gjort og hva som gjenstår.
+          </p>
+        </div>
+        <div className={styles.moduleGrid}>
+          {participant.modules.map((module) => (
+            <details className={styles.moduleCard} key={module.id}>
+              <summary>
+                <span>
+                  <strong>{module.title}</strong>
+                  <small>
+                    {module.completedCount} av {module.totalCount} gjennomført
+                  </small>
+                </span>
+                <span className={styles.modulePercentage}>
+                  {module.percentage} %
+                </span>
+                <progress
+                  aria-label={`${module.title}: ${module.percentage} prosent`}
+                  max="100"
+                  value={module.percentage}
+                />
+              </summary>
+              <ul className={styles.activityList}>
+                {module.activities.map((activity) => (
+                  <li key={activity.id}>
+                    <span>{activity.title}</span>
+                    <strong data-completed={activity.completed || undefined}>
+                      {activity.completed
+                        ? "Fullført"
+                        : activity.required
+                          ? "Gjenstår"
+                          : "Valgfri"}
+                    </strong>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ))}
+        </div>
+      </section>
 
       <section className={styles.sessionSection}>
         <div>

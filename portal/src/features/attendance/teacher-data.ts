@@ -11,6 +11,28 @@ type EnrollmentRow = Readonly<{
   status: "invited" | "active" | "withdrawn" | "completed";
 }>;
 
+type ModuleProgressRow = Readonly<{
+  id: string;
+  learning_path_id: string;
+  title: string;
+  sort_order: number;
+}>;
+
+type ActivityProgressRow = Readonly<{
+  id: string;
+  learning_path_id: string;
+  module_id: string;
+  title: string;
+  required: boolean;
+  sort_order: number;
+}>;
+
+type CompletionProgressRow = Readonly<{
+  enrollment_id: string;
+  learning_path_id: string;
+  activity_id: string;
+}>;
+
 export type TeacherParticipantListItem = Readonly<{
   enrollmentId: string;
   studentName: string;
@@ -19,6 +41,25 @@ export type TeacherParticipantListItem = Readonly<{
   status: EnrollmentRow["status"];
   progressPercentage: number;
   attendancePercentage: number;
+  modules: readonly TeacherParticipantModuleProgress[];
+}>;
+
+export type TeacherParticipantActivityProgress = Readonly<{
+  id: string;
+  title: string;
+  completed: boolean;
+  required: boolean;
+  sortOrder: number;
+}>;
+
+export type TeacherParticipantModuleProgress = Readonly<{
+  id: string;
+  title: string;
+  sortOrder: number;
+  completedCount: number;
+  totalCount: number;
+  percentage: number;
+  activities: readonly TeacherParticipantActivityProgress[];
 }>;
 
 export type TeacherParticipantView = TeacherParticipantListItem &
@@ -45,7 +86,7 @@ async function loadParticipantsForEnrollments(
 ): Promise<TeacherParticipantListItem[]> {
   if (enrollments.length === 0) return [];
   const enrollmentIds = enrollments.map((enrollment) => enrollment.id);
-  const [profiles, courses, progress, attendance] = await Promise.all([
+  const [profiles, courses, progress, attendance, paths] = await Promise.all([
     client
       .from("profiles")
       .select("id,display_name,club_name")
@@ -68,8 +109,44 @@ async function loadParticipantsForEnrollments(
       .from("attendance_records")
       .select("enrollment_id,planned_minutes,present_minutes")
       .in("enrollment_id", enrollmentIds),
+    client
+      .from("learning_paths")
+      .select("id,course_run_id")
+      .in(
+        "course_run_id",
+        enrollments.map((enrollment) => enrollment.course_run_id),
+      )
+      .eq("status", "published"),
   ]);
-  for (const result of [profiles, courses, progress, attendance]) {
+  for (const result of [profiles, courses, progress, attendance, paths]) {
+    assertNoQueryError(result.error);
+  }
+
+  const pathIds = (paths.data ?? []).map((path) => path.id);
+  const [modules, activities, completions] =
+    pathIds.length === 0
+      ? [
+          { data: [], error: null },
+          { data: [], error: null },
+          { data: [], error: null },
+        ]
+      : await Promise.all([
+          client
+            .from("modules")
+            .select("id,learning_path_id,title,sort_order")
+            .in("learning_path_id", pathIds)
+            .order("sort_order"),
+          client
+            .from("activities")
+            .select("id,learning_path_id,module_id,title,required,sort_order")
+            .in("learning_path_id", pathIds),
+          client
+            .from("activity_completions")
+            .select("enrollment_id,learning_path_id,activity_id")
+            .in("enrollment_id", enrollmentIds)
+            .in("learning_path_id", pathIds),
+        ]);
+  for (const result of [modules, activities, completions]) {
     assertNoQueryError(result.error);
   }
 
@@ -82,10 +159,38 @@ async function loadParticipantsForEnrollments(
   const progressByEnrollment = new Map(
     (progress.data ?? []).map((row) => [row.enrollment_id, row.percentage]),
   );
+  const pathByCourseRun = new Map(
+    (paths.data ?? []).map((path) => [path.course_run_id, path.id]),
+  );
+  const moduleRows = (modules.data ?? []) as ModuleProgressRow[];
+  const activityRows = (activities.data ?? []) as ActivityProgressRow[];
+  const completionRows = (completions.data ?? []) as CompletionProgressRow[];
+  const modulesByPath = new Map<string, ModuleProgressRow[]>();
+  for (const learningModule of moduleRows) {
+    const current = modulesByPath.get(learningModule.learning_path_id) ?? [];
+    current.push(learningModule);
+    modulesByPath.set(learningModule.learning_path_id, current);
+  }
+  const activitiesByModule = new Map<string, ActivityProgressRow[]>();
+  for (const activity of activityRows) {
+    const current = activitiesByModule.get(activity.module_id) ?? [];
+    current.push(activity);
+    activitiesByModule.set(activity.module_id, current);
+  }
+  const completedByEnrollment = new Map<string, Set<string>>();
+  for (const completion of completionRows) {
+    const current =
+      completedByEnrollment.get(completion.enrollment_id) ?? new Set<string>();
+    current.add(completion.activity_id);
+    completedByEnrollment.set(completion.enrollment_id, current);
+  }
 
   return sortDemoParticipants(
     enrollments.map((enrollment) => {
       const profile = profileById.get(enrollment.profile_id);
+      const pathId = pathByCourseRun.get(enrollment.course_run_id);
+      const completedIds =
+        completedByEnrollment.get(enrollment.id) ?? new Set<string>();
       const attendanceSummary = calculateAttendance(
         (attendance.data ?? [])
           .filter((row) => row.enrollment_id === enrollment.id)
@@ -94,6 +199,42 @@ async function loadParticipantsForEnrollments(
             presentMinutes: row.present_minutes,
           })),
       );
+      const moduleProgress = (pathId ? (modulesByPath.get(pathId) ?? []) : [])
+        .sort((left, right) => left.sort_order - right.sort_order)
+        .map<TeacherParticipantModuleProgress>((learningModule) => {
+          const moduleActivities = [
+            ...(activitiesByModule.get(learningModule.id) ?? []),
+          ]
+            .sort((left, right) => left.sort_order - right.sort_order)
+            .map<TeacherParticipantActivityProgress>((activity) => ({
+              id: activity.id,
+              title: activity.title,
+              completed: completedIds.has(activity.id),
+              required: activity.required,
+              sortOrder: activity.sort_order,
+            }));
+          const requiredActivities = moduleActivities.filter(
+            (activity) => activity.required,
+          );
+          const completedCount = requiredActivities.filter(
+            (activity) => activity.completed,
+          ).length;
+
+          return {
+            id: learningModule.id,
+            title: learningModule.title,
+            sortOrder: learningModule.sort_order,
+            completedCount,
+            totalCount: requiredActivities.length,
+            percentage:
+              requiredActivities.length === 0
+                ? 0
+                : Math.round(
+                    (completedCount / requiredActivities.length) * 100,
+                  ),
+            activities: moduleActivities,
+          };
+        });
 
       return {
         enrollmentId: enrollment.id,
@@ -104,6 +245,7 @@ async function loadParticipantsForEnrollments(
         status: enrollment.status,
         progressPercentage: progressByEnrollment.get(enrollment.id) ?? 0,
         attendancePercentage: attendanceSummary.displayPercentage,
+        modules: moduleProgress,
       };
     }),
     (participant) => participant.studentName,

@@ -45,18 +45,72 @@
   box-shadow: var(--nivaa-shadow-card);
 }
 
+.listControls {
+  display: flex;
+  align-items: end;
+  padding: var(--nivaa-space-default);
+  margin-bottom: var(--nivaa-space-default);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  gap: var(--nivaa-space-default);
+}
+
+.listControls label {
+  display: grid;
+  min-width: min(18rem, 38vw);
+  gap: var(--nivaa-space-micro);
+}
+
+.listControls label > span {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 700;
+}
+
+.listControls select {
+  min-height: 2.75rem;
+  padding: 0 var(--nivaa-space-compact);
+  border: 1px solid var(--nivaa-border-strong);
+  border-radius: var(--nivaa-radius-control);
+  background: var(--nivaa-surface);
+  color: var(--nivaa-text);
+}
+
+.listControls > strong {
+  margin-left: auto;
+  padding-bottom: 0.7rem;
+  white-space: nowrap;
+}
+
 .participantRow {
   display: grid;
-  min-height: 6rem;
+  min-height: 4.25rem;
   align-items: center;
-  padding: var(--nivaa-space-default) var(--nivaa-space-comfortable);
+  padding: 0.7rem var(--nivaa-space-default);
   border-bottom: 1px solid var(--nivaa-border);
+  color: inherit;
   gap: var(--nivaa-space-default);
-  grid-template-columns: minmax(13rem, 2fr) auto 7rem 7rem auto;
+  grid-template-columns: minmax(13rem, 2fr) auto minmax(7rem, 0.8fr) 6rem auto;
+  text-decoration: none;
+  transition:
+    background 150ms ease,
+    box-shadow 150ms ease;
 }
 
 .participantRow:last-child {
   border-bottom: 0;
+}
+
+.participantRow:hover {
+  background: var(--nivaa-primary-soft);
+}
+
+.participantRow:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid var(--nivaa-primary);
+  outline-offset: -3px;
 }
 
 .participantRow > div:first-child,
@@ -93,6 +147,13 @@
 .participantRow > span[data-tone="danger"] {
   background: var(--nivaa-error-soft);
   color: var(--nivaa-error);
+}
+
+.participantRow > .rowArrow {
+  padding: 0;
+  background: transparent;
+  color: var(--nivaa-primary);
+  font-size: 1.35rem;
 }
 
 .metric strong {
@@ -136,6 +197,107 @@
   background: var(--nivaa-primary-soft);
   color: var(--nivaa-on-primary-soft);
   font-weight: 650;
+}
+
+.moduleSection {
+  margin-bottom: var(--nivaa-space-comfortable);
+  padding: var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+}
+
+.sectionIntro {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: var(--nivaa-space-default);
+  gap: var(--nivaa-space-default);
+}
+
+.sectionIntro h2,
+.sectionIntro p {
+  margin-bottom: 0;
+}
+
+.sectionIntro > p {
+  max-width: 34rem;
+  color: var(--nivaa-text-muted);
+}
+
+.moduleGrid {
+  display: grid;
+  gap: var(--nivaa-space-compact);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+}
+
+.moduleCard {
+  overflow: hidden;
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-control);
+  background: var(--nivaa-background);
+}
+
+.moduleCard summary {
+  display: grid;
+  padding: var(--nivaa-space-default);
+  cursor: pointer;
+  gap: var(--nivaa-space-compact);
+  grid-template-columns: 1fr auto;
+  list-style: none;
+}
+
+.moduleCard summary::-webkit-details-marker {
+  display: none;
+}
+
+.moduleCard summary > span:first-child {
+  display: grid;
+}
+
+.moduleCard summary small {
+  color: var(--nivaa-text-muted);
+}
+
+.moduleCard progress {
+  width: 100%;
+  height: 0.45rem;
+  border: 0;
+  border-radius: var(--nivaa-radius-pill);
+  accent-color: var(--nivaa-primary);
+  grid-column: 1 / -1;
+}
+
+.modulePercentage {
+  color: var(--nivaa-primary);
+  font-weight: 800;
+}
+
+.activityList {
+  display: grid;
+  padding: 0 var(--nivaa-space-default) var(--nivaa-space-default);
+  margin: 0;
+  gap: var(--nivaa-space-micro);
+  list-style: none;
+}
+
+.activityList li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-top: var(--nivaa-space-compact);
+  border-top: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-compact);
+}
+
+.activityList li > strong {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-caption);
+}
+
+.activityList li > strong[data-completed] {
+  color: var(--nivaa-success);
 }
 
 .sessionSection {
@@ -193,10 +355,9 @@
   display: grid;
   align-items: center;
   gap: var(--nivaa-space-default);
-  grid-template-columns: minmax(9rem, 1fr) minmax(10rem, auto) minmax(
-      8rem,
-      0.7fr
-    ) auto;
+  grid-template-columns:
+    minmax(9rem, 1fr) minmax(10rem, auto) minmax(8rem, 0.7fr)
+    auto;
 }
 
 .attendanceForm label {
@@ -267,5 +428,20 @@
   .participantRow > span {
     display: inline-flex;
     justify-self: start;
+  }
+
+  .listControls,
+  .sectionIntro {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .listControls label {
+    min-width: 0;
+  }
+
+  .listControls > strong {
+    margin-left: 0;
+    padding-bottom: 0;
   }
 }

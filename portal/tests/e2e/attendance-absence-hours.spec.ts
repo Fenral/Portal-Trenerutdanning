@@ -5,7 +5,7 @@ test("teacher records absence in whole hours and sees live attendance", async ({
 }) => {
   await page.goto("/test-login?as=teacher-t3");
   await page.getByRole("link", { name: "Deltakere" }).click();
-  await page.getByRole("link", { name: "Åpne Kari Ferdig" }).click();
+  await page.getByRole("link", { name: "Vis profil for Kari Ferdig" }).click();
 
   await expect(page.getByText("100 % oppmøte", { exact: true })).toBeVisible();
   await expect(
