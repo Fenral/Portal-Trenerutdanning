@@ -1,0 +1,165 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
+
+import styles from "./StudentShell.module.css";
+
+type IconName = "home" | "learning" | "practice" | "submissions" | "help";
+
+type NavigationItem = Readonly<{
+  label: string;
+  icon: IconName;
+  href?: string;
+}>;
+
+const navigation: readonly NavigationItem[] = [
+  { label: "Hjem", icon: "home", href: "/student" },
+  { label: "Læringsløp", icon: "learning", href: "/student/content" },
+  { label: "Praksis", icon: "practice" },
+  { label: "Innleveringer", icon: "submissions" },
+  { label: "Hjelp", icon: "help" },
+];
+
+function Icon({ name }: { name: IconName }) {
+  if (name === "learning") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M4 5.5A3.5 3.5 0 0 1 7.5 4H12v16H7.5A3.5 3.5 0 0 0 4 21.5v-16ZM20 5.5A3.5 3.5 0 0 0 16.5 4H12v16h4.5a3.5 3.5 0 0 1 3.5 1.5v-16Z" />
+      </svg>
+    );
+  }
+
+  if (name === "practice") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <circle cx="8" cy="8" r="2.5" />
+        <circle cx="16" cy="8" r="2.5" />
+        <path d="M3.5 20v-2a4.5 4.5 0 0 1 9 0v2M11.5 20v-2a4.5 4.5 0 0 1 9 0v2" />
+      </svg>
+    );
+  }
+
+  if (name === "submissions") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M6 3.5h8l4 4V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z" />
+        <path d="M14 3.5V8h4M8 12h7M8 16h5" />
+      </svg>
+    );
+  }
+
+  if (name === "help") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M9.8 9a2.4 2.4 0 1 1 3.6 2.1c-.9.5-1.4 1-1.4 2.1M12 17h.01" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <path d="M4 10.5 12 4l8 6.5V20H5a1 1 0 0 1-1-1v-8.5Z" />
+      <path d="M9 20v-6h6v6" />
+    </svg>
+  );
+}
+
+function initialsFor(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toLocaleUpperCase("nb-NO"))
+    .join("");
+}
+
+export function StudentShell({
+  children,
+  courseTitle,
+  userName,
+}: Readonly<{
+  children: ReactNode;
+  courseTitle: string;
+  userName: string;
+}>) {
+  const pathname = usePathname();
+
+  return (
+    <div className={styles.frame}>
+      <aside className={styles.sidebar}>
+        <Link className={styles.brand} href="/student">
+          <span aria-hidden="true" className={styles.brandMark}>
+            T
+          </span>
+          <span>TRENERLØFTET</span>
+        </Link>
+
+        <nav aria-label="Hovedmeny" className={styles.navigation}>
+          <ul>
+            {navigation.map((item) => {
+              const isCurrent =
+                item.href === "/student"
+                  ? pathname === item.href
+                  : Boolean(item.href && pathname.startsWith(item.href));
+
+              return (
+                <li key={item.label}>
+                  {item.href ? (
+                    <Link
+                      aria-current={isCurrent ? "page" : undefined}
+                      className={styles.navigationItem}
+                      data-active={isCurrent || undefined}
+                      href={item.href}
+                    >
+                      <Icon name={item.icon} />
+                      <span>{item.label}</span>
+                    </Link>
+                  ) : (
+                    <span
+                      aria-disabled="true"
+                      className={styles.navigationItem}
+                      data-disabled="true"
+                    >
+                      <Icon name={item.icon} />
+                      <span>{item.label}</span>
+                      <small>Senere</small>
+                    </span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        <div className={styles.profile}>
+          <span aria-hidden="true" className={styles.avatar}>
+            {initialsFor(userName)}
+          </span>
+          <span>
+            <strong>{userName}</strong>
+            <small>{courseTitle}</small>
+          </span>
+        </div>
+      </aside>
+
+      <div className={styles.workspace}>
+        <header className={styles.topbar}>
+          <div className={styles.context}>
+            <span>Trenerutdanning</span>
+            <span aria-hidden="true">/</span>
+            <strong>Min læring</strong>
+            <span className={styles.demoBadge}>Demodata</span>
+          </div>
+          <div className={styles.courseContext}>
+            <Icon name="learning" />
+            <span>{courseTitle}</span>
+          </div>
+        </header>
+        <div className={styles.content}>{children}</div>
+      </div>
+    </div>
+  );
+}

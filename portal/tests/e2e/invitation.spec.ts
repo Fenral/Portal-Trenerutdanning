@@ -312,6 +312,10 @@ test("private email completes passwordless activation exactly once", async ({
   const magicLink = await waitForMagicLink(email);
   await page.goto(magicLink);
   await expect(page).toHaveURL(/\/student$/);
+  const cookiesAfterActivation = await page.context().cookies();
+  expect(
+    cookiesAfterActivation.some((cookie) => cookie.name.endsWith("auth-token")),
+  ).toBe(true);
   await expect(
     page.getByRole("heading", { name: "Tilgangen er aktivert" }),
   ).toBeVisible();

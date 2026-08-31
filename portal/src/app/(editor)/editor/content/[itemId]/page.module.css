@@ -1,0 +1,388 @@
+.shell {
+  width: min(calc(100% - 2rem), var(--nivaa-content-max));
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 4rem) 0;
+}
+
+.backLink {
+  display: inline-flex;
+  margin-bottom: var(--nivaa-space-spacious);
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.hero,
+.panelHeading,
+.resourceTitleLine,
+.formFooter,
+.fileMeta,
+.resourceActions {
+  display: flex;
+  align-items: center;
+}
+
+.hero {
+  align-items: end;
+  justify-content: space-between;
+  padding-bottom: var(--nivaa-space-section);
+  border-bottom: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-spacious);
+}
+
+.hero h1 {
+  margin-bottom: var(--nivaa-space-tight);
+}
+
+.hero p:not(.eyebrow) {
+  margin-bottom: 0;
+  color: var(--nivaa-text-muted);
+}
+
+.eyebrow {
+  margin-bottom: var(--nivaa-space-tight);
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-label);
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.statusStack {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+  gap: var(--nivaa-space-tight);
+}
+
+.statusBadge,
+.countPill,
+.audienceBadge {
+  padding: var(--nivaa-space-micro) var(--nivaa-space-compact);
+  border-radius: var(--nivaa-radius-pill);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.statusBadge[data-status="draft"] {
+  background: var(--nivaa-warning-soft);
+  color: var(--nivaa-warning);
+}
+
+.statusBadge[data-status="published"],
+.countPill {
+  background: var(--nivaa-success-soft);
+  color: var(--nivaa-success);
+}
+
+.successBanner,
+.errorBanner {
+  margin: var(--nivaa-space-comfortable) 0 0;
+  padding: var(--nivaa-space-default);
+  border-radius: var(--nivaa-radius-control);
+  font-weight: 650;
+}
+
+.successBanner {
+  background: var(--nivaa-success-soft);
+  color: var(--nivaa-success);
+}
+
+.errorBanner {
+  background: var(--nivaa-error-soft);
+  color: var(--nivaa-error);
+}
+
+.editorGrid {
+  display: grid;
+  padding-top: var(--nivaa-space-spacious);
+  gap: var(--nivaa-space-comfortable);
+  grid-template-columns: minmax(0, 1.45fr) minmax(20rem, 0.75fr);
+}
+
+.panel {
+  margin-top: var(--nivaa-space-comfortable);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+}
+
+.editorGrid .panel {
+  margin-top: 0;
+}
+
+.panelHeading {
+  justify-content: space-between;
+  padding-bottom: var(--nivaa-space-comfortable);
+  border-bottom: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-default);
+}
+
+.panelHeading h2,
+.resourceCard h3,
+.resourceCard p {
+  margin-bottom: 0;
+}
+
+.panelHeading > small,
+.formFooter span,
+.publishForm fieldset > p,
+.resourceCard p,
+.fileMeta,
+.versionList small {
+  color: var(--nivaa-text-muted);
+}
+
+.editForm,
+.publishForm {
+  display: grid;
+  padding-top: var(--nivaa-space-comfortable);
+  gap: var(--nivaa-space-default);
+}
+
+.editForm label,
+.publishForm label:not(.courseChoice) {
+  display: grid;
+  gap: var(--nivaa-space-tight);
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 700;
+}
+
+.editForm input,
+.editForm textarea,
+.editForm select,
+.publishForm textarea {
+  width: 100%;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--nivaa-border-strong);
+  border-radius: var(--nivaa-radius-field);
+  background: var(--nivaa-surface);
+  color: var(--nivaa-on-surface);
+  font-weight: 450;
+}
+
+.editForm textarea,
+.publishForm textarea {
+  resize: vertical;
+}
+
+.formFooter {
+  flex-wrap: wrap;
+  gap: var(--nivaa-space-default);
+}
+
+.formFooter span {
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.publishForm fieldset {
+  display: grid;
+  min-width: 0;
+  margin: 0;
+  padding: var(--nivaa-space-default);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-inner);
+  gap: var(--nivaa-space-tight);
+}
+
+.publishForm legend {
+  padding: 0 var(--nivaa-space-tight);
+  font-weight: 750;
+}
+
+.publishForm fieldset > p {
+  margin-bottom: var(--nivaa-space-tight);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.courseChoice {
+  display: flex;
+  align-items: start;
+  padding: var(--nivaa-space-tight) 0;
+  gap: var(--nivaa-space-tight);
+}
+
+.courseChoice input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.2rem;
+}
+
+.courseChoice span {
+  display: grid;
+}
+
+.courseChoice small {
+  color: var(--nivaa-text-muted);
+}
+
+.resourceList {
+  display: grid;
+  padding-top: var(--nivaa-space-default);
+  gap: var(--nivaa-space-tight);
+}
+
+.resourceCard {
+  display: grid;
+  padding: var(--nivaa-space-default);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-inner);
+  gap: var(--nivaa-space-default);
+  grid-template-columns: 3rem minmax(0, 1fr);
+}
+
+.resourceIcon {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border-radius: var(--nivaa-radius-control);
+  background: var(--nivaa-primary-soft);
+  color: var(--nivaa-on-primary-soft);
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.resourceBody {
+  min-width: 0;
+}
+
+.resourceTitleLine {
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--nivaa-space-default);
+}
+
+.resourceCard h3 {
+  font-size: 1rem;
+}
+
+.resourceCard p {
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.audienceBadge[data-audience="teachers"] {
+  background: var(--nivaa-warning-soft);
+  color: var(--nivaa-warning);
+}
+
+.audienceBadge[data-audience="course_members"] {
+  background: var(--nivaa-info-soft);
+  color: var(--nivaa-info);
+}
+
+.fileMeta,
+.resourceActions {
+  flex-wrap: wrap;
+  margin-top: var(--nivaa-space-default);
+  gap: var(--nivaa-space-tight) var(--nivaa-space-default);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.fileMeta strong {
+  color: var(--nivaa-on-surface);
+}
+
+.historyDetails {
+  position: relative;
+}
+
+.historyDetails summary {
+  padding: 0.625rem 0;
+  color: var(--nivaa-primary);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.historyDetails ol {
+  display: grid;
+  min-width: min(28rem, 75vw);
+  margin: var(--nivaa-space-tight) 0 0;
+  padding: var(--nivaa-space-default);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-surface-subtle);
+  gap: var(--nivaa-space-tight);
+  list-style: none;
+}
+
+.historyDetails li {
+  display: grid;
+  gap: var(--nivaa-space-micro) var(--nivaa-space-tight);
+  grid-template-columns: auto auto 1fr;
+}
+
+.historyDetails small {
+  grid-column: 1 / -1;
+}
+
+.uploadNotice {
+  margin-top: var(--nivaa-space-comfortable);
+  padding: var(--nivaa-space-default);
+  border-left: 3px solid var(--nivaa-info);
+  background: var(--nivaa-info-soft);
+}
+
+.uploadNotice p {
+  margin: var(--nivaa-space-micro) 0 0;
+}
+
+.versionList {
+  display: grid;
+  margin: 0;
+  padding: var(--nivaa-space-default) 0 0;
+  list-style: none;
+}
+
+.versionList li {
+  display: grid;
+  align-items: center;
+  padding: var(--nivaa-space-default) 0;
+  border-bottom: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-tight) var(--nivaa-space-default);
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+}
+
+.versionList li:last-child {
+  border-bottom: 0;
+}
+
+.versionList p {
+  margin-bottom: 0;
+}
+
+@media (max-width: 64rem) {
+  .editorGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 48rem) {
+  .hero,
+  .panelHeading,
+  .resourceTitleLine {
+    display: grid;
+    align-items: start;
+  }
+
+  .statusStack {
+    justify-content: start;
+  }
+
+  .resourceCard {
+    grid-template-columns: 1fr;
+  }
+
+  .versionList li {
+    grid-template-columns: auto 1fr;
+  }
+
+  .versionList p,
+  .versionList small {
+    grid-column: 1 / -1;
+  }
+}

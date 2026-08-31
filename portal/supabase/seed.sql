@@ -225,3 +225,197 @@ select
   enrollment.course_run_id,
   'c0000000-0000-0000-0000-000000000001'
 from public.enrollments as enrollment;
+
+insert into public.content_items (
+  id,
+  kind,
+  slug,
+  title,
+  created_by,
+  created_at
+)
+values (
+  'a2000000-0000-0000-0000-000000000001',
+  'lesson',
+  'ballfluktslover-og-balltreff',
+  'Ballfluktslover og balltreff',
+  'c0000000-0000-0000-0000-000000000001',
+  '2026-08-20T09:00:00+02:00'
+);
+
+insert into public.content_revisions (
+  id,
+  content_item_id,
+  revision_number,
+  status,
+  document,
+  change_note,
+  created_by,
+  created_at,
+  published_by,
+  published_at,
+  updated_at
+)
+values
+  (
+    'a2100000-0000-0000-0000-000000000001',
+    'a2000000-0000-0000-0000-000000000001',
+    1,
+    'published',
+    '{"locale":"nb-NO","format":"short_page","blocks":[{"type":"heading","level":2,"text":"Ballfluktslover og balltreff"},{"type":"paragraph","text":"Lær hvordan kølleblad og svingbane påvirker ballens startretning og kurve."},{"type":"callout","tone":"practice","title":"Ta med til samling","text":"Observer startretningen før du vurderer ballens kurve."},{"type":"video","provider":"trackman","url":"https://ondemand.trackmangolf.com/example","required":true}]}'::jsonb,
+    'Første publiserte versjon',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T09:00:00+02:00',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T10:00:00+02:00',
+    '2026-08-20T10:00:00+02:00'
+  ),
+  (
+    'a2100000-0000-0000-0000-000000000002',
+    'a2000000-0000-0000-0000-000000000001',
+    2,
+    'draft',
+    '{"locale":"nb-NO","format":"short_page","blocks":[{"type":"heading","level":2,"text":"Ballfluktslover og balltreff"},{"type":"paragraph","text":"Lær hvordan kølleblad og svingbane påvirker ballens startretning og kurve."},{"type":"callout","tone":"practice","title":"Ta med til samling","text":"Observer startretningen før du vurderer ballens kurve."},{"type":"video","provider":"trackman","url":"https://ondemand.trackmangolf.com/example","required":true}]}'::jsonb,
+    'Kladd fra publisert versjon',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T10:00:00+02:00',
+    null,
+    null,
+    '2026-08-20T10:00:00+02:00'
+  );
+
+insert into public.course_content_bindings (
+  course_run_id,
+  content_item_id,
+  content_revision_id,
+  bound_by,
+  bound_at
+)
+values (
+  'b1030000-0000-0000-0000-000000000001',
+  'a2000000-0000-0000-0000-000000000001',
+  'a2100000-0000-0000-0000-000000000001',
+  'c0000000-0000-0000-0000-000000000001',
+  '2026-08-20T10:00:00+02:00'
+);
+
+insert into public.media_assets (
+  id,
+  storage_path,
+  original_filename,
+  mime_type,
+  byte_size,
+  sha256,
+  scan_status,
+  scanned_at,
+  uploaded_by,
+  created_at
+)
+values
+  (
+    'a2300000-0000-0000-0000-000000000001',
+    'demo/ballfluktslover-pensum.pdf',
+    'ballfluktslover-pensum.pdf',
+    'application/pdf',
+    24576,
+    repeat('a', 64),
+    'clean',
+    '2026-08-20T09:15:00+02:00',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T09:10:00+02:00'
+  ),
+  (
+    'a2300000-0000-0000-0000-000000000002',
+    'demo/ballfluktslover-undervisning.pptx',
+    'ballfluktslover-undervisning.pptx',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    53248,
+    repeat('b', 64),
+    'clean',
+    '2026-08-20T09:25:00+02:00',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T09:20:00+02:00'
+  ),
+  (
+    'a2300000-0000-0000-0000-000000000003',
+    'demo/observasjonsskjema.xlsx',
+    'observasjonsskjema.xlsx',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    18432,
+    repeat('c', 64),
+    'clean',
+    '2026-08-20T09:35:00+02:00',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T09:30:00+02:00'
+  );
+
+insert into public.resource_items (
+  id,
+  title,
+  description,
+  audience,
+  content_item_id,
+  created_by,
+  created_at
+)
+values
+  (
+    'a2200000-0000-0000-0000-000000000001',
+    'Pensum som PDF',
+    'Nedlastbar versjon av pensumet.',
+    'course_members',
+    'a2000000-0000-0000-0000-000000000001',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T09:15:00+02:00'
+  ),
+  (
+    'a2200000-0000-0000-0000-000000000002',
+    'Undervisningspresentasjon',
+    'PowerPoint for kurslærere.',
+    'teachers',
+    'a2000000-0000-0000-0000-000000000001',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T09:25:00+02:00'
+  ),
+  (
+    'a2200000-0000-0000-0000-000000000003',
+    'Observasjonsskjema',
+    'Excel-ark som kan brukes under praksis.',
+    'course_members',
+    'a2000000-0000-0000-0000-000000000001',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T09:35:00+02:00'
+  );
+
+insert into public.resource_revisions (
+  id,
+  resource_item_id,
+  revision_number,
+  status,
+  media_asset_id,
+  change_note,
+  created_by,
+  created_at,
+  published_by,
+  published_at,
+  updated_at
+)
+values
+  ('a2400000-0000-0000-0000-000000000001', 'a2200000-0000-0000-0000-000000000001', 1, 'published', 'a2300000-0000-0000-0000-000000000001', 'Første publisering', 'c0000000-0000-0000-0000-000000000001', '2026-08-20T09:15:00+02:00', 'c0000000-0000-0000-0000-000000000001', '2026-08-20T09:16:00+02:00', '2026-08-20T09:16:00+02:00'),
+  ('a2400000-0000-0000-0000-000000000002', 'a2200000-0000-0000-0000-000000000001', 2, 'draft', 'a2300000-0000-0000-0000-000000000001', 'Kladd fra publisert versjon', 'c0000000-0000-0000-0000-000000000001', '2026-08-20T09:16:00+02:00', null, null, '2026-08-20T09:16:00+02:00'),
+  ('a2400000-0000-0000-0000-000000000003', 'a2200000-0000-0000-0000-000000000002', 1, 'published', 'a2300000-0000-0000-0000-000000000002', 'Første publisering', 'c0000000-0000-0000-0000-000000000001', '2026-08-20T09:25:00+02:00', 'c0000000-0000-0000-0000-000000000001', '2026-08-20T09:26:00+02:00', '2026-08-20T09:26:00+02:00'),
+  ('a2400000-0000-0000-0000-000000000004', 'a2200000-0000-0000-0000-000000000002', 2, 'draft', 'a2300000-0000-0000-0000-000000000002', 'Kladd fra publisert versjon', 'c0000000-0000-0000-0000-000000000001', '2026-08-20T09:26:00+02:00', null, null, '2026-08-20T09:26:00+02:00'),
+  ('a2400000-0000-0000-0000-000000000005', 'a2200000-0000-0000-0000-000000000003', 1, 'published', 'a2300000-0000-0000-0000-000000000003', 'Første publisering', 'c0000000-0000-0000-0000-000000000001', '2026-08-20T09:35:00+02:00', 'c0000000-0000-0000-0000-000000000001', '2026-08-20T09:36:00+02:00', '2026-08-20T09:36:00+02:00'),
+  ('a2400000-0000-0000-0000-000000000006', 'a2200000-0000-0000-0000-000000000003', 2, 'draft', 'a2300000-0000-0000-0000-000000000003', 'Kladd fra publisert versjon', 'c0000000-0000-0000-0000-000000000001', '2026-08-20T09:36:00+02:00', null, null, '2026-08-20T09:36:00+02:00');
+
+insert into public.course_resource_bindings (
+  course_run_id,
+  resource_item_id,
+  resource_revision_id,
+  bound_by,
+  bound_at
+)
+values
+  ('b1030000-0000-0000-0000-000000000001', 'a2200000-0000-0000-0000-000000000001', 'a2400000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000001', '2026-08-20T10:00:00+02:00'),
+  ('b1030000-0000-0000-0000-000000000001', 'a2200000-0000-0000-0000-000000000002', 'a2400000-0000-0000-0000-000000000003', 'c0000000-0000-0000-0000-000000000001', '2026-08-20T10:00:00+02:00'),
+  ('b1030000-0000-0000-0000-000000000001', 'a2200000-0000-0000-0000-000000000003', 'a2400000-0000-0000-0000-000000000005', 'c0000000-0000-0000-0000-000000000001', '2026-08-20T10:00:00+02:00');

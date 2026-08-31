@@ -19,7 +19,7 @@ const navigationItems: readonly NavigationItem[] = [
   { label: "Oversikt", icon: "chart" },
   { label: "Kurs", icon: "courses", href: "/admin/courses" },
   { label: "Deltakere", icon: "people" },
-  { label: "Innhold", icon: "content" },
+  { label: "Innhold", icon: "content", href: "/editor/content" },
   { label: "Rapporter", icon: "reports" },
   { label: "Innstillinger", icon: "settings" },
 ];
@@ -88,11 +88,22 @@ function initialsFor(name: string): string {
 export function AdminShell({
   children,
   userName,
+  roleLabel = "Administrator",
+  contextLabel = "Administrasjon",
+  topbarLabel = "Kursår 2026",
 }: {
   children: ReactNode;
   userName: string;
+  roleLabel?: "Administrator" | "Redaktør";
+  contextLabel?: string;
+  topbarLabel?: string;
 }) {
   const pathname = usePathname();
+  const availableNavigationItems = navigationItems.map((item) =>
+    roleLabel === "Redaktør" && item.label === "Kurs"
+      ? { ...item, href: undefined }
+      : item,
+  );
 
   return (
     <div className={styles.frame}>
@@ -108,7 +119,7 @@ export function AdminShell({
           <p className={styles.navigationLabel}>Administrasjon</p>
           <nav aria-label="Hovedmeny">
             <ul>
-              {navigationItems.map((item) => {
+              {availableNavigationItems.map((item) => {
                 const isCurrent = Boolean(
                   item.href && pathname.startsWith(item.href),
                 );
@@ -149,7 +160,7 @@ export function AdminShell({
           </span>
           <span>
             <strong>{userName}</strong>
-            <small>Administrator</small>
+            <small>{roleLabel}</small>
           </span>
         </div>
       </aside>
@@ -159,13 +170,13 @@ export function AdminShell({
           <div className={styles.context}>
             <span>Trenerutdanning</span>
             <span aria-hidden="true">/</span>
-            <strong>Administrasjon</strong>
+            <strong>{contextLabel}</strong>
             <span className={styles.demoBadge}>Demodata</span>
           </div>
           <div className={styles.topbarMeta}>
             <span>
               <NavigationIcon name="courses" />
-              Kursår 2026
+              {topbarLabel}
             </span>
             <span className={styles.userIcon} title={userName}>
               {initialsFor(userName)}

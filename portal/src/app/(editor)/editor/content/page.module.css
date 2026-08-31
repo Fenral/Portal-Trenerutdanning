@@ -1,0 +1,116 @@
+.shell {
+  width: min(calc(100% - 2rem), var(--nivaa-content-max));
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4.5rem) 0;
+}
+
+.hero {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  padding-bottom: var(--nivaa-space-section);
+  border-bottom: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-spacious);
+}
+
+.hero h1 {
+  margin-bottom: var(--nivaa-space-default);
+}
+
+.hero p:not(.eyebrow) {
+  max-width: 48rem;
+  margin-bottom: 0;
+  color: var(--nivaa-text-muted);
+}
+
+.eyebrow,
+.kind {
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-label);
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.countBadge {
+  padding: var(--nivaa-space-tight) var(--nivaa-space-default);
+  border-radius: var(--nivaa-radius-pill);
+  background: var(--nivaa-primary-soft);
+  color: var(--nivaa-on-primary-soft);
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.catalog {
+  display: grid;
+  padding-top: var(--nivaa-space-spacious);
+  gap: var(--nivaa-space-default);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.catalogCard {
+  display: grid;
+  min-width: 0;
+  padding: var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+  color: inherit;
+  gap: var(--nivaa-space-tight);
+  text-decoration: none;
+  transition:
+    border-color var(--nivaa-transition-fast),
+    transform var(--nivaa-transition-fast);
+}
+
+.catalogCard:hover {
+  border-color: var(--nivaa-primary);
+  transform: translateY(-2px);
+}
+
+.catalogCard h2,
+.catalogCard p {
+  margin-bottom: 0;
+}
+
+.catalogCard p,
+.catalogCard small,
+.catalogCard dt {
+  color: var(--nivaa-text-muted);
+}
+
+.catalogCard dl {
+  display: flex;
+  margin: var(--nivaa-space-default) 0;
+  gap: var(--nivaa-space-spacious);
+}
+
+.catalogCard dl > div {
+  display: grid;
+}
+
+.catalogCard dt {
+  font-size: var(--nivaa-font-size-caption);
+}
+
+.catalogCard dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+@media (max-width: 48rem) {
+  .hero {
+    display: grid;
+    align-items: start;
+  }
+
+  .countBadge {
+    justify-self: start;
+  }
+
+  .catalog {
+    grid-template-columns: 1fr;
+  }
+}

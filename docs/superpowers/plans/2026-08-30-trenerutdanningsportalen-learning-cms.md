@@ -6,7 +6,7 @@
 
 **Architecture:** Ferdig pensum lagres som versjonerte, strukturerte dokumenter med et begrenset blokkbibliotek. Presentasjoner og andre dokumenter lagres som separate, versjonerte filressurser; V1 bygger ikke en intern presentasjonseditor. Kursgjennomføringen bindes eksplisitt til publiserte innholds- og filversjoner. Læringshendelser lagres separat slik at publisering aldri omskriver studenthistorikk eller fjerner en allerede oppnådd fullføring. Progresjon og sluttgodkjenning beregnes av rene domenefunksjoner og materialiseres transaksjonelt for raske oversikter.
 
-**Tech Stack:** Next.js server components/actions, PostgreSQL/Supabase Storage, TipTap JSON, Zod, Vitest, Playwright, React-PDF og Nivå Klassisk Premium.
+**Tech Stack:** Next.js server components/actions, PostgreSQL/Supabase Storage, skjemavalidert blokk-JSON, Zod, Vitest, Playwright, React-PDF og Nivå Klassisk Premium.
 
 ---
 
@@ -301,9 +301,9 @@ git commit -m "feat: add immutable versioned content model"
 - Create: `portal/src/app/(editor)/editor/content/[itemId]/page.tsx`
 - Create: `portal/src/app/(editor)/editor/content/[itemId]/ResourcePanel.tsx`
 - Test: `portal/tests/unit/content/publish-content.test.ts`
-- Test: `portal/tests/e2e/editor-publish.spec.ts`
+- Test: `portal/tests/e2e/content-publishing.spec.ts`
 
-- [ ] **Step 1: Skriv failing publiseringstest**
+- [x] **Step 1: Skriv failing publiseringstest**
 
 ```ts
 import { describe, expect, it } from "vitest";
@@ -339,7 +339,7 @@ describe("planPublication", () => {
 Run: `pnpm vitest tests/unit/content/publish-content.test.ts --run`  
 Expected: FAIL.
 
-- [ ] **Step 2: Implementer ren publiseringsplan og databasefunksjon**
+- [x] **Step 2: Implementer ren publiseringsplan og databasefunksjon**
 
 ```ts
 export function planPublication(input: {
@@ -360,18 +360,20 @@ export function planPublication(input: {
 
 Database function `publish_content(item_id, actor_id, change_note)` locks all revisions for the item, validates editor/admin role, marks current published as superseded, promotes the existing draft revision to published, creates one fresh draft copy with the next revision number and writes `content.published` audit-event in one transaction.
 
-- [ ] **Step 3: Bygg redaktørflaten uten autosave til publisert**
+- [x] **Step 3: Bygg redaktørflaten uten autosave til publisert**
 
-Run `pnpm add @tiptap/react @tiptap/starter-kit` and commit the updated lockfile. Editor page has persistent status `Kladd`, `Publisert vN` and `Sist endret`. Save updates only draft. Publish opens confirmation with change note and affected active course runs. `ResourcePanel` can link zero, one or many file resources. Each resource has independent draft/published status, audience (`kun lærere` eller `lærere og studenter`), preview/download metadata and version history. Course teachers may upload a draft for their course; course lead publishes to that course; only editor/admin publishes master resources.
+Editor page uses the validated content-block schema rather than arbitrary HTML. It has persistent status `Kladd`, `Publisert vN` and `Sist endret`. Save updates only draft. Publish requires a change note and explicit selection of affected active course runs. `ResourcePanel` links zero, one or many file resources. Each resource has independent draft/published status, audience (`kun lærere` eller `lærere og studenter`), preview/download metadata and version history.
 
-- [ ] **Step 4: E2E-test at student ikke ser kladd**
+**Bevisst avgrensning:** Sikker filopplasting er ikke aktivert ennå. UI-et viser statusen eksplisitt. Privat lagringsbøtte, EU-skanner og karanteneflyt må konfigureres før opplastingsknappen kan åpnes; dette skal ikke simuleres som ferdig funksjonalitet.
+
+- [x] **Step 4: E2E-test at student ikke ser kladd**
 
 Test edits title from `Ballfluktslover` to `Ballens startretning`, saves draft, verifies student still sees old title, publishes with note, upgrades the demo course binding and verifies student sees new title without losing an existing completion. Also verify a lesson publishes without files, many resources can be attached, a teacher-only resource stays hidden from students, PDF is previewable/downloadable and PowerPoint/Excel are downloadable.
 
-Run: `pnpm playwright test tests/e2e/editor-publish.spec.ts`  
+Run: `pnpm playwright test tests/e2e/content-publishing.spec.ts`
 Expected: PASS; version history shows both revisions.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add portal/src/features/content portal/src/app/\(editor\) portal/tests

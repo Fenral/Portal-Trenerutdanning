@@ -1,0 +1,178 @@
+.page {
+  width: min(100%, var(--nivaa-content-max));
+  margin-inline: auto;
+  padding: clamp(2rem, 5vw, 4.5rem) clamp(1rem, 4vw, 3.5rem);
+}
+
+.hero {
+  display: grid;
+  align-items: end;
+  padding-bottom: var(--nivaa-space-section);
+  border-bottom: 1px solid var(--nivaa-border);
+  gap: clamp(2rem, 5vw, 5rem);
+  grid-template-columns: minmax(0, 1fr) minmax(13rem, 18rem);
+}
+
+.hero h1 {
+  max-width: 15ch;
+  margin: var(--nivaa-space-default) 0 var(--nivaa-space-compact);
+}
+
+.hero p {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-lg);
+}
+
+.progressCard {
+  display: grid;
+  padding: var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+  gap: var(--nivaa-space-tight);
+}
+
+.progressCard strong {
+  font-size: 2.5rem;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+.progressCard > span {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.section {
+  padding-top: var(--nivaa-space-section);
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: var(--nivaa-space-comfortable);
+  gap: var(--nivaa-space-default);
+}
+
+.sectionHeading h2,
+.eyebrow {
+  margin-bottom: 0;
+}
+
+.eyebrow,
+.courseLabel {
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.sectionHeading > span {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.contentGrid {
+  display: grid;
+  gap: var(--nivaa-space-default);
+}
+
+.contentCard {
+  display: grid;
+  align-items: center;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+  gap: var(--nivaa-space-comfortable);
+  grid-template-columns: 3.25rem minmax(0, 1fr) auto;
+}
+
+.contentCard h3 {
+  margin-bottom: var(--nivaa-space-tight);
+  font-size: 1.35rem;
+}
+
+.contentCard > div:nth-child(2) > p:not(.courseLabel) {
+  max-width: 65ch;
+  margin-bottom: var(--nivaa-space-default);
+  color: var(--nivaa-text-muted);
+}
+
+.moduleNumber {
+  display: grid;
+  width: 3.25rem;
+  height: 3.25rem;
+  place-items: center;
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-primary-soft);
+  color: var(--nivaa-on-primary-soft);
+  font-size: var(--nivaa-font-size-label);
+  font-weight: 800;
+}
+
+.courseLabel {
+  margin-bottom: var(--nivaa-space-micro);
+}
+
+.cardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nivaa-space-comfortable);
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-caption);
+}
+
+.emptyState {
+  padding: clamp(2rem, 6vw, 4rem);
+  border: 1px dashed var(--nivaa-border-strong);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  text-align: center;
+}
+
+.emptyState h3 {
+  margin-bottom: var(--nivaa-space-tight);
+}
+
+.emptyState p {
+  max-width: 48ch;
+  margin: 0 auto;
+  color: var(--nivaa-text-muted);
+}
+
+@media (max-width: 48rem) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .contentCard {
+    align-items: start;
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+  }
+
+  .contentCard > a {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 32rem) {
+  .sectionHeading > span {
+    display: none;
+  }
+
+  .contentCard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .moduleNumber {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}

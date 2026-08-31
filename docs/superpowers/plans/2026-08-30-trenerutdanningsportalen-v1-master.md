@@ -6,7 +6,7 @@
 
 **Architecture:** Bygg en modulær monolitt i Next.js med strenge domenemoduler, server-side autorisasjon og Supabase/PostgreSQL som autoritativ datakilde. Checkin forblir system of record for påmelding og betaling; V1 importerer original Excel-eksport idempotent. All asynkron kommunikasjon går gjennom en database-outbox slik at invitasjoner, påminnelser og diplomer kan prøves på nytt uten duplikater.
 
-**Tech Stack:** Next.js App Router, React, TypeScript strict, pnpm, PostgreSQL/Supabase Auth + Storage + RLS, Zod, TipTap JSON, ExcelJS, React-PDF, OpenAI SDK bak allowlist-adapter, Vitest, Testing Library, Playwright, axe-core, MSW, GitHub Actions, Sentry og EU-hosting.
+**Tech Stack:** Next.js App Router, React, TypeScript strict, pnpm, PostgreSQL/Supabase Auth + Storage + RLS, Zod, skjemavalidert blokk-JSON, ExcelJS, React-PDF, OpenAI SDK bak allowlist-adapter, Vitest, Testing Library, Playwright, axe-core, MSW, GitHub Actions, Sentry og EU-hosting.
 
 ---
 

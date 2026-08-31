@@ -1,0 +1,278 @@
+.frame {
+  display: grid;
+  min-height: 100vh;
+  grid-template-columns: var(--nivaa-sidebar-width) minmax(0, 1fr);
+}
+
+.sidebar {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  display: flex;
+  height: 100vh;
+  min-height: 36rem;
+  flex-direction: column;
+  padding: var(--nivaa-space-comfortable) var(--nivaa-space-default);
+  border-right: 1px solid var(--nivaa-border);
+  background: var(--nivaa-surface);
+}
+
+.brand {
+  display: flex;
+  min-height: 3.5rem;
+  align-items: center;
+  padding: 0 var(--nivaa-space-tight);
+  gap: var(--nivaa-space-compact);
+  color: var(--nivaa-on-surface);
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.brandMark {
+  display: grid;
+  width: 2rem;
+  height: 2.25rem;
+  place-items: center;
+  background: var(--nivaa-on-surface);
+  color: var(--nivaa-surface);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    78% 22%,
+    62% 22%,
+    62% 100%,
+    20% 100%,
+    20% 22%,
+    0 22%
+  );
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.navigation {
+  padding-top: var(--nivaa-space-spacious);
+}
+
+.navigation ul {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: var(--nivaa-space-micro);
+  list-style: none;
+}
+
+.navigationItem {
+  display: grid;
+  min-height: 3rem;
+  align-items: center;
+  padding: 0 var(--nivaa-space-compact);
+  border-radius: var(--nivaa-radius-control);
+  gap: var(--nivaa-space-compact);
+  grid-template-columns: 1.25rem minmax(0, 1fr) auto;
+  color: var(--nivaa-on-surface);
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 560;
+  text-decoration: none;
+  transition: background-color var(--nivaa-transition-fast);
+}
+
+.navigationItem svg,
+.courseContext svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.65;
+}
+
+.navigationItem[data-active] {
+  background: var(--nivaa-primary-soft);
+  color: var(--nivaa-on-primary-soft);
+  font-weight: 700;
+}
+
+.navigationItem[href]:hover {
+  background: var(--nivaa-surface-subtle);
+}
+
+.navigationItem[data-disabled] {
+  color: var(--nivaa-text-muted);
+}
+
+.navigationItem small {
+  color: var(--nivaa-on-disabled);
+  font-size: 0.625rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.profile {
+  display: flex;
+  min-height: 4.5rem;
+  align-items: center;
+  margin-top: auto;
+  padding: var(--nivaa-space-default) var(--nivaa-space-tight) 0;
+  border-top: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-compact);
+}
+
+.profile > span:last-child {
+  display: grid;
+  min-width: 0;
+}
+
+.profile strong,
+.profile small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile strong {
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.profile small {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-caption);
+}
+
+.avatar {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-primary-soft);
+  color: var(--nivaa-on-primary-soft);
+  font-size: var(--nivaa-font-size-label);
+  font-weight: 750;
+}
+
+.workspace {
+  min-width: 0;
+}
+
+.topbar {
+  position: sticky;
+  z-index: 10;
+  top: 0;
+  display: flex;
+  min-height: 4.5rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(1rem, 3vw, 2rem);
+  border-bottom: 1px solid var(--nivaa-border);
+  background: color-mix(in srgb, var(--nivaa-surface) 96%, transparent);
+  gap: var(--nivaa-space-default);
+  backdrop-filter: blur(12px);
+}
+
+.context,
+.courseContext {
+  display: flex;
+  align-items: center;
+  gap: var(--nivaa-space-tight);
+  font-size: var(--nivaa-font-size-body-sm);
+  white-space: nowrap;
+}
+
+.context > span:first-child {
+  color: var(--nivaa-text-muted);
+}
+
+.demoBadge {
+  padding: var(--nivaa-space-micro) var(--nivaa-space-compact);
+  border-radius: var(--nivaa-radius-pill);
+  background: var(--nivaa-primary-soft);
+  color: var(--nivaa-on-primary-soft);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 700;
+}
+
+.courseContext {
+  max-width: 23rem;
+  font-weight: 650;
+}
+
+.courseContext span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.content {
+  min-width: 0;
+}
+
+@media (max-width: 64rem) {
+  .frame {
+    grid-template-columns: 13rem minmax(0, 1fr);
+  }
+
+  .navigationItem small {
+    display: none;
+  }
+}
+
+@media (max-width: 48rem) {
+  .frame {
+    display: block;
+  }
+
+  .sidebar {
+    position: sticky;
+    height: auto;
+    min-height: 0;
+    padding: var(--nivaa-space-tight) var(--nivaa-space-default);
+    border-right: 0;
+    border-bottom: 1px solid var(--nivaa-border);
+  }
+
+  .brand {
+    min-height: 2.75rem;
+  }
+
+  .navigation {
+    overflow-x: auto;
+    padding-top: var(--nivaa-space-tight);
+    scrollbar-width: none;
+  }
+
+  .navigation ul {
+    display: flex;
+  }
+
+  .navigationItem[data-disabled],
+  .profile {
+    display: none;
+  }
+
+  .navigationItem {
+    padding: 0 var(--nivaa-space-default);
+    grid-template-columns: 1.25rem auto;
+    white-space: nowrap;
+  }
+
+  .topbar {
+    position: static;
+    min-height: 3.75rem;
+  }
+
+  .context > span:first-child,
+  .context > span:nth-child(2) {
+    display: none;
+  }
+}
+
+@media (max-width: 34rem) {
+  .courseContext {
+    display: none;
+  }
+}
