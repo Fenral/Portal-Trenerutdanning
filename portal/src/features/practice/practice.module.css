@@ -1,0 +1,357 @@
+.page {
+  width: min(100%, 82rem);
+  margin-inline: auto;
+  padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1rem, 4vw, 3.5rem) 5rem;
+}
+
+.hero {
+  display: grid;
+  align-items: end;
+  padding-bottom: var(--nivaa-space-section);
+  border-bottom: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-section);
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.hero h1 {
+  margin-bottom: var(--nivaa-space-compact);
+}
+
+.hero > div > p:last-child {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-lg);
+}
+
+.eyebrow {
+  margin-bottom: var(--nivaa-space-tight);
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.heroProgress {
+  display: grid;
+  min-width: 12rem;
+  padding-left: var(--nivaa-space-comfortable);
+  border-left: 1px solid var(--nivaa-border-strong);
+  gap: var(--nivaa-space-tight);
+}
+
+.heroProgress strong {
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+}
+
+.heroProgress span {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.statusCard {
+  display: grid;
+  align-items: center;
+  margin-top: var(--nivaa-space-comfortable);
+  padding: var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-info);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-info-soft);
+  gap: var(--nivaa-space-default);
+  grid-template-columns: 3rem minmax(0, 1fr);
+}
+
+.statusCard > span {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--nivaa-surface);
+  color: var(--nivaa-info);
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.statusCard h2,
+.statusCard p {
+  margin-bottom: var(--nivaa-space-tight);
+}
+
+.statusCard[data-status="approved_manual"],
+.statusCard[data-status="approved_auto"] {
+  border-color: var(--nivaa-success);
+  background: var(--nivaa-success-soft);
+}
+
+.statusCard[data-status="approved_manual"] > span,
+.statusCard[data-status="approved_auto"] > span {
+  color: var(--nivaa-success);
+}
+
+.statusCard[data-status="revision_required"] {
+  border-color: var(--nivaa-warning);
+  background: var(--nivaa-warning-soft);
+}
+
+.statusCard[data-status="revision_required"] > span {
+  color: var(--nivaa-warning);
+}
+
+.notice {
+  margin-top: var(--nivaa-space-default);
+  padding: var(--nivaa-space-default);
+  border-left: 0.25rem solid var(--nivaa-error);
+  background: var(--nivaa-error-soft);
+}
+
+.notice[data-success="true"] {
+  border-color: var(--nivaa-success);
+  background: var(--nivaa-success-soft);
+}
+
+.progressCard,
+.formCard,
+.entriesCard,
+.submitCard {
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+}
+
+.progressCard {
+  margin-top: var(--nivaa-space-comfortable);
+}
+
+.progressHeading,
+.sectionHeading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--nivaa-space-default);
+}
+
+.progressHeading h2,
+.sectionHeading h2,
+.formCard h2,
+.submitCard h2 {
+  margin-bottom: 0;
+}
+
+.progressHeading > strong {
+  color: var(--nivaa-primary);
+  font-size: 2rem;
+  letter-spacing: -0.05em;
+}
+
+.progressTrack {
+  height: 0.7rem;
+  margin-top: var(--nivaa-space-comfortable);
+  overflow: hidden;
+  border-radius: var(--nivaa-radius-pill);
+  background: var(--nivaa-primary-soft);
+}
+
+.progressTrack span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--nivaa-primary);
+}
+
+.totals {
+  display: grid;
+  margin: var(--nivaa-space-comfortable) 0 0;
+  gap: var(--nivaa-space-default);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.totals div {
+  display: grid;
+  padding: var(--nivaa-space-default);
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-canvas);
+  gap: var(--nivaa-space-tight);
+}
+
+.totals dt {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.totals dd {
+  margin: 0;
+  font-weight: 750;
+}
+
+.layout {
+  display: grid;
+  align-items: start;
+  margin-top: var(--nivaa-space-comfortable);
+  gap: var(--nivaa-space-comfortable);
+  grid-template-columns: minmax(0, 1fr) minmax(19rem, 24rem);
+}
+
+.mainColumn {
+  display: grid;
+  gap: var(--nivaa-space-comfortable);
+}
+
+.entryForm {
+  display: grid;
+  margin-top: var(--nivaa-space-comfortable);
+  gap: var(--nivaa-space-default);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.entryForm label {
+  display: grid;
+  gap: var(--nivaa-space-tight);
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 700;
+}
+
+.entryForm input,
+.entryForm select,
+.entryForm textarea {
+  width: 100%;
+  min-height: 2.85rem;
+  padding: var(--nivaa-space-compact);
+  border: 1px solid var(--nivaa-border-strong);
+  border-radius: var(--nivaa-radius-field);
+  background: var(--nivaa-canvas);
+  color: var(--nivaa-on-surface);
+  font: inherit;
+}
+
+.entryForm textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+.durationFields {
+  display: grid;
+  gap: var(--nivaa-space-default);
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.descriptionField,
+.entryForm :global(.nivaa-button) {
+  grid-column: 1 / -1;
+}
+
+.entryForm :global(.nivaa-button) {
+  justify-self: start;
+}
+
+.sectionHeading {
+  margin-bottom: var(--nivaa-space-comfortable);
+}
+
+.sectionHeading > span {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.entriesCard ol {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entriesCard li {
+  display: grid;
+  align-items: center;
+  padding: var(--nivaa-space-default) 0;
+  border-top: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-default);
+  grid-template-columns: 7rem minmax(0, 1fr) auto;
+}
+
+.entriesCard li > span:nth-child(2) {
+  display: grid;
+  gap: var(--nivaa-space-micro);
+}
+
+.entriesCard small,
+.entryDate {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.submitCard {
+  position: sticky;
+  top: calc(4.5rem + var(--nivaa-space-comfortable));
+}
+
+.submitCard > p:not(.eyebrow) {
+  color: var(--nivaa-text-muted);
+}
+
+.submitCard form {
+  display: grid;
+  margin-top: var(--nivaa-space-comfortable);
+  gap: var(--nivaa-space-default);
+}
+
+.submitCard :global(.nivaa-button) {
+  width: 100%;
+}
+
+.submitCard small,
+.lockedMessage {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+@media (max-width: 64rem) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .submitCard {
+    position: static;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 48rem) {
+  .hero {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .heroProgress {
+    padding-top: var(--nivaa-space-default);
+    padding-left: 0;
+    border-top: 1px solid var(--nivaa-border-strong);
+    border-left: 0;
+  }
+
+  .totals,
+  .entryForm,
+  .durationFields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .durationFields,
+  .descriptionField,
+  .entryForm :global(.nivaa-button) {
+    grid-column: auto;
+  }
+
+  .entriesCard li {
+    align-items: start;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .entryDate {
+    grid-column: 1 / -1;
+  }
+}

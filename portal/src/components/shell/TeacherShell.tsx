@@ -75,7 +75,8 @@ export function TeacherShell({
               const current = Boolean(
                 item.href &&
                 (item.label === "Vurderinger"
-                  ? pathname.startsWith("/teacher/assignments")
+                  ? pathname.startsWith("/teacher/assignments") ||
+                    pathname.startsWith("/teacher/practice")
                   : pathname === item.href),
               );
 

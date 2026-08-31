@@ -7,9 +7,9 @@ test("a student passes the knowledge test and updates the learning path", async 
   await page.goto("/test-login?as=student-selma");
 
   await expect(
-    page.getByRole("link", { name: "Fortsett Kunnskapsprøve" }),
+    page.getByRole("link", { name: "Åpne Kunnskapsprøve" }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Fortsett Kunnskapsprøve" }).click();
+  await page.getByRole("link", { name: "Åpne Kunnskapsprøve" }).click();
 
   await expect(
     page.getByRole("heading", { name: "Kunnskapsprøve" }),
@@ -37,6 +37,6 @@ test("a student passes the knowledge test and updates the learning path", async 
 
   await page.getByRole("link", { name: "Til læringsløpet" }).click();
   await expect(
-    page.getByRole("progressbar", { name: "80 prosent fullført" }),
+    page.getByRole("progressbar", { name: "70 prosent fullført" }),
   ).toBeVisible();
 });

@@ -65,6 +65,23 @@
   box-shadow: var(--nivaa-shadow-card);
 }
 
+.queueHeading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin-top: var(--nivaa-space-section);
+  gap: var(--nivaa-space-default);
+}
+
+.queueHeading h2 {
+  margin-bottom: 0;
+}
+
+.queueHeading > span {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
 .queue ol {
   margin: 0;
   padding: 0;
@@ -129,7 +146,10 @@
   color: var(--nivaa-warning);
 }
 
-.detailStatus[data-status="approved"] {
+.status[data-status="approved_manual"],
+.detailStatus[data-status="approved"],
+.detailStatus[data-status="approved_manual"],
+.detailStatus[data-status="approved_auto"] {
   background: var(--nivaa-success-soft);
   color: var(--nivaa-success);
 }

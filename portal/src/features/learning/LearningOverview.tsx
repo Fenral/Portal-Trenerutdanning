@@ -47,6 +47,13 @@ function activityHref(
     return `/student/assignments/${activity.id}`;
   }
 
+  if (
+    activity.activityType === "practice" &&
+    activity.access.state === "open"
+  ) {
+    return "/student/practice";
+  }
+
   return `/student/courses/${learningPath.courseRunId}/activities/${activity.id}`;
 }
 

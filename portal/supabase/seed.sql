@@ -802,13 +802,6 @@ join (
       'a2000000-0000-0000-0000-000000000001'::uuid,
       'a2100000-0000-0000-0000-000000000001'::uuid,
       '2026-04-02T12:00:00+02:00'::timestamptz
-    ),
-    (
-      'c0000000-0000-0000-0000-000000000007'::uuid,
-      'a3200000-0000-0000-0000-000000000005'::uuid,
-      null::uuid,
-      null::uuid,
-      '2026-08-15T12:00:00+02:00'::timestamptz
     )
 ) as completion(
   profile_id,
@@ -969,3 +962,84 @@ values (
   'c0000000-0000-0000-0000-000000000001',
   '2026-08-20T10:30:00+02:00'
 );
+
+insert into public.practice_definitions (
+  activity_id,
+  required_minutes,
+  max_planning_minutes,
+  approval_mode,
+  auto_delay_hours,
+  created_by,
+  created_at,
+  updated_at
+)
+values (
+  'a3200000-0000-0000-0000-000000000005',
+  2700,
+  540,
+  'manual_review',
+  null,
+  'c0000000-0000-0000-0000-000000000001',
+  '2026-08-20T10:30:00+02:00',
+  '2026-08-20T10:30:00+02:00'
+);
+
+insert into public.practice_entries (
+  id,
+  enrollment_id,
+  course_run_id,
+  learning_path_id,
+  activity_id,
+  occurred_on,
+  minutes,
+  category,
+  description,
+  idempotency_key,
+  created_by,
+  created_at
+)
+select
+  demo.id,
+  enrollment.id,
+  enrollment.course_run_id,
+  'a3000000-0000-0000-0000-000000000001',
+  'a3200000-0000-0000-0000-000000000005',
+  demo.occurred_on,
+  demo.minutes,
+  demo.category::public.practice_category,
+  demo.description,
+  demo.idempotency_key,
+  enrollment.profile_id,
+  demo.created_at
+from public.enrollments as enrollment
+cross join (
+  values
+    (
+      'a5000000-0000-0000-0000-000000000001'::uuid,
+      '2026-05-12'::date,
+      900,
+      'delivery'::text,
+      'Planla og gjennomførte treninger for juniorgruppen.',
+      'a5100000-0000-0000-0000-000000000001'::uuid,
+      '2026-05-12T20:00:00+02:00'::timestamptz
+    ),
+    (
+      'a5000000-0000-0000-0000-000000000002'::uuid,
+      '2026-05-19'::date,
+      180,
+      'planning'::text,
+      'Planla mål, øvelser og tilpasninger for juniorgruppen.',
+      'a5100000-0000-0000-0000-000000000002'::uuid,
+      '2026-05-19T20:00:00+02:00'::timestamptz
+    )
+) as demo(
+  id,
+  occurred_on,
+  minutes,
+  category,
+  description,
+  idempotency_key,
+  created_at
+)
+where enrollment.course_run_id = 'b1030000-0000-0000-0000-000000000001'
+  and enrollment.profile_id = 'c0000000-0000-0000-0000-000000000005';

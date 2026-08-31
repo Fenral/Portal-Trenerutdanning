@@ -89,7 +89,7 @@ export function StudentShell({
         ? `/student/courses/${courseRunId}`
         : "/student/content",
     },
-    { label: "Praksis", icon: "practice" },
+    { label: "Praksis", icon: "practice", href: "/student/practice" },
     {
       label: "Innleveringer",
       icon: "submissions",
