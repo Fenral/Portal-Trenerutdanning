@@ -419,3 +419,398 @@ values
   ('b1030000-0000-0000-0000-000000000001', 'a2200000-0000-0000-0000-000000000001', 'a2400000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000001', '2026-08-20T10:00:00+02:00'),
   ('b1030000-0000-0000-0000-000000000001', 'a2200000-0000-0000-0000-000000000002', 'a2400000-0000-0000-0000-000000000003', 'c0000000-0000-0000-0000-000000000001', '2026-08-20T10:00:00+02:00'),
   ('b1030000-0000-0000-0000-000000000001', 'a2200000-0000-0000-0000-000000000003', 'a2400000-0000-0000-0000-000000000005', 'c0000000-0000-0000-0000-000000000001', '2026-08-20T10:00:00+02:00');
+
+insert into public.content_items (
+  id,
+  kind,
+  slug,
+  title,
+  created_by,
+  created_at
+)
+values
+  (
+    'a2000000-0000-0000-0000-000000000002',
+    'lesson',
+    'velkommen-til-trener-3',
+    'Velkommen til Trener 3',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T08:00:00+02:00'
+  ),
+  (
+    'a2000000-0000-0000-0000-000000000003',
+    'lesson',
+    'planlegging-av-treningsokt',
+    'Planlegging av treningsøkt',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T08:10:00+02:00'
+  );
+
+insert into public.content_revisions (
+  id,
+  content_item_id,
+  revision_number,
+  status,
+  document,
+  change_note,
+  created_by,
+  created_at,
+  published_by,
+  published_at,
+  updated_at
+)
+values
+  (
+    'a2100000-0000-0000-0000-000000000003',
+    'a2000000-0000-0000-0000-000000000002',
+    1,
+    'published',
+    '{"locale":"nb-NO","format":"short_page","blocks":[{"type":"heading","level":2,"text":"Velkommen til Trener 3"},{"type":"paragraph","text":"Her får du oversikt over læringsløpet, samlingene og hva som anbefales før neste samling."}]}'::jsonb,
+    'Første publiserte versjon',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T08:00:00+02:00',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T08:05:00+02:00',
+    '2026-08-20T08:05:00+02:00'
+  ),
+  (
+    'a2100000-0000-0000-0000-000000000004',
+    'a2000000-0000-0000-0000-000000000002',
+    2,
+    'draft',
+    '{"locale":"nb-NO","format":"short_page","blocks":[{"type":"heading","level":2,"text":"Velkommen til Trener 3"},{"type":"paragraph","text":"Her får du oversikt over læringsløpet, samlingene og hva som anbefales før neste samling."}]}'::jsonb,
+    'Kladd fra publisert versjon',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T08:05:00+02:00',
+    null,
+    null,
+    '2026-08-20T08:05:00+02:00'
+  ),
+  (
+    'a2100000-0000-0000-0000-000000000005',
+    'a2000000-0000-0000-0000-000000000003',
+    1,
+    'published',
+    '{"locale":"nb-NO","format":"short_page","blocks":[{"type":"heading","level":2,"text":"Planlegging av treningsøkt"},{"type":"paragraph","text":"Lag en tydelig plan med mål, aktivitet og en kort vurdering etter økten."},{"type":"callout","tone":"practice","title":"Før samling","text":"Ta med ett eksempel fra egen klubb."}]}'::jsonb,
+    'Første publiserte versjon',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T08:10:00+02:00',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T08:15:00+02:00',
+    '2026-08-20T08:15:00+02:00'
+  ),
+  (
+    'a2100000-0000-0000-0000-000000000006',
+    'a2000000-0000-0000-0000-000000000003',
+    2,
+    'draft',
+    '{"locale":"nb-NO","format":"short_page","blocks":[{"type":"heading","level":2,"text":"Planlegging av treningsøkt"},{"type":"paragraph","text":"Lag en tydelig plan med mål, aktivitet og en kort vurdering etter økten."},{"type":"callout","tone":"practice","title":"Før samling","text":"Ta med ett eksempel fra egen klubb."}]}'::jsonb,
+    'Kladd fra publisert versjon',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T08:15:00+02:00',
+    null,
+    null,
+    '2026-08-20T08:15:00+02:00'
+  );
+
+insert into public.course_content_bindings (
+  course_run_id,
+  content_item_id,
+  content_revision_id,
+  bound_by,
+  bound_at
+)
+values
+  (
+    'b1030000-0000-0000-0000-000000000001',
+    'a2000000-0000-0000-0000-000000000002',
+    'a2100000-0000-0000-0000-000000000003',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T10:00:00+02:00'
+  ),
+  (
+    'b1030000-0000-0000-0000-000000000001',
+    'a2000000-0000-0000-0000-000000000003',
+    'a2100000-0000-0000-0000-000000000005',
+    'c0000000-0000-0000-0000-000000000001',
+    '2026-08-20T10:00:00+02:00'
+  );
+
+insert into public.learning_paths (
+  id,
+  course_run_id,
+  title,
+  created_by,
+  created_at
+)
+values (
+  'a3000000-0000-0000-0000-000000000001',
+  'b1030000-0000-0000-0000-000000000001',
+  'Trener 3 · 2026–2027',
+  'c0000000-0000-0000-0000-000000000001',
+  '2026-08-20T10:10:00+02:00'
+);
+
+insert into public.modules (
+  id,
+  learning_path_id,
+  title,
+  description,
+  sort_order
+)
+values
+  (
+    'a3100000-0000-0000-0000-000000000001',
+    'a3000000-0000-0000-0000-000000000001',
+    'Kom i gang',
+    'Introduksjon og planlegging før første samling.',
+    1
+  ),
+  (
+    'a3100000-0000-0000-0000-000000000002',
+    'a3000000-0000-0000-0000-000000000001',
+    'Golfteknikk',
+    'Fagstoff om ballflukt, treff og trenerens observasjoner.',
+    2
+  ),
+  (
+    'a3100000-0000-0000-0000-000000000003',
+    'a3000000-0000-0000-0000-000000000001',
+    'Praksis',
+    'Registrering og godkjenning av praksistimer.',
+    3
+  ),
+  (
+    'a3100000-0000-0000-0000-000000000004',
+    'a3000000-0000-0000-0000-000000000001',
+    'Avslutning',
+    'Oppsummerende kunnskapsprøve.',
+    4
+  );
+
+insert into public.activities (
+  id,
+  learning_path_id,
+  module_id,
+  title,
+  activity_type,
+  completion_mode,
+  content_item_id,
+  required,
+  weight,
+  sort_order
+)
+values
+  (
+    'a3200000-0000-0000-0000-000000000001',
+    'a3000000-0000-0000-0000-000000000001',
+    'a3100000-0000-0000-0000-000000000001',
+    'Velkommen til Trener 3',
+    'lesson',
+    'manual',
+    'a2000000-0000-0000-0000-000000000002',
+    true,
+    1,
+    1
+  ),
+  (
+    'a3200000-0000-0000-0000-000000000002',
+    'a3000000-0000-0000-0000-000000000001',
+    'a3100000-0000-0000-0000-000000000001',
+    'Planlegging av treningsøkt',
+    'lesson',
+    'reach_end',
+    'a2000000-0000-0000-0000-000000000003',
+    true,
+    1,
+    2
+  ),
+  (
+    'a3200000-0000-0000-0000-000000000003',
+    'a3000000-0000-0000-0000-000000000001',
+    'a3100000-0000-0000-0000-000000000002',
+    'Ballfluktslover og balltreff',
+    'lesson',
+    'reach_end',
+    'a2000000-0000-0000-0000-000000000001',
+    true,
+    2,
+    1
+  ),
+  (
+    'a3200000-0000-0000-0000-000000000004',
+    'a3000000-0000-0000-0000-000000000001',
+    'a3100000-0000-0000-0000-000000000002',
+    'Ekstra fordypning i ballflukt',
+    'lesson',
+    'manual',
+    'a2000000-0000-0000-0000-000000000001',
+    false,
+    1,
+    2
+  ),
+  (
+    'a3200000-0000-0000-0000-000000000005',
+    'a3000000-0000-0000-0000-000000000001',
+    'a3100000-0000-0000-0000-000000000003',
+    'Praksisregistrering',
+    'practice',
+    'practice_approved',
+    null,
+    true,
+    2,
+    1
+  ),
+  (
+    'a3200000-0000-0000-0000-000000000006',
+    'a3000000-0000-0000-0000-000000000001',
+    'a3100000-0000-0000-0000-000000000004',
+    'Kunnskapsprøve',
+    'knowledge_test',
+    'quiz_pass',
+    null,
+    true,
+    2,
+    1
+  );
+
+insert into public.activity_prerequisites (
+  learning_path_id,
+  activity_id,
+  prerequisite_activity_id
+)
+values
+  (
+    'a3000000-0000-0000-0000-000000000001',
+    'a3200000-0000-0000-0000-000000000002',
+    'a3200000-0000-0000-0000-000000000001'
+  ),
+  (
+    'a3000000-0000-0000-0000-000000000001',
+    'a3200000-0000-0000-0000-000000000003',
+    'a3200000-0000-0000-0000-000000000002'
+  ),
+  (
+    'a3000000-0000-0000-0000-000000000001',
+    'a3200000-0000-0000-0000-000000000006',
+    'a3200000-0000-0000-0000-000000000001'
+  ),
+  (
+    'a3000000-0000-0000-0000-000000000001',
+    'a3200000-0000-0000-0000-000000000006',
+    'a3200000-0000-0000-0000-000000000002'
+  ),
+  (
+    'a3000000-0000-0000-0000-000000000001',
+    'a3200000-0000-0000-0000-000000000006',
+    'a3200000-0000-0000-0000-000000000003'
+  );
+
+set role authenticated;
+select set_config(
+  'request.jwt.claim.sub',
+  'd0000000-0000-0000-0000-000000000001',
+  false
+);
+select public.publish_learning_path(
+  'a3000000-0000-0000-0000-000000000001',
+  'c0000000-0000-0000-0000-000000000001'
+);
+reset role;
+
+insert into public.activity_completions (
+  enrollment_id,
+  course_run_id,
+  learning_path_id,
+  activity_id,
+  content_item_id,
+  content_revision_id,
+  source,
+  completed_by,
+  completed_at
+)
+select
+  enrollment.id,
+  enrollment.course_run_id,
+  'a3000000-0000-0000-0000-000000000001',
+  completion.activity_id,
+  completion.content_item_id,
+  completion.content_revision_id,
+  'system',
+  enrollment.profile_id,
+  completion.completed_at
+from public.enrollments as enrollment
+join (
+  values
+    (
+      'c0000000-0000-0000-0000-000000000005'::uuid,
+      'a3200000-0000-0000-0000-000000000001'::uuid,
+      'a2000000-0000-0000-0000-000000000002'::uuid,
+      'a2100000-0000-0000-0000-000000000003'::uuid,
+      '2026-03-01T12:00:00+01:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000005'::uuid,
+      'a3200000-0000-0000-0000-000000000002'::uuid,
+      'a2000000-0000-0000-0000-000000000003'::uuid,
+      'a2100000-0000-0000-0000-000000000005'::uuid,
+      '2026-03-08T12:00:00+01:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000005'::uuid,
+      'a3200000-0000-0000-0000-000000000003'::uuid,
+      'a2000000-0000-0000-0000-000000000001'::uuid,
+      'a2100000-0000-0000-0000-000000000001'::uuid,
+      '2026-04-05T12:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000006'::uuid,
+      'a3200000-0000-0000-0000-000000000001'::uuid,
+      'a2000000-0000-0000-0000-000000000002'::uuid,
+      'a2100000-0000-0000-0000-000000000003'::uuid,
+      '2026-03-04T12:00:00+01:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000006'::uuid,
+      'a3200000-0000-0000-0000-000000000002'::uuid,
+      'a2000000-0000-0000-0000-000000000003'::uuid,
+      'a2100000-0000-0000-0000-000000000005'::uuid,
+      '2026-03-11T12:00:00+01:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000007'::uuid,
+      'a3200000-0000-0000-0000-000000000001'::uuid,
+      'a2000000-0000-0000-0000-000000000002'::uuid,
+      'a2100000-0000-0000-0000-000000000003'::uuid,
+      '2026-02-22T12:00:00+01:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000007'::uuid,
+      'a3200000-0000-0000-0000-000000000002'::uuid,
+      'a2000000-0000-0000-0000-000000000003'::uuid,
+      'a2100000-0000-0000-0000-000000000005'::uuid,
+      '2026-03-02T12:00:00+01:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000007'::uuid,
+      'a3200000-0000-0000-0000-000000000003'::uuid,
+      'a2000000-0000-0000-0000-000000000001'::uuid,
+      'a2100000-0000-0000-0000-000000000001'::uuid,
+      '2026-04-02T12:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000007'::uuid,
+      'a3200000-0000-0000-0000-000000000005'::uuid,
+      null::uuid,
+      null::uuid,
+      '2026-08-15T12:00:00+02:00'::timestamptz
+    )
+) as completion(
+  profile_id,
+  activity_id,
+  content_item_id,
+  content_revision_id,
+  completed_at
+)
+  on completion.profile_id = enrollment.profile_id
+where enrollment.course_run_id = 'b1030000-0000-0000-0000-000000000001';

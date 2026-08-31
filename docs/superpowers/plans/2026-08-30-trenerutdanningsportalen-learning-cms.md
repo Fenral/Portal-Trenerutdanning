@@ -391,7 +391,7 @@ git commit -m "feat: add draft and publish workflow"
 - Test: `portal/tests/unit/learning/progress.test.ts`
 - Test: `portal/tests/unit/learning/access.test.ts`
 
-- [ ] **Step 1: Skriv failing progresjonstest**
+- [x] **Step 1: Skriv failing progresjonstest**
 
 ```ts
 import { describe, expect, it } from "vitest";
@@ -424,7 +424,7 @@ describe("calculateProgress", () => {
 Run: `pnpm vitest tests/unit/learning/progress.test.ts --run`  
 Expected: FAIL.
 
-- [ ] **Step 2: Implementer ren, deterministisk progresjon**
+- [x] **Step 2: Implementer ren, deterministisk progresjon**
 
 ```ts
 export type ProgressActivity = Readonly<{
@@ -454,11 +454,11 @@ export function calculateProgress(
 Run: `pnpm vitest tests/unit/learning/progress.test.ts --run`  
 Expected: PASS, 2 tests.
 
-- [ ] **Step 3: Opprett moduler, aktiviteter, prerequisites og completions**
+- [x] **Step 3: Opprett moduler, aktiviteter, prerequisites og completions**
 
 Migration adds `learning_paths`, `modules`, `activities`, `activity_prerequisites`, `activity_completions` and `enrollment_progress`. Constraints: weight `>0`, sort order unique per parent, completion unique `(enrollment_id, activity_id)`, completion references the bound content revision, and student may insert completion only for own active enrollment through a security-definer function that checks access.
 
-- [ ] **Step 4: Skriv og implementer låseforklaring**
+- [x] **Step 4: Skriv og implementer låseforklaring**
 
 `getActivityAccess(activityId, completions, prerequisites)` returns:
 
@@ -476,7 +476,7 @@ Tests must cover `steg 1 før steg 2`, all required lessons before knowledge tes
 Run: `pnpm vitest tests/unit/learning --run`  
 Expected: PASS; a locked UI lists exact missing titles.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add portal/supabase portal/src/features/learning portal/tests/unit/learning
