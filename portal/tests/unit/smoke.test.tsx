@@ -10,8 +10,17 @@ describe("portal shell", () => {
     expect(
       screen.getByRole("heading", { name: "Trenerutdanning" }),
     ).toBeVisible();
-    expect(screen.getByRole("link", { name: "Student" })).toBeVisible();
-    expect(screen.getByRole("link", { name: "Lærer" })).toBeVisible();
-    expect(screen.getByRole("link", { name: "Administrator" })).toBeVisible();
+    expect(screen.getByRole("link", { name: "Student" })).toHaveAttribute(
+      "href",
+      "/test-login?as=student-selma",
+    );
+    expect(screen.getByRole("link", { name: "Lærer" })).toHaveAttribute(
+      "href",
+      "/test-login?as=teacher-t3",
+    );
+    expect(screen.getByRole("link", { name: "Administrator" })).toHaveAttribute(
+      "href",
+      "/test-login?as=admin",
+    );
   });
 });

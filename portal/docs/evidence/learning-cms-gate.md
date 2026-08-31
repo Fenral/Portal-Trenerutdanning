@@ -29,20 +29,20 @@ Databevis etter reisen:
 
 ## Kvalitetsport
 
-| Kontroll | Resultat |
-| --- | --- |
-| `pnpm format:check` | PASS |
-| `pnpm lint` | PASS, 0 feil |
-| `pnpm typecheck` | PASS |
-| `pnpm test:unit --run` | PASS, 23 filer / 77 tester |
-| `pnpm test:integration --run` | PASS, 5 filer / 9 tester |
-| `pnpm test:rls` | PASS, 7 filer / 165 tester |
-| `pnpm supabase db lint --level warning` | PASS, 0 skjemaavvik |
-| `pnpm build` | PASS, produksjonsbygg og alle dynamiske ruter generert |
-| `pnpm playwright test tests/e2e/vertical-learning-slice.spec.ts` | PASS, 1 reise på 21,0 sekunder |
-| Axe på sluttvisningen | PASS, 0 alvorlige/kritiske avvik |
-| Visuell kontroll 1280 px | PASS |
-| Visuell kontroll 390 px | PASS, ingen horisontal overflow |
+| Kontroll                                                         | Resultat                                               |
+| ---------------------------------------------------------------- | ------------------------------------------------------ |
+| `pnpm format:check`                                              | PASS                                                   |
+| `pnpm lint`                                                      | PASS, 0 feil                                           |
+| `pnpm typecheck`                                                 | PASS                                                   |
+| `pnpm test:unit --run`                                           | PASS, 23 filer / 77 tester                             |
+| `pnpm test:integration --run`                                    | PASS, 5 filer / 9 tester                               |
+| `pnpm test:rls`                                                  | PASS, 7 filer / 165 tester                             |
+| `pnpm supabase db lint --level warning`                          | PASS, 0 skjemaavvik                                    |
+| `pnpm build`                                                     | PASS, produksjonsbygg og alle dynamiske ruter generert |
+| `pnpm playwright test tests/e2e/vertical-learning-slice.spec.ts` | PASS, 1 reise på 21,0 sekunder                         |
+| Axe på sluttvisningen                                            | PASS, 0 alvorlige/kritiske avvik                       |
+| Visuell kontroll 1280 px                                         | PASS                                                   |
+| Visuell kontroll 390 px                                          | PASS, ingen horisontal overflow                        |
 
 Den vertikale testen krever en fersk lokal seed fordi quizforsøk, innleveringsversjoner, praksis og aktivitetsfullføringer med vilje er uforanderlige. Porten kjørte `pnpm supabase db reset` før integrasjonstestene og igjen før Playwright-reisen.
 
@@ -54,10 +54,10 @@ Den vertikale testen krever en fersk lokal seed fordi quizforsøk, innleveringsv
 
 ## Kjente lave avvik og eksterne porter
 
-| Punkt | Alvorlighet | Eier | Frist/handling |
-| --- | --- | --- | --- |
-| Endelig NGF-diplommal, lisensiert font og signaturplassering er ikke levert; `digital-v1` brukes som funksjonell demomal. | Lav for demo, release-port for produksjon | NGF | Leveres i Gate G3 før produksjonssetting |
-| Mobilmenyen er horisontalt rullbar og viser de viktigste handlingene først; desktop er anbefalt for lærer/admin. | Lav | Produkt | Vurderes etter pilotbruk |
-| En uavhengig menneskelig design-/kodegjennomgang er ikke del av den lokale automatiske porten. | Lav | Prosjekteier | Gjennomføres før produksjonsrelease |
+| Punkt                                                                                                                     | Alvorlighet                               | Eier         | Frist/handling                           |
+| ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- | ------------ | ---------------------------------------- |
+| Endelig NGF-diplommal, lisensiert font og signaturplassering er ikke levert; `digital-v1` brukes som funksjonell demomal. | Lav for demo, release-port for produksjon | NGF          | Leveres i Gate G3 før produksjonssetting |
+| Mobilmenyen er horisontalt rullbar og viser de viktigste handlingene først; desktop er anbefalt for lærer/admin.          | Lav                                       | Produkt      | Vurderes etter pilotbruk                 |
+| En uavhengig menneskelig design-/kodegjennomgang er ikke del av den lokale automatiske porten.                            | Lav                                       | Prosjekteier | Gjennomføres før produksjonsrelease      |
 
 Ingen høye eller kritiske kode-, sikkerhets-, tilgjengelighets- eller dataavvik ble funnet i sluttkontrollen.
