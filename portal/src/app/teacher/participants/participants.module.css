@@ -80,6 +80,21 @@
   font-weight: 700;
 }
 
+.participantRow > span[data-tone="success"] {
+  background: var(--nivaa-success-soft);
+  color: var(--nivaa-success);
+}
+
+.participantRow > span[data-tone="attention"] {
+  background: var(--nivaa-warning-soft);
+  color: var(--nivaa-warning);
+}
+
+.participantRow > span[data-tone="danger"] {
+  background: var(--nivaa-error-soft);
+  color: var(--nivaa-error);
+}
+
 .metric strong {
   font-size: 1.2rem;
 }

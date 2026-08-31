@@ -132,7 +132,7 @@ export function TeacherShell({
             <span>Trenerutdanning</span>
             <span aria-hidden="true">/</span>
             <strong>Lærer</strong>
-            <span className={styles.demoBadge}>Demodata</span>
+            <span className={styles.demoBadge}>DEMO · fiktive data</span>
           </div>
           <div className={styles.courseContext}>
             <Icon name="review" />

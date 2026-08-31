@@ -21,7 +21,24 @@ values
   (12, 'Ingrid Gran', 'ingrid.gran@nivaa.invalid', 'Romerike GK'),
   (13, 'Oskar Haug', 'oskar.haug@nivaa.invalid', 'Kristiansund og Omegn GK'),
   (14, 'Sofie Iversen', 'sofie.iversen@nivaa.invalid', 'Grenland og Omegn GK'),
-  (15, 'Marius Kvale', 'marius.kvale@nivaa.invalid', 'Oslo GK');
+  (15, 'Marius Kvale', 'marius.kvale@nivaa.invalid', 'Oslo GK'),
+  (16, 'Kari Ferdig', 'kari.ferdig@nivaa.invalid', 'Oslo GK'),
+  (17, 'Trond «50%»', 'trond.50@nivaa.invalid', 'Losby GK'),
+  (18, 'Jonas «henger etter»', 'jonas.henger.etter@nivaa.invalid', 'Fana GK'),
+  (19, 'Amalie Solberg', 'amalie.solberg@nivaa.invalid', 'Byneset GK'),
+  (20, 'Bendik Nilsen', 'bendik.nilsen@nivaa.invalid', 'Stavanger GK'),
+  (21, 'Camilla Røed', 'camilla.roed@nivaa.invalid', 'Romerike GK'),
+  (22, 'Daniel Moen', 'daniel.moen@nivaa.invalid', 'Onsøy GK'),
+  (23, 'Eva Lunde', 'eva.lunde@nivaa.invalid', 'Oslo GK'),
+  (24, 'Fredrik Berg', 'fredrik.berg@nivaa.invalid', 'Grenland og Omegn GK'),
+  (25, 'Guro Hagen', 'guro.hagen@nivaa.invalid', 'Kristiansund og Omegn GK'),
+  (26, 'Håkon Lie', 'hakon.lie@nivaa.invalid', 'Sandane GK'),
+  (27, 'Ida Strand', 'ida.strand@nivaa.invalid', 'Losby GK'),
+  (28, 'Kristian Vik', 'kristian.vik@nivaa.invalid', 'Fana GK'),
+  (29, 'Line Aasen', 'line.aasen@nivaa.invalid', 'Elverum GK'),
+  (30, 'Martin Dale', 'martin.dale@nivaa.invalid', 'Byneset GK'),
+  (31, 'Nina Holm', 'nina.holm@nivaa.invalid', 'Stavanger GK'),
+  (32, 'Ole Pettersen', 'ole.pettersen@nivaa.invalid', 'Romerike GK');
 
 insert into auth.users (
   instance_id,
@@ -98,7 +115,11 @@ select
   display_name,
   email,
   club_name,
-  case when position in (7, 9) then 2009 else 1988 + position end
+  case
+    when position in (7, 9) then 2009
+    when position >= 16 then 1980 + (position % 18)
+    else 1988 + position
+  end
 from demo_seed_users;
 
 insert into public.user_accounts (user_id, profile_id, normalized_email)
@@ -211,7 +232,24 @@ values
   ('b1010000-0000-0000-0000-000000000002', 'c0000000-0000-0000-0000-000000000012', 'active'),
   ('b1010000-0000-0000-0000-000000000003', 'c0000000-0000-0000-0000-000000000013', 'active'),
   ('b1010000-0000-0000-0000-000000000004', 'c0000000-0000-0000-0000-000000000014', 'active'),
-  ('b1010000-0000-0000-0000-000000000005', 'c0000000-0000-0000-0000-000000000015', 'active');
+  ('b1010000-0000-0000-0000-000000000005', 'c0000000-0000-0000-0000-000000000015', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000016', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000017', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000018', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000019', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000020', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000021', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000022', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000023', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000024', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000025', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000026', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000027', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000028', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000029', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000030', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000031', 'active'),
+  ('b1030000-0000-0000-0000-000000000001', 'c0000000-0000-0000-0000-000000000032', 'active');
 
 insert into public.role_assignments (
   profile_id,
@@ -813,6 +851,249 @@ join (
   on completion.profile_id = enrollment.profile_id
 where enrollment.course_run_id = 'b1030000-0000-0000-0000-000000000001';
 
+insert into public.activity_completions (
+  enrollment_id,
+  course_run_id,
+  learning_path_id,
+  activity_id,
+  source,
+  completed_by,
+  completed_at
+)
+select
+  enrollment.id,
+  enrollment.course_run_id,
+  'a3000000-0000-0000-0000-000000000001',
+  completed_activity.activity_id,
+  'system',
+  enrollment.profile_id,
+  demo.completed_at
+from public.enrollments as enrollment
+join (
+  values
+    (
+      'c0000000-0000-0000-0000-000000000016'::uuid,
+      array[
+        'a3200000-0000-0000-0000-000000000001'::uuid,
+        'a3200000-0000-0000-0000-000000000002'::uuid,
+        'a3200000-0000-0000-0000-000000000003'::uuid,
+        'a3200000-0000-0000-0000-000000000005'::uuid,
+        'a3200000-0000-0000-0000-000000000006'::uuid,
+        'a3200000-0000-0000-0000-000000000007'::uuid
+      ],
+      '2026-08-25T10:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000017'::uuid,
+      array[
+        'a3200000-0000-0000-0000-000000000001'::uuid,
+        'a3200000-0000-0000-0000-000000000002'::uuid,
+        'a3200000-0000-0000-0000-000000000003'::uuid
+      ],
+      '2026-07-18T10:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000018'::uuid,
+      array['a3200000-0000-0000-0000-000000000001'::uuid],
+      '2026-03-01T10:00:00+01:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000019'::uuid,
+      array[
+        'a3200000-0000-0000-0000-000000000001'::uuid,
+        'a3200000-0000-0000-0000-000000000002'::uuid,
+        'a3200000-0000-0000-0000-000000000003'::uuid,
+        'a3200000-0000-0000-0000-000000000005'::uuid,
+        'a3200000-0000-0000-0000-000000000006'::uuid
+      ],
+      '2026-08-20T10:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000020'::uuid,
+      array[
+        'a3200000-0000-0000-0000-000000000001'::uuid,
+        'a3200000-0000-0000-0000-000000000002'::uuid,
+        'a3200000-0000-0000-0000-000000000003'::uuid,
+        'a3200000-0000-0000-0000-000000000006'::uuid
+      ],
+      '2026-08-18T10:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000021'::uuid,
+      array[
+        'a3200000-0000-0000-0000-000000000001'::uuid,
+        'a3200000-0000-0000-0000-000000000002'::uuid,
+        'a3200000-0000-0000-0000-000000000006'::uuid
+      ],
+      '2026-08-14T10:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000022'::uuid,
+      array[
+        'a3200000-0000-0000-0000-000000000001'::uuid,
+        'a3200000-0000-0000-0000-000000000002'::uuid,
+        'a3200000-0000-0000-0000-000000000003'::uuid
+      ],
+      '2026-08-12T10:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000023'::uuid,
+      array[
+        'a3200000-0000-0000-0000-000000000001'::uuid,
+        'a3200000-0000-0000-0000-000000000002'::uuid,
+        'a3200000-0000-0000-0000-000000000007'::uuid
+      ],
+      '2026-08-10T10:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000024'::uuid,
+      array[
+        'a3200000-0000-0000-0000-000000000001'::uuid,
+        'a3200000-0000-0000-0000-000000000003'::uuid
+      ],
+      '2026-07-29T10:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000025'::uuid,
+      array['a3200000-0000-0000-0000-000000000001'::uuid],
+      '2026-07-20T10:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000026'::uuid,
+      array['a3200000-0000-0000-0000-000000000003'::uuid],
+      '2026-07-11T10:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000027'::uuid,
+      array[
+        'a3200000-0000-0000-0000-000000000001'::uuid,
+        'a3200000-0000-0000-0000-000000000002'::uuid,
+        'a3200000-0000-0000-0000-000000000003'::uuid,
+        'a3200000-0000-0000-0000-000000000006'::uuid,
+        'a3200000-0000-0000-0000-000000000007'::uuid
+      ],
+      '2026-08-22T10:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000028'::uuid,
+      array[
+        'a3200000-0000-0000-0000-000000000001'::uuid,
+        'a3200000-0000-0000-0000-000000000002'::uuid,
+        'a3200000-0000-0000-0000-000000000003'::uuid,
+        'a3200000-0000-0000-0000-000000000006'::uuid
+      ],
+      '2026-08-16T10:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000029'::uuid,
+      array[
+        'a3200000-0000-0000-0000-000000000001'::uuid,
+        'a3200000-0000-0000-0000-000000000002'::uuid,
+        'a3200000-0000-0000-0000-000000000006'::uuid
+      ],
+      '2026-08-08T10:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000030'::uuid,
+      array[
+        'a3200000-0000-0000-0000-000000000001'::uuid,
+        'a3200000-0000-0000-0000-000000000002'::uuid
+      ],
+      '2026-07-30T10:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000031'::uuid,
+      array[
+        'a3200000-0000-0000-0000-000000000001'::uuid,
+        'a3200000-0000-0000-0000-000000000003'::uuid
+      ],
+      '2026-07-23T10:00:00+02:00'::timestamptz
+    ),
+    (
+      'c0000000-0000-0000-0000-000000000032'::uuid,
+      array['a3200000-0000-0000-0000-000000000003'::uuid],
+      '2026-07-12T10:00:00+02:00'::timestamptz
+    )
+) as demo(profile_id, activity_ids, completed_at)
+  on demo.profile_id = enrollment.profile_id
+cross join lateral unnest(demo.activity_ids) as completed_activity(activity_id)
+where enrollment.course_run_id = 'b1030000-0000-0000-0000-000000000001';
+
+insert into public.attendance_records (
+  enrollment_id,
+  course_run_id,
+  session_id,
+  planned_minutes,
+  present_minutes,
+  reason,
+  recorded_by,
+  recorded_at,
+  updated_at
+)
+select
+  enrollment.id,
+  enrollment.course_run_id,
+  session.id,
+  420,
+  case
+    when enrollment.profile_id = 'c0000000-0000-0000-0000-000000000018'
+      and session.sort_order = 1 then 210
+    when enrollment.profile_id = 'c0000000-0000-0000-0000-000000000018'
+      and session.sort_order = 2 then 0
+    else 420
+  end,
+  'Fiktivt oppmøte for demonstrasjon',
+  'c0000000-0000-0000-0000-000000000004',
+  '2026-08-25T12:00:00+02:00',
+  '2026-08-25T12:00:00+02:00'
+from public.enrollments as enrollment
+join public.course_sessions as session
+  on session.course_run_id = enrollment.course_run_id
+  and session.session_type = 'regular'
+  and session.is_required
+where enrollment.profile_id in (
+  'c0000000-0000-0000-0000-000000000016',
+  'c0000000-0000-0000-0000-000000000017',
+  'c0000000-0000-0000-0000-000000000018'
+)
+and (
+  enrollment.profile_id = 'c0000000-0000-0000-0000-000000000016'
+  or (
+    enrollment.profile_id = 'c0000000-0000-0000-0000-000000000017'
+    and session.sort_order <= 3
+  )
+  or (
+    enrollment.profile_id = 'c0000000-0000-0000-0000-000000000018'
+    and session.sort_order <= 2
+  )
+);
+
+insert into public.university_requirements (
+  enrollment_id,
+  course_run_id,
+  completed,
+  note,
+  verified_by,
+  verified_at,
+  updated_at
+)
+select
+  enrollment.id,
+  enrollment.course_run_id,
+  true,
+  'Fiktivt universitetskrav kontrollert for demonstrasjon',
+  'c0000000-0000-0000-0000-000000000001',
+  '2026-08-25T12:10:00+02:00',
+  '2026-08-25T12:10:00+02:00'
+from public.enrollments as enrollment
+where enrollment.profile_id = 'c0000000-0000-0000-0000-000000000016'
+  and enrollment.course_run_id = 'b1030000-0000-0000-0000-000000000001';
+
+select private.try_complete_enrollment(enrollment.id)
+from public.enrollments as enrollment
+where enrollment.profile_id = 'c0000000-0000-0000-0000-000000000016'
+  and enrollment.course_run_id = 'b1030000-0000-0000-0000-000000000001';
+
 insert into public.question_versions (
   id,
   question_key,
@@ -962,6 +1243,89 @@ values (
   'c0000000-0000-0000-0000-000000000001',
   '2026-08-20T10:30:00+02:00'
 );
+
+insert into public.assignment_submissions (
+  id,
+  enrollment_id,
+  course_run_id,
+  learning_path_id,
+  activity_id,
+  status,
+  current_version_number,
+  created_at,
+  updated_at
+)
+select
+  demo.submission_id,
+  enrollment.id,
+  enrollment.course_run_id,
+  'a3000000-0000-0000-0000-000000000001',
+  'a3200000-0000-0000-0000-000000000007',
+  demo.status::public.assignment_submission_status,
+  1,
+  demo.created_at,
+  demo.updated_at
+from public.enrollments as enrollment
+join (
+  values
+    ('c0000000-0000-0000-0000-000000000016'::uuid, 'a6000000-0000-0000-0000-000000000001'::uuid, 'approved'::text, '2026-08-10T12:00:00+02:00'::timestamptz, '2026-08-12T14:00:00+02:00'::timestamptz),
+    ('c0000000-0000-0000-0000-000000000017'::uuid, 'a6000000-0000-0000-0000-000000000002'::uuid, 'submitted'::text, '2026-08-28T09:00:00+02:00'::timestamptz, '2026-08-28T09:00:00+02:00'::timestamptz),
+    ('c0000000-0000-0000-0000-000000000018'::uuid, 'a6000000-0000-0000-0000-000000000003'::uuid, 'revision_required'::text, '2026-06-02T09:00:00+02:00'::timestamptz, '2026-06-05T11:00:00+02:00'::timestamptz),
+    ('c0000000-0000-0000-0000-000000000019'::uuid, 'a6000000-0000-0000-0000-000000000004'::uuid, 'submitted'::text, '2026-08-27T13:30:00+02:00'::timestamptz, '2026-08-27T13:30:00+02:00'::timestamptz),
+    ('c0000000-0000-0000-0000-000000000020'::uuid, 'a6000000-0000-0000-0000-000000000005'::uuid, 'revision_required'::text, '2026-08-15T10:00:00+02:00'::timestamptz, '2026-08-18T15:00:00+02:00'::timestamptz),
+    ('c0000000-0000-0000-0000-000000000021'::uuid, 'a6000000-0000-0000-0000-000000000006'::uuid, 'submitted'::text, '2026-08-26T08:15:00+02:00'::timestamptz, '2026-08-26T08:15:00+02:00'::timestamptz),
+    ('c0000000-0000-0000-0000-000000000022'::uuid, 'a6000000-0000-0000-0000-000000000007'::uuid, 'submitted'::text, '2026-08-24T18:45:00+02:00'::timestamptz, '2026-08-24T18:45:00+02:00'::timestamptz),
+    ('c0000000-0000-0000-0000-000000000023'::uuid, 'a6000000-0000-0000-0000-000000000008'::uuid, 'approved'::text, '2026-08-06T11:30:00+02:00'::timestamptz, '2026-08-09T09:20:00+02:00'::timestamptz)
+) as demo(profile_id, submission_id, status, created_at, updated_at)
+  on demo.profile_id = enrollment.profile_id
+where enrollment.course_run_id = 'b1030000-0000-0000-0000-000000000001';
+
+insert into public.assignment_submission_versions (
+  id,
+  submission_id,
+  version_number,
+  note,
+  submitted_by,
+  submitted_at
+)
+select
+  demo.version_id,
+  demo.submission_id,
+  1,
+  demo.note,
+  enrollment.profile_id,
+  demo.submitted_at
+from public.assignment_submissions as submission
+join public.enrollments as enrollment on enrollment.id = submission.enrollment_id
+join (
+  values
+    ('a6000000-0000-0000-0000-000000000001'::uuid, 'a6100000-0000-0000-0000-000000000001'::uuid, 'Ferdig treningsplan med mål, øvelser og evaluering.'::text, '2026-08-10T12:00:00+02:00'::timestamptz),
+    ('a6000000-0000-0000-0000-000000000002'::uuid, 'a6100000-0000-0000-0000-000000000002'::uuid, 'Halvveis i løpet og klar for tilbakemelding.'::text, '2026-08-28T09:00:00+02:00'::timestamptz),
+    ('a6000000-0000-0000-0000-000000000003'::uuid, 'a6100000-0000-0000-0000-000000000003'::uuid, 'Første utkast. Trenger hjelp til evalueringen.'::text, '2026-06-02T09:00:00+02:00'::timestamptz),
+    ('a6000000-0000-0000-0000-000000000004'::uuid, 'a6100000-0000-0000-0000-000000000004'::uuid, 'Plan for inkluderende økt med juniorgruppen.'::text, '2026-08-27T13:30:00+02:00'::timestamptz),
+    ('a6000000-0000-0000-0000-000000000005'::uuid, 'a6100000-0000-0000-0000-000000000005'::uuid, 'Oppdatert etter samling tre.'::text, '2026-08-15T10:00:00+02:00'::timestamptz),
+    ('a6000000-0000-0000-0000-000000000006'::uuid, 'a6100000-0000-0000-0000-000000000006'::uuid, 'Øktplan for voksne nybegynnere.'::text, '2026-08-26T08:15:00+02:00'::timestamptz),
+    ('a6000000-0000-0000-0000-000000000007'::uuid, 'a6100000-0000-0000-0000-000000000007'::uuid, 'Øktplan for regional juniorsamling.'::text, '2026-08-24T18:45:00+02:00'::timestamptz),
+    ('a6000000-0000-0000-0000-000000000008'::uuid, 'a6100000-0000-0000-0000-000000000008'::uuid, 'Godkjent plan med tydelig differensiering.'::text, '2026-08-06T11:30:00+02:00'::timestamptz)
+) as demo(submission_id, version_id, note, submitted_at)
+  on demo.submission_id = submission.id;
+
+insert into public.assignment_reviews (
+  id,
+  submission_id,
+  submission_version_id,
+  action,
+  scale,
+  result_value,
+  comment,
+  reviewed_by,
+  reviewed_at
+)
+values
+  ('a6200000-0000-0000-0000-000000000001', 'a6000000-0000-0000-0000-000000000001', 'a6100000-0000-0000-0000-000000000001', 'approve', 'pass_fail', 'approved', 'Godkjent. Planen viser tydelige mål og gode tilpasninger.', 'c0000000-0000-0000-0000-000000000004', '2026-08-12T14:00:00+02:00'),
+  ('a6200000-0000-0000-0000-000000000002', 'a6000000-0000-0000-0000-000000000003', 'a6100000-0000-0000-0000-000000000003', 'request_revision', null, null, 'Beskriv hvordan økten skal evalueres og legg inn ny realistisk frist.', 'c0000000-0000-0000-0000-000000000004', '2026-06-05T11:00:00+02:00'),
+  ('a6200000-0000-0000-0000-000000000003', 'a6000000-0000-0000-0000-000000000005', 'a6100000-0000-0000-0000-000000000005', 'request_revision', null, null, 'Tydeliggjør tilpasningen til spillere med ulikt ferdighetsnivå.', 'c0000000-0000-0000-0000-000000000004', '2026-08-18T15:00:00+02:00'),
+  ('a6200000-0000-0000-0000-000000000004', 'a6000000-0000-0000-0000-000000000008', 'a6100000-0000-0000-0000-000000000008', 'approve', 'pass_fail', 'approved', 'Godkjent med presise læringsmål og god differensiering.', 'c0000000-0000-0000-0000-000000000004', '2026-08-09T09:20:00+02:00');
 
 insert into public.practice_definitions (
   activity_id,

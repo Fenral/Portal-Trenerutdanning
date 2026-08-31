@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { sortDemoParticipants } from "@/features/demo/participants";
+
 import { calculateAttendance } from "./percentage";
 
 type EnrollmentRow = Readonly<{
@@ -81,8 +83,8 @@ async function loadParticipantsForEnrollments(
     (progress.data ?? []).map((row) => [row.enrollment_id, row.percentage]),
   );
 
-  return enrollments
-    .map((enrollment) => {
+  return sortDemoParticipants(
+    enrollments.map((enrollment) => {
       const profile = profileById.get(enrollment.profile_id);
       const attendanceSummary = calculateAttendance(
         (attendance.data ?? [])
@@ -103,10 +105,9 @@ async function loadParticipantsForEnrollments(
         progressPercentage: progressByEnrollment.get(enrollment.id) ?? 0,
         attendancePercentage: attendanceSummary.displayPercentage,
       };
-    })
-    .sort((left, right) =>
-      left.studentName.localeCompare(right.studentName, "nb-NO"),
-    );
+    }),
+    (participant) => participant.studentName,
+  );
 }
 
 export async function loadTeacherParticipants(

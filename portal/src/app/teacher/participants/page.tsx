@@ -1,17 +1,12 @@
 import Link from "next/link";
 
 import { loadTeacherParticipants } from "@/features/attendance/teacher-data";
+import { participantProgressSignal } from "@/features/demo/participants";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import styles from "./participants.module.css";
 
 export const dynamic = "force-dynamic";
-
-function statusLabel(status: string) {
-  if (status === "completed") return "Fullført";
-  if (status === "active") return "Aktiv";
-  return "Invitert";
-}
 
 export default async function TeacherParticipantsPage() {
   const client = await createSupabaseServerClient();
@@ -29,35 +24,41 @@ export default async function TeacherParticipantsPage() {
       </header>
 
       <section aria-label="Deltakerliste" className={styles.participantList}>
-        {participants.map((participant) => (
-          <article
-            className={styles.participantRow}
-            key={participant.enrollmentId}
-          >
-            <div>
-              <strong>{participant.studentName}</strong>
-              <small>
-                {participant.clubName} · {participant.courseTitle}
-              </small>
-            </div>
-            <span>{statusLabel(participant.status)}</span>
-            <div className={styles.metric}>
-              <small>Progresjon</small>
-              <strong>{participant.progressPercentage} %</strong>
-            </div>
-            <div className={styles.metric}>
-              <small>Oppmøte</small>
-              <strong>{participant.attendancePercentage} %</strong>
-            </div>
-            <Link
-              aria-label={`Åpne ${participant.studentName}`}
-              className="nivaa-button nivaa-button--secondary"
-              href={`/teacher/participants/${participant.enrollmentId}`}
+        {participants.map((participant) => {
+          const signal = participantProgressSignal(
+            participant.progressPercentage,
+          );
+
+          return (
+            <article
+              className={styles.participantRow}
+              key={participant.enrollmentId}
             >
-              Åpne
-            </Link>
-          </article>
-        ))}
+              <div>
+                <strong>{participant.studentName}</strong>
+                <small>
+                  {participant.clubName} · {participant.courseTitle}
+                </small>
+              </div>
+              <span data-tone={signal.tone}>{signal.label}</span>
+              <div className={styles.metric}>
+                <small>Progresjon</small>
+                <strong>{participant.progressPercentage} %</strong>
+              </div>
+              <div className={styles.metric}>
+                <small>Oppmøte</small>
+                <strong>{participant.attendancePercentage} %</strong>
+              </div>
+              <Link
+                aria-label={`Åpne ${participant.studentName}`}
+                className="nivaa-button nivaa-button--secondary"
+                href={`/teacher/participants/${participant.enrollmentId}`}
+              >
+                Åpne
+              </Link>
+            </article>
+          );
+        })}
       </section>
     </main>
   );

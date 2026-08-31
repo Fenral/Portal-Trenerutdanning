@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { isAdministrator } from "@/features/access/require-administrator";
 import { calculateAttendance } from "@/features/attendance/percentage";
+import { sortDemoParticipants } from "@/features/demo/participants";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -92,8 +93,8 @@ export default async function AdminCourseDetailPage({
   const universityByEnrollment = new Map(
     (university.data ?? []).map((row) => [row.enrollment_id, row.completed]),
   );
-  const participants = enrollmentRows
-    .map((enrollment) => {
+  const participants = sortDemoParticipants(
+    enrollmentRows.map((enrollment) => {
       const profile = profileById.get(enrollment.profile_id);
       const attendanceSummary = calculateAttendance(
         (attendance.data ?? [])
@@ -112,8 +113,9 @@ export default async function AdminCourseDetailPage({
         attendance: attendanceSummary.displayPercentage,
         universityCompleted: universityByEnrollment.get(enrollment.id) ?? false,
       };
-    })
-    .sort((left, right) => left.name.localeCompare(right.name, "nb-NO"));
+    }),
+    (participant) => participant.name,
+  );
 
   return (
     <main className={styles.page} id="main-content">

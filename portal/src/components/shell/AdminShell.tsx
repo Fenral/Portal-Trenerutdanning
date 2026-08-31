@@ -172,7 +172,7 @@ export function AdminShell({
             <span>Trenerutdanning</span>
             <span aria-hidden="true">/</span>
             <strong>{contextLabel}</strong>
-            <span className={styles.demoBadge}>Demodata</span>
+            <span className={styles.demoBadge}>DEMO · fiktive data</span>
           </div>
           <div className={styles.topbarMeta}>
             <span>
