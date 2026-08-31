@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { AdminShell } from "@/components/shell/AdminShell";
 import { getContentManagerIdentity } from "@/features/access/require-content-manager";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { isDemoMode } from "@/lib/supabase/environment";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function displayNameFor(user: {
@@ -38,6 +39,7 @@ export default async function EditorLayout({
   return (
     <AdminShell
       contextLabel="Innhold"
+      demoMode={isDemoMode()}
       roleLabel={identity.role === "editor" ? "Redaktør" : "Administrator"}
       topbarLabel="Pensum · Bokmål"
       userName={displayNameFor(user)}

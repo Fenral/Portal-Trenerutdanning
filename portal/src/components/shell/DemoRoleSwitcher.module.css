@@ -1,0 +1,70 @@
+.switcher {
+  padding: var(--nivaa-space-compact);
+  margin-top: var(--nivaa-space-default);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-control);
+  background: var(--nivaa-surface-subtle);
+}
+
+.switcher p {
+  margin: 0 0 var(--nivaa-space-tight);
+  color: var(--nivaa-text-muted);
+  font-size: 0.65rem;
+  font-weight: 750;
+  letter-spacing: 0.065em;
+  text-transform: uppercase;
+}
+
+.switcher > div {
+  display: grid;
+  gap: 0.2rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.switcher a {
+  display: grid;
+  min-height: 2rem;
+  place-items: center;
+  padding: 0 0.25rem;
+  border-radius: calc(var(--nivaa-radius-control) - 0.2rem);
+  color: var(--nivaa-text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.switcher a:hover {
+  background: var(--nivaa-surface);
+  color: var(--nivaa-on-surface);
+}
+
+.switcher a[data-current] {
+  background: var(--nivaa-primary);
+  color: var(--nivaa-on-primary);
+}
+
+.switcher a:focus-visible {
+  outline: 2px solid var(--nivaa-primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 48rem) {
+  .switcher {
+    margin-top: var(--nivaa-space-tight);
+  }
+
+  .switcher p {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .switcher > div {
+    grid-template-columns: repeat(3, minmax(4.75rem, 1fr));
+  }
+}

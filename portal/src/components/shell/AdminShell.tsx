@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { DemoRoleSwitcher } from "./DemoRoleSwitcher";
 import styles from "./AdminShell.module.css";
 
 type IconName =
@@ -87,12 +88,14 @@ function initialsFor(name: string): string {
 
 export function AdminShell({
   children,
+  demoMode = false,
   userName,
   roleLabel = "Administrator",
   contextLabel = "Administrasjon",
   topbarLabel = "Kursår 2026",
 }: {
   children: ReactNode;
+  demoMode?: boolean;
   userName: string;
   roleLabel?: "Administrator" | "Redaktør";
   contextLabel?: string;
@@ -115,6 +118,8 @@ export function AdminShell({
           </span>
           <span>TRENERLØFTET</span>
         </Link>
+
+        {demoMode ? <DemoRoleSwitcher currentRole="admin" /> : null}
 
         <div className={styles.navigationBlock}>
           <p className={styles.navigationLabel}>Administrasjon</p>

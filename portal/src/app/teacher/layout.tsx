@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { TeacherShell } from "@/components/shell/TeacherShell";
+import { isDemoMode } from "@/lib/supabase/environment";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export default async function TeacherLayout({
@@ -29,6 +30,7 @@ export default async function TeacherLayout({
   return (
     <TeacherShell
       courseTitle={courseResult.data?.title ?? "Aktivt kurs"}
+      demoMode={isDemoMode()}
       userName={profileResult.data?.display_name ?? "Kurslærer"}
     >
       {children}

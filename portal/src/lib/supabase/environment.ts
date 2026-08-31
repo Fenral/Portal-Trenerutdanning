@@ -32,6 +32,10 @@ export function isE2ETestMode(): boolean {
   );
 }
 
+export function isDemoMode(): boolean {
+  return isE2ETestMode() || process.env.DEMO_MODE === "true";
+}
+
 export function getE2EDemoPassword(): string {
   return requireEnvironmentValue("E2E_DEMO_PASSWORD");
 }

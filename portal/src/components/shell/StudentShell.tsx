@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { DemoRoleSwitcher } from "./DemoRoleSwitcher";
 import styles from "./StudentShell.module.css";
 
 type IconName =
@@ -82,11 +83,13 @@ export function StudentShell({
   children,
   courseRunId,
   courseTitle,
+  demoMode = false,
   userName,
 }: Readonly<{
   children: ReactNode;
   courseRunId: string | null;
   courseTitle: string;
+  demoMode?: boolean;
   userName: string;
 }>) {
   const pathname = usePathname();
@@ -122,6 +125,8 @@ export function StudentShell({
           </span>
           <span>TRENERLØFTET</span>
         </Link>
+
+        {demoMode ? <DemoRoleSwitcher currentRole="student" /> : null}
 
         <nav aria-label="Hovedmeny" className={styles.navigation}>
           <ul>

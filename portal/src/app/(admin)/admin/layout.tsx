@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { AdminShell } from "@/components/shell/AdminShell";
 import { isAdministrator } from "@/features/access/require-administrator";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { isDemoMode } from "@/lib/supabase/environment";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function displayNameFor(user: {
@@ -32,5 +33,9 @@ export default async function AdminLayout({
     notFound();
   }
 
-  return <AdminShell userName={displayNameFor(user)}>{children}</AdminShell>;
+  return (
+    <AdminShell demoMode={isDemoMode()} userName={displayNameFor(user)}>
+      {children}
+    </AdminShell>
+  );
 }
