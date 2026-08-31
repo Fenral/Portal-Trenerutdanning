@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
+import { PDFDocument } from "pdf-lib";
 
 const courseRunId = "b1030000-0000-0000-0000-000000000001";
 const selmaProfileId = "c0000000-0000-0000-0000-000000000007";
@@ -75,6 +76,13 @@ test("student sees, celebrates and downloads only her own diploma", async ({
     "href",
     /\/storage\/v1\/object\/sign\/certificates\//,
   );
+  const diplomaUrl = await download.getAttribute("href");
+  if (!diplomaUrl) throw new Error("Diploma URL missing");
+  const diplomaResponse = await page.request.get(diplomaUrl);
+  expect(diplomaResponse.ok()).toBe(true);
+  const diploma = await PDFDocument.load(await diplomaResponse.body());
+  expect(diploma.getPage(0).getWidth()).toBeCloseTo(595.28, 1);
+  expect(diploma.getPage(0).getHeight()).toBeCloseTo(841.89, 1);
 
   const celebrate = page.getByRole("button", { name: "Feir fullføringen" });
   await celebrate.click();

@@ -22,25 +22,35 @@ export type StoredDiploma = Readonly<{
   created: boolean;
 }>;
 
-function storagePath(certificate: CertificateRecord) {
-  return `${certificate.course_run_id}/${certificate.id}/diplom.pdf`;
+export const CURRENT_DIPLOMA_TEMPLATE_VERSION = "ngf-official-v1";
+
+export function diplomaStoragePath(certificate: CertificateRecord) {
+  return `${certificate.course_run_id}/${certificate.id}/diplom-${CURRENT_DIPLOMA_TEMPLATE_VERSION}.pdf`;
+}
+
+export function needsDiplomaRefresh(certificate: CertificateRecord) {
+  return (
+    !certificate.storage_path ||
+    !certificate.sha256 ||
+    certificate.template_version !== CURRENT_DIPLOMA_TEMPLATE_VERSION
+  );
 }
 
 export async function ensureDiplomaStored(
   adminClient: SupabaseClient,
   certificate: CertificateRecord,
 ): Promise<StoredDiploma> {
-  if (certificate.storage_path && certificate.sha256) {
+  if (!needsDiplomaRefresh(certificate)) {
     return {
-      path: certificate.storage_path,
-      sha256: certificate.sha256,
+      path: certificate.storage_path!,
+      sha256: certificate.sha256!,
       created: false,
     };
   }
 
-  const path = storagePath(certificate);
+  const path = diplomaStoragePath(certificate);
   const bytes = await generateDiploma({
-    templateVersion: certificate.template_version,
+    templateVersion: CURRENT_DIPLOMA_TEMPLATE_VERSION,
     displayName: certificate.display_name,
     courseTitle: certificate.course_title,
     completedOn: certificate.completed_on,
@@ -62,12 +72,13 @@ export async function ensureDiplomaStored(
   const update = await adminClient
     .from("certificates")
     .update({
+      template_version: CURRENT_DIPLOMA_TEMPLATE_VERSION,
       storage_path: path,
       sha256,
       generated_at: new Date().toISOString(),
     })
     .eq("id", certificate.id)
-    .is("storage_path", null)
+    .eq("template_version", certificate.template_version)
     .select("storage_path,sha256")
     .maybeSingle();
 

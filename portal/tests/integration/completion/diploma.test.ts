@@ -467,7 +467,9 @@ describe.sequential("course completion and diploma", () => {
       .from("certificates")
       .list(`${courseRunId}/${certificate.id}`);
     assertNoError(files.error);
-    expect(files.data?.map((file) => file.name)).toEqual(["diplom.pdf"]);
+    expect(files.data?.map((file) => file.name)).toEqual([
+      "diplom-ngf-official-v1.pdf",
+    ]);
 
     const ownSignedUrl = await studentClient.storage
       .from("certificates")
