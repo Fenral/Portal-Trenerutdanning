@@ -55,7 +55,11 @@ export function TeacherShell({
   const pathname = usePathname();
   const navigation = [
     { label: "Oversikt", href: "/teacher", icon: "home" as const },
-    { label: "Deltakere", icon: "people" as const },
+    {
+      label: "Deltakere",
+      href: "/teacher/participants",
+      icon: "people" as const,
+    },
     { label: "Vurderinger", href: "/teacher", icon: "review" as const },
   ];
 
@@ -74,10 +78,12 @@ export function TeacherShell({
             {navigation.map((item) => {
               const current = Boolean(
                 item.href &&
-                (item.label === "Vurderinger"
-                  ? pathname.startsWith("/teacher/assignments") ||
-                    pathname.startsWith("/teacher/practice")
-                  : pathname === item.href),
+                (item.label === "Deltakere"
+                  ? pathname.startsWith("/teacher/participants")
+                  : item.label === "Vurderinger"
+                    ? pathname.startsWith("/teacher/assignments") ||
+                      pathname.startsWith("/teacher/practice")
+                    : pathname === item.href),
               );
 
               return (

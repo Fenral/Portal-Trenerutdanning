@@ -96,6 +96,7 @@ function SingleCourseGroup({
         <div className={styles.groupMeta}>
           <strong>{run.displayYear}</strong>
           <span>{run.sessions.length} samlinger</span>
+          <Link href={`/admin/courses/${run.id}`}>Åpne {run.title}</Link>
         </div>
       </div>
       <SessionList sessions={run.sessions} />
@@ -163,6 +164,7 @@ export default async function AdminCoursesPage() {
                 <span>{run.displayYear}</span>
               </div>
               <SessionList sessions={run.sessions} />
+              <Link href={`/admin/courses/${run.id}`}>Åpne {run.title}</Link>
             </article>
           ))}
         </div>

@@ -1,0 +1,216 @@
+.page {
+  width: min(calc(100% - 2rem), var(--nivaa-content-max));
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4rem) 0 5rem;
+}
+
+.eyebrow {
+  margin-bottom: var(--nivaa-space-tight);
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.hero,
+.profileHero {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: var(--nivaa-space-spacious);
+  gap: var(--nivaa-space-spacious);
+}
+
+.hero h1,
+.profileHero h1 {
+  margin-bottom: var(--nivaa-space-tight);
+}
+
+.hero p:last-child,
+.profileHero p:last-child {
+  margin: 0;
+  color: var(--nivaa-text-muted);
+}
+
+.hero > strong {
+  font-size: 1.25rem;
+}
+
+.participantList {
+  overflow: hidden;
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+}
+
+.participantRow {
+  display: grid;
+  min-height: 6rem;
+  align-items: center;
+  padding: var(--nivaa-space-default) var(--nivaa-space-comfortable);
+  border-bottom: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-default);
+  grid-template-columns: minmax(13rem, 2fr) auto 7rem 7rem auto;
+}
+
+.participantRow:last-child {
+  border-bottom: 0;
+}
+
+.participantRow > div:first-child,
+.metric,
+.profileMetrics span {
+  display: grid;
+}
+
+.participantRow small,
+.metric small,
+.profileMetrics small {
+  color: var(--nivaa-text-muted);
+}
+
+.participantRow > span {
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--nivaa-radius-pill);
+  background: var(--nivaa-primary-soft);
+  color: var(--nivaa-on-primary-soft);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 700;
+}
+
+.metric strong {
+  font-size: 1.2rem;
+}
+
+.backLink {
+  display: inline-block;
+  margin-bottom: var(--nivaa-space-comfortable);
+  color: var(--nivaa-primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.profileHero {
+  padding-bottom: var(--nivaa-space-spacious);
+  border-bottom: 1px solid var(--nivaa-border);
+}
+
+.profileMetrics {
+  display: flex;
+  gap: var(--nivaa-space-spacious);
+}
+
+.profileMetrics strong {
+  font-size: 1.5rem;
+}
+
+.notice {
+  padding: var(--nivaa-space-default);
+  border-radius: var(--nivaa-radius-control);
+  background: var(--nivaa-primary-soft);
+  color: var(--nivaa-on-primary-soft);
+  font-weight: 650;
+}
+
+.sessionSection {
+  padding: var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+}
+
+.sessionSection > ol {
+  display: grid;
+  margin: var(--nivaa-space-comfortable) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sessionSection > ol > li {
+  padding: var(--nivaa-space-default) 0;
+  border-top: 1px solid var(--nivaa-border);
+}
+
+.sessionHeading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  margin-bottom: var(--nivaa-space-default);
+  gap: var(--nivaa-space-default);
+}
+
+.sessionHeading > span:first-child {
+  display: grid;
+}
+
+.sessionHeading time {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.sessionHeading > span:last-child {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 700;
+}
+
+.sessionHeading > span[data-recorded] {
+  color: var(--nivaa-primary);
+}
+
+.attendanceForm {
+  display: grid;
+  align-items: end;
+  gap: var(--nivaa-space-default);
+  grid-template-columns: minmax(8rem, 1fr) minmax(8rem, 1fr) auto;
+}
+
+.attendanceForm label {
+  display: grid;
+  gap: var(--nivaa-space-micro);
+}
+
+.attendanceForm label > span {
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 700;
+}
+
+.attendanceForm input[type="number"] {
+  min-height: 2.75rem;
+  padding: 0 var(--nivaa-space-compact);
+  border: 1px solid var(--nivaa-border-strong);
+  border-radius: var(--nivaa-radius-control);
+}
+
+@media (max-width: 60rem) {
+  .participantRow {
+    grid-template-columns: minmax(12rem, 1fr) auto auto;
+  }
+
+  .participantRow > span {
+    display: none;
+  }
+}
+
+@media (max-width: 44rem) {
+  .hero,
+  .profileHero,
+  .profileMetrics {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .participantRow,
+  .attendanceForm {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .participantRow > span {
+    display: inline-flex;
+    justify-self: start;
+  }
+}

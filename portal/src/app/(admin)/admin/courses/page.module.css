@@ -156,6 +156,20 @@
   font-size: var(--nivaa-font-size-body-sm);
 }
 
+.groupMeta a,
+.locationCard > a {
+  margin-top: var(--nivaa-space-tight);
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.groupMeta a:hover,
+.locationCard > a:hover {
+  text-decoration: underline;
+}
+
 .sessions {
   display: grid;
   margin: 0;
