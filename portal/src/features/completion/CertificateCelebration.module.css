@@ -1,0 +1,115 @@
+.celebration {
+  position: relative;
+  display: flex;
+  min-height: 7rem;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: var(--nivaa-space-default) var(--nivaa-space-comfortable);
+  border: 1px solid color-mix(in srgb, var(--nivaa-primary) 30%, transparent);
+  border-radius: var(--nivaa-radius-card);
+  background:
+    radial-gradient(
+      circle at 12% 15%,
+      color-mix(in srgb, var(--nivaa-primary-soft) 72%, transparent),
+      transparent 42%
+    ),
+    var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+  gap: var(--nivaa-space-default);
+}
+
+.message {
+  display: flex;
+  align-items: center;
+  gap: var(--nivaa-space-default);
+}
+
+.message > span:last-child {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.message strong {
+  font-size: var(--nivaa-font-size-h3);
+  letter-spacing: -0.02em;
+}
+
+.message small {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.medal {
+  display: grid;
+  width: 3.25rem;
+  height: 3.25rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--nivaa-primary);
+  color: var(--nivaa-surface);
+  font-size: 1.5rem;
+  font-weight: 800;
+  box-shadow: 0 0 0 0.45rem var(--nivaa-primary-soft);
+}
+
+.confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.confetti i {
+  --column: calc(var(--piece) * 5.4% + 2%);
+  position: absolute;
+  top: -1rem;
+  left: var(--column);
+  width: 0.55rem;
+  height: 0.9rem;
+  border-radius: 0.12rem;
+  animation: fall 1.35s cubic-bezier(0.2, 0.7, 0.25, 1) forwards;
+  animation-delay: calc(var(--piece) * 35ms);
+  background: var(--nivaa-primary);
+  opacity: 0;
+  rotate: calc(var(--piece) * 17deg);
+}
+
+.confetti i:nth-child(3n) {
+  background: var(--nivaa-warning);
+}
+
+.confetti i:nth-child(3n + 2) {
+  background: var(--nivaa-info);
+}
+
+.confetti[data-reduced-motion] {
+  display: none;
+}
+
+@keyframes fall {
+  0% {
+    opacity: 0;
+    transform: translateY(-1rem) rotate(0deg);
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(9rem) rotate(380deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti {
+    display: none;
+  }
+}
+
+@media (max-width: 40rem) {
+  .celebration {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

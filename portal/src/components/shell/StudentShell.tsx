@@ -6,7 +6,8 @@ import type { ReactNode } from "react";
 
 import styles from "./StudentShell.module.css";
 
-type IconName = "home" | "learning" | "practice" | "submissions" | "help";
+type IconName =
+  "home" | "learning" | "practice" | "submissions" | "certificates" | "help";
 
 type NavigationItem = Readonly<{
   label: string;
@@ -15,6 +16,15 @@ type NavigationItem = Readonly<{
 }>;
 
 function Icon({ name }: { name: IconName }) {
+  if (name === "certificates") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M7 4h10v8a5 5 0 0 1-10 0V4Z" />
+        <path d="M7 6H4v2a4 4 0 0 0 4 4M17 6h3v2a4 4 0 0 1-4 4M12 17v3M8.5 20h7" />
+      </svg>
+    );
+  }
+
   if (name === "learning") {
     return (
       <svg aria-hidden="true" viewBox="0 0 24 24">
@@ -94,6 +104,11 @@ export function StudentShell({
       label: "Innleveringer",
       icon: "submissions",
       href: "/student/assignments",
+    },
+    {
+      label: "Mine diplomer",
+      icon: "certificates",
+      href: "/student/certificates",
     },
     { label: "Hjelp", icon: "help" },
   ];

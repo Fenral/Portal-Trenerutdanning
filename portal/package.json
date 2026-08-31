@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "test:unit": "vitest tests/unit",
-    "test:integration": "vitest tests/integration",
+    "test:integration": "vitest tests/integration --no-file-parallelism",
     "test:rls": "supabase test db",
     "test:e2e": "playwright test",
     "check:quick": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test:unit --run"
@@ -21,6 +21,7 @@
     "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.112.4",
     "next": "16.3.3",
+    "pdf-lib": "^1.17.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "zod": "^4.5.4"
