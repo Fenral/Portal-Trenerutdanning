@@ -16,7 +16,9 @@ export async function recordAttendanceAction(
   const enrollmentId = textValue(formData, "enrollmentId");
   const sessionId = textValue(formData, "sessionId");
   const plannedMinutes = Number(textValue(formData, "plannedMinutes"));
-  const presentMinutes = Number(textValue(formData, "presentMinutes"));
+  const absenceHours = Number(textValue(formData, "absenceHours"));
+  const absenceMinutes = absenceHours * 60;
+  const presentMinutes = plannedMinutes - absenceMinutes;
   const detailPath = `/teacher/participants/${enrollmentId}`;
 
   if (
@@ -24,9 +26,9 @@ export async function recordAttendanceAction(
     !sessionId ||
     !Number.isInteger(plannedMinutes) ||
     plannedMinutes <= 0 ||
-    !Number.isInteger(presentMinutes) ||
-    presentMinutes < 0 ||
-    presentMinutes > plannedMinutes
+    !Number.isInteger(absenceHours) ||
+    absenceHours < 0 ||
+    absenceMinutes > plannedMinutes
   ) {
     redirect(`${detailPath}?notice=invalid-attendance`);
   }

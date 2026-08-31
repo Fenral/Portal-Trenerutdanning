@@ -114,11 +114,20 @@
 
 .profileMetrics {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--nivaa-space-spacious);
 }
 
 .profileMetrics strong {
   font-size: 1.5rem;
+}
+
+.profileMetrics span[data-tone="success"] strong {
+  color: var(--nivaa-success);
+}
+
+.profileMetrics span[data-tone="danger"] strong {
+  color: var(--nivaa-error);
 }
 
 .notice {
@@ -147,6 +156,10 @@
 .sessionSection > ol > li {
   padding: var(--nivaa-space-default) 0;
   border-top: 1px solid var(--nivaa-border);
+}
+
+.sessionSection article {
+  display: grid;
 }
 
 .sessionHeading {
@@ -178,9 +191,12 @@
 
 .attendanceForm {
   display: grid;
-  align-items: end;
+  align-items: center;
   gap: var(--nivaa-space-default);
-  grid-template-columns: minmax(8rem, 1fr) minmax(8rem, 1fr) auto;
+  grid-template-columns: minmax(9rem, 1fr) minmax(10rem, auto) minmax(
+      8rem,
+      0.7fr
+    ) auto;
 }
 
 .attendanceForm label {
@@ -198,6 +214,30 @@
   padding: 0 var(--nivaa-space-compact);
   border: 1px solid var(--nivaa-border-strong);
   border-radius: var(--nivaa-radius-control);
+}
+
+.sessionDuration {
+  margin: 0;
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.absenceChoice {
+  display: flex !important;
+  align-items: center;
+  min-height: 2.75rem;
+  gap: var(--nivaa-space-compact) !important;
+  font-weight: 700;
+}
+
+.absenceChoice input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--nivaa-primary);
+}
+
+.absenceHours {
+  min-width: 8rem;
 }
 
 @media (max-width: 60rem) {
