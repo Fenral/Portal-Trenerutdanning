@@ -12,6 +12,10 @@ const syntheticAliases: Readonly<Record<string, TestLoginIdentity>> = {
     email: "teacher.demo@nivaa.invalid",
     destination: "/teacher",
   },
+  "teacher-t3": {
+    email: "lead.t3@nivaa.invalid",
+    destination: "/teacher",
+  },
   student: {
     email: "student.demo@nivaa.invalid",
     destination: "/student",

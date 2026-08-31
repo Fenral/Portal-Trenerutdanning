@@ -586,6 +586,13 @@ values
     'Avslutning',
     'Oppsummerende kunnskapsprøve.',
     4
+  ),
+  (
+    'a3100000-0000-0000-0000-000000000005',
+    'a3000000-0000-0000-0000-000000000001',
+    'Innlevering',
+    'Skriftlig oppgave med vurdering og mulighet for utbedring.',
+    5
   );
 
 insert into public.activities (
@@ -668,6 +675,18 @@ values
     'Kunnskapsprøve',
     'knowledge_test',
     'quiz_pass',
+    null,
+    true,
+    2,
+    1
+  ),
+  (
+    'a3200000-0000-0000-0000-000000000007',
+    'a3000000-0000-0000-0000-000000000001',
+    'a3100000-0000-0000-0000-000000000005',
+    'Innlevering: Planlegg en inkluderende golføkt',
+    'assignment',
+    'submission_approved',
     null,
     true,
     2,
@@ -933,3 +952,20 @@ values
     'a4100000-0000-0000-0000-000000000005',
     5
   );
+
+insert into public.assignment_definitions (
+  activity_id,
+  assessment_scale,
+  default_deadline,
+  instructions,
+  created_by,
+  created_at
+)
+values (
+  'a3200000-0000-0000-0000-000000000007',
+  'pass_fail',
+  '2026-12-20T23:59:00+01:00',
+  'Last opp planen for en inkluderende golføkt. Beskriv mål, organisering, tilpasning til utøverne og hvordan du vil evaluere økten.',
+  'c0000000-0000-0000-0000-000000000001',
+  '2026-08-20T10:30:00+02:00'
+);

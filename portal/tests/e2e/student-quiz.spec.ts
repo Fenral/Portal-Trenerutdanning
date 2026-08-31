@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-test("a student passes the knowledge test and completes the learning path", async ({
+test("a student passes the knowledge test and updates the learning path", async ({
   page,
 }) => {
   await page.goto("/test-login?as=student-selma");
@@ -36,5 +36,7 @@ test("a student passes the knowledge test and completes the learning path", asyn
   ).toEqual([]);
 
   await page.getByRole("link", { name: "Til læringsløpet" }).click();
-  await expect(page.getByText("100 %", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("progressbar", { name: "80 prosent fullført" }),
+  ).toBeVisible();
 });

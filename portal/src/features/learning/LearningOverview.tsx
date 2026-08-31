@@ -40,6 +40,13 @@ function activityHref(
     return `/student/quiz/${activity.id}`;
   }
 
+  if (
+    activity.activityType === "assignment" &&
+    activity.access.state === "open"
+  ) {
+    return `/student/assignments/${activity.id}`;
+  }
+
   return `/student/courses/${learningPath.courseRunId}/activities/${activity.id}`;
 }
 

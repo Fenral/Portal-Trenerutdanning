@@ -6,34 +6,8 @@ import type { ReactNode } from "react";
 
 import styles from "./StudentShell.module.css";
 
-type IconName = "home" | "learning" | "practice" | "submissions" | "help";
-
-type NavigationItem = Readonly<{
-  label: string;
-  icon: IconName;
-  href?: string;
-}>;
-
-function Icon({ name }: { name: IconName }) {
-  if (name === "learning") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M4 5.5A3.5 3.5 0 0 1 7.5 4H12v16H7.5A3.5 3.5 0 0 0 4 21.5v-16ZM20 5.5A3.5 3.5 0 0 0 16.5 4H12v16h4.5a3.5 3.5 0 0 1 3.5 1.5v-16Z" />
-      </svg>
-    );
-  }
-
-  if (name === "practice") {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <circle cx="8" cy="8" r="2.5" />
-        <circle cx="16" cy="8" r="2.5" />
-        <path d="M3.5 20v-2a4.5 4.5 0 0 1 9 0v2M11.5 20v-2a4.5 4.5 0 0 1 9 0v2" />
-      </svg>
-    );
-  }
-
-  if (name === "submissions") {
+function Icon({ name }: Readonly<{ name: "home" | "review" | "people" }>) {
+  if (name === "review") {
     return (
       <svg aria-hidden="true" viewBox="0 0 24 24">
         <path d="M6 3.5h8l4 4V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z" />
@@ -42,11 +16,12 @@ function Icon({ name }: { name: IconName }) {
     );
   }
 
-  if (name === "help") {
+  if (name === "people") {
     return (
       <svg aria-hidden="true" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="9" />
-        <path d="M9.8 9a2.4 2.4 0 1 1 3.6 2.1c-.9.5-1.4 1-1.4 2.1M12 17h.01" />
+        <circle cx="8" cy="8" r="2.5" />
+        <circle cx="16" cy="8" r="2.5" />
+        <path d="M3.5 20v-2a4.5 4.5 0 0 1 9 0v2M11.5 20v-2a4.5 4.5 0 0 1 9 0v2" />
       </svg>
     );
   }
@@ -64,44 +39,30 @@ function initialsFor(name: string): string {
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((part) => part.charAt(0).toLocaleUpperCase("nb-NO"))
+    .map((part) => part[0].toLocaleUpperCase("nb-NO"))
     .join("");
 }
 
-export function StudentShell({
+export function TeacherShell({
   children,
-  courseRunId,
   courseTitle,
   userName,
 }: Readonly<{
   children: ReactNode;
-  courseRunId: string | null;
   courseTitle: string;
   userName: string;
 }>) {
   const pathname = usePathname();
-  const navigation: readonly NavigationItem[] = [
-    { label: "Hjem", icon: "home", href: "/student" },
-    {
-      label: "Læringsløp",
-      icon: "learning",
-      href: courseRunId
-        ? `/student/courses/${courseRunId}`
-        : "/student/content",
-    },
-    { label: "Praksis", icon: "practice" },
-    {
-      label: "Innleveringer",
-      icon: "submissions",
-      href: "/student/assignments",
-    },
-    { label: "Hjelp", icon: "help" },
+  const navigation = [
+    { label: "Oversikt", href: "/teacher", icon: "home" as const },
+    { label: "Deltakere", icon: "people" as const },
+    { label: "Vurderinger", href: "/teacher", icon: "review" as const },
   ];
 
   return (
     <div className={styles.frame}>
       <aside className={styles.sidebar}>
-        <Link className={styles.brand} href="/student">
+        <Link className={styles.brand} href="/teacher">
           <span aria-hidden="true" className={styles.brandMark}>
             T
           </span>
@@ -111,22 +72,20 @@ export function StudentShell({
         <nav aria-label="Hovedmeny" className={styles.navigation}>
           <ul>
             {navigation.map((item) => {
-              const isCurrent =
-                item.href === "/student"
-                  ? pathname === item.href
-                  : item.label === "Læringsløp"
-                    ? pathname.startsWith("/student/courses") ||
-                      pathname.startsWith("/student/content") ||
-                      pathname.startsWith("/student/quiz")
-                    : Boolean(item.href && pathname.startsWith(item.href));
+              const current = Boolean(
+                item.href &&
+                (item.label === "Vurderinger"
+                  ? pathname.startsWith("/teacher/assignments")
+                  : pathname === item.href),
+              );
 
               return (
                 <li key={item.label}>
                   {item.href ? (
                     <Link
-                      aria-current={isCurrent ? "page" : undefined}
+                      aria-current={current ? "page" : undefined}
                       className={styles.navigationItem}
-                      data-active={isCurrent || undefined}
+                      data-active={current || undefined}
                       href={item.href}
                     >
                       <Icon name={item.icon} />
@@ -155,7 +114,7 @@ export function StudentShell({
           </span>
           <span>
             <strong>{userName}</strong>
-            <small>{courseTitle}</small>
+            <small>Kurslærer</small>
           </span>
         </div>
       </aside>
@@ -165,11 +124,11 @@ export function StudentShell({
           <div className={styles.context}>
             <span>Trenerutdanning</span>
             <span aria-hidden="true">/</span>
-            <strong>Min læring</strong>
+            <strong>Lærer</strong>
             <span className={styles.demoBadge}>Demodata</span>
           </div>
           <div className={styles.courseContext}>
-            <Icon name="learning" />
+            <Icon name="review" />
             <span>{courseTitle}</span>
           </div>
         </header>

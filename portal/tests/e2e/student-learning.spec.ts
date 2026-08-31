@@ -11,7 +11,7 @@ test("student sees one next action and an exact reason for a locked test", async
   await expect(
     page.getByRole("heading", { name: "Fortsett der du slapp" }),
   ).toBeVisible();
-  await expect(page.getByText("50 %", { exact: true })).toBeVisible();
+  await expect(page.getByText("40 %", { exact: true })).toBeVisible();
   await expect(
     page.getByRole("link", {
       name: "Fortsett Ballfluktslover og balltreff",
