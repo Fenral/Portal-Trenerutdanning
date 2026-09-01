@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { loadEffectiveDeadlines } from "./effective-deadlines";
+
 type SubmissionRow = Readonly<{
   id: string;
   enrollment_id: string;
@@ -88,7 +90,7 @@ export async function loadTeacherAssignmentQueue(
   const submissions = (submissionsResult.data ?? []) as SubmissionRow[];
   if (submissions.length === 0) return [];
 
-  const [enrollmentsResult, activitiesResult, coursesResult] =
+  const [enrollmentsResult, activitiesResult, coursesResult, deadlines] =
     await Promise.all([
       client
         .from("enrollments")
@@ -111,6 +113,10 @@ export async function loadTeacherAssignmentQueue(
           "id",
           submissions.map((submission) => submission.course_run_id),
         ),
+      loadEffectiveDeadlines(
+        client,
+        submissions.map((submission) => submission.enrollment_id),
+      ),
     ]);
   assertNoQueryError(enrollmentsResult.error);
   assertNoQueryError(activitiesResult.error);
@@ -138,13 +144,15 @@ export async function loadTeacherAssignmentQueue(
     (coursesResult.data ?? []).map((course) => [course.id, course]),
   );
 
-  return submissions.map((submission) => {
+  const now = Date.now();
+  const overdue: TeacherAssignmentQueueItem[] = [];
+  const rest: TeacherAssignmentQueueItem[] = [];
+  for (const submission of submissions) {
     const enrollment = enrollmentById.get(submission.enrollment_id);
     const profile = enrollment
       ? profileById.get(enrollment.profile_id)
       : undefined;
-
-    return {
+    const item: TeacherAssignmentQueueItem = {
       submissionId: submission.id,
       studentName: profile?.display_name ?? "Ukjent deltaker",
       clubName: profile?.club_name ?? "Ukjent klubb",
@@ -156,7 +164,16 @@ export async function loadTeacherAssignmentQueue(
       versionNumber: submission.current_version_number,
       updatedAt: submission.updated_at,
     };
-  });
+    const deadline = deadlines.effectiveDeadline(
+      submission.enrollment_id,
+      submission.activity_id,
+    );
+    const isOverdue = deadline !== null && new Date(deadline).getTime() < now;
+    (isOverdue ? overdue : rest).push(item);
+  }
+
+  // Passert effektiv frist først; ellers dagens rekkefølge (nyeste øverst).
+  return [...overdue, ...rest];
 }
 
 export async function loadTeacherAssignment(

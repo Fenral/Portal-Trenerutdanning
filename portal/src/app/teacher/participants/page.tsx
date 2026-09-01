@@ -1,4 +1,5 @@
 import { loadTeacherParticipants } from "@/features/attendance/teacher-data";
+import { loadPaceByEnrollment } from "@/features/courses/pace/teacher-pace-data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { ParticipantList } from "./participant-list";
@@ -9,6 +10,7 @@ export const dynamic = "force-dynamic";
 export default async function TeacherParticipantsPage() {
   const client = await createSupabaseServerClient();
   const participants = await loadTeacherParticipants(client);
+  const paceByEnrollment = await loadPaceByEnrollment(client, participants);
 
   return (
     <main className={styles.page} id="main-content">
@@ -21,7 +23,10 @@ export default async function TeacherParticipantsPage() {
         <strong>{participants.length} deltakere</strong>
       </header>
 
-      <ParticipantList participants={participants} />
+      <ParticipantList
+        paceByEnrollment={paceByEnrollment}
+        participants={participants}
+      />
     </main>
   );
 }

@@ -35,6 +35,7 @@ type CompletionProgressRow = Readonly<{
 
 export type TeacherParticipantListItem = Readonly<{
   enrollmentId: string;
+  courseRunId: string;
   studentName: string;
   clubName: string;
   courseTitle: string;
@@ -238,6 +239,7 @@ async function loadParticipantsForEnrollments(
 
       return {
         enrollmentId: enrollment.id,
+        courseRunId: enrollment.course_run_id,
         studentName: profile?.display_name ?? "Ukjent deltaker",
         clubName: profile?.club_name ?? "Ukjent klubb",
         courseTitle:

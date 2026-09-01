@@ -4,17 +4,33 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import type { TeacherParticipantListItem } from "@/features/attendance/teacher-data";
+import type { Pace } from "@/features/courses/pace";
 import { participantProgressSignal } from "@/features/demo/participants";
 
 import styles from "./participants.module.css";
 
 type SortMode = "recommended" | "progress-desc" | "progress-asc";
+type PaceFilter = "all" | Pace;
+
+const paceSignals: Readonly<
+  Record<Pace, Readonly<{ label: string; symbol: string; tone: string }>>
+> = {
+  green: { label: "I rute", symbol: "✓", tone: "success" },
+  yellow: { label: "Litt bak", symbol: "!", tone: "attention" },
+  red: { label: "Må følges opp", symbol: "!!", tone: "danger" },
+};
 
 export function ParticipantList({
+  paceByEnrollment,
   participants,
-}: Readonly<{ participants: readonly TeacherParticipantListItem[] }>) {
+}: Readonly<{
+  paceByEnrollment: Readonly<Record<string, Pace>>;
+  participants: readonly TeacherParticipantListItem[];
+}>) {
   const [selectedModuleId, setSelectedModuleId] = useState("all");
+  const [paceFilter, setPaceFilter] = useState<PaceFilter>("all");
   const [sortMode, setSortMode] = useState<SortMode>("recommended");
+  const hasPacePlan = Object.keys(paceByEnrollment).length > 0;
   const moduleOptions = useMemo(() => {
     const options = new Map<string, string>();
     for (const participant of participants) {
@@ -43,6 +59,11 @@ export function ParticipantList({
       })
       .filter(
         (row) => selectedModuleId === "all" || row.selectedModule !== null,
+      )
+      .filter(
+        (row) =>
+          paceFilter === "all" ||
+          paceByEnrollment[row.participant.enrollmentId] === paceFilter,
       );
 
     if (sortMode === "recommended") return visible;
@@ -56,7 +77,7 @@ export function ParticipantList({
         "nb-NO",
       );
     });
-  }, [participants, selectedModuleId, sortMode]);
+  }, [paceByEnrollment, paceFilter, participants, selectedModuleId, sortMode]);
 
   return (
     <>
@@ -75,6 +96,22 @@ export function ParticipantList({
             ))}
           </select>
         </label>
+        {hasPacePlan ? (
+          <label>
+            <span>Tempo</span>
+            <select
+              onChange={(event) =>
+                setPaceFilter(event.target.value as PaceFilter)
+              }
+              value={paceFilter}
+            >
+              <option value="all">Alle</option>
+              <option value="green">I rute</option>
+              <option value="yellow">Litt bak</option>
+              <option value="red">Må følges opp</option>
+            </select>
+          </label>
+        ) : null}
         <label>
           <span>Sorter deltakere</span>
           <select
@@ -91,7 +128,10 @@ export function ParticipantList({
 
       <section aria-label="Deltakerliste" className={styles.participantList}>
         {rows.map(({ participant, percentage, selectedModule }) => {
-          const signal = participantProgressSignal(percentage);
+          const pace = paceByEnrollment[participant.enrollmentId];
+          const signal = pace
+            ? paceSignals[pace]
+            : participantProgressSignal(percentage);
 
           return (
             <Link
@@ -107,7 +147,12 @@ export function ParticipantList({
                   {participant.clubName} · {participant.courseTitle}
                 </small>
               </div>
-              <span data-tone={signal.tone}>{signal.label}</span>
+              <span data-tone={signal.tone}>
+                {"symbol" in signal ? (
+                  <span aria-hidden="true">{signal.symbol} </span>
+                ) : null}
+                {signal.label}
+              </span>
               <div className={styles.metric}>
                 <small>{selectedModule?.title ?? "Progresjon"}</small>
                 <strong>{percentage} %</strong>
