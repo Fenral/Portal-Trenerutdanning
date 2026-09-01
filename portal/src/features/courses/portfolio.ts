@@ -47,6 +47,23 @@ function assertNoQueryError(error: { message: string } | null): void {
   }
 }
 
+export async function loadParticipantCounts(
+  adminClient: SupabaseClient,
+): Promise<Map<string, number>> {
+  const { data, error } = await adminClient
+    .from("enrollments")
+    .select("course_run_id,status")
+    .neq("status", "withdrawn");
+
+  assertNoQueryError(error);
+
+  const counts = new Map<string, number>();
+  for (const row of (data ?? []) as { course_run_id: string }[]) {
+    counts.set(row.course_run_id, (counts.get(row.course_run_id) ?? 0) + 1);
+  }
+  return counts;
+}
+
 export async function loadCoursePortfolio(
   adminClient: SupabaseClient,
 ): Promise<CourseRunView[]> {

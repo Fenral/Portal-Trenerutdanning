@@ -4,9 +4,11 @@ import { notFound } from "next/navigation";
 import { isAdministrator } from "@/features/access/require-administrator";
 import {
   loadCoursePortfolio,
+  loadParticipantCounts,
   type CourseRunView,
   type CourseSessionView,
 } from "@/features/courses/portfolio";
+import { buildT1List } from "@/features/courses/t1-list";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -115,8 +117,12 @@ export default async function AdminCoursesPage() {
     notFound();
   }
 
-  const portfolio = await loadCoursePortfolio(adminClient);
+  const [portfolio, participantCounts] = await Promise.all([
+    loadCoursePortfolio(adminClient),
+    loadParticipantCounts(adminClient),
+  ]);
   const t1Runs = portfolio.filter((run) => run.templateCode === "T1");
+  const t1Rows = buildT1List(t1Runs, participantCounts, new Date());
   const t2Run = portfolio.find((run) => run.templateCode === "T2");
   const t3Run = portfolio.find((run) => run.templateCode === "T3");
 
@@ -131,22 +137,23 @@ export default async function AdminCoursesPage() {
             vil arbeide med Trener 2 eller Trener 3.
           </p>
         </div>
-        <Link
-          className="nivaa-button nivaa-button--primary"
-          href="/admin/courses/new"
-        >
-          Ny kursgjennomføring
-        </Link>
+        <div className={styles.heroAside}>
+          <div className={styles.summary}>
+            <span>
+              <strong>{portfolio.length}</strong> kursgjennomføringer
+            </span>
+            <span>
+              <strong>{t1Runs.length}</strong> kurssteder på Trener 1
+            </span>
+          </div>
+          <Link
+            className="nivaa-button nivaa-button--primary"
+            href="/admin/courses/new"
+          >
+            Ny kursgjennomføring
+          </Link>
+        </div>
       </header>
-
-      <div className={styles.summary}>
-        <span>
-          <strong>{portfolio.length}</strong> kursgjennomføringer
-        </span>
-        <span>
-          <strong>{t1Runs.length}</strong> kurssteder på Trener 1
-        </span>
-      </div>
 
       <details className={styles.t1Details} data-testid="t1-course-group">
         <summary>
@@ -154,20 +161,57 @@ export default async function AdminCoursesPage() {
             <span className={styles.kicker}>T1</span>
             <strong>Trener 1 · {t1Runs.length} kurssteder</strong>
           </span>
-          <span className={styles.summaryHint}>Vis kurssteder</span>
+          <span className={styles.summaryHint} data-when="closed">
+            Vis kurssteder
+          </span>
+          <span className={styles.summaryHint} data-when="open">
+            Skjul kurssteder
+          </span>
         </summary>
-        <div className={styles.t1Grid}>
-          {t1Runs.map((run) => (
-            <article className={styles.locationCard} key={run.id}>
-              <div>
-                <h2>{run.locationName}</h2>
-                <span>{run.displayYear}</span>
-              </div>
-              <SessionList sessions={run.sessions} />
-              <Link href={`/admin/courses/${run.id}`}>Åpne {run.title}</Link>
-            </article>
-          ))}
-        </div>
+        <h2 className="nivaa-sr-only">Trener 1</h2>
+        <ol className={styles.t1List}>
+          {t1Rows.map((row) =>
+            row.kind === "youth_drive" ? (
+              <li className={styles.t1YouthRow} key="youth-drive">
+                <div className={styles.t1Identity}>
+                  <h3>Ungdomsdriven · valgfri</h3>
+                  <span>For påmeldte 15–19 år · felles samling</span>
+                </div>
+                <div className={styles.t1Metric}>
+                  <small>Samling</small>
+                  <strong>{row.dateLabel}</strong>
+                </div>
+              </li>
+            ) : (
+              <li key={row.runId}>
+                <Link
+                  className={styles.t1Row}
+                  href={`/admin/courses/${row.runId}`}
+                >
+                  <div className={styles.t1Identity}>
+                    <h3>{row.locationName}</h3>
+                    <span>{row.title}</span>
+                  </div>
+                  <div className={styles.t1Metric}>
+                    <small>Deltakere</small>
+                    <strong>{row.participantCount}</strong>
+                  </div>
+                  <div className={styles.t1Metric}>
+                    <small>Samling 1</small>
+                    <strong>{row.session1Label ?? "–"}</strong>
+                  </div>
+                  <div className={styles.t1Metric}>
+                    <small>Samling 2</small>
+                    <strong>{row.session2Label ?? "–"}</strong>
+                  </div>
+                  <span aria-hidden="true" className={styles.t1Arrow}>
+                    →
+                  </span>
+                </Link>
+              </li>
+            ),
+          )}
+        </ol>
       </details>
 
       {t2Run ? <SingleCourseGroup code="T2" run={t2Run} /> : null}

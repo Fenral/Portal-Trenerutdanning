@@ -53,6 +53,15 @@ export default async function TeacherPage() {
         <div className={styles.queueCount}>
           <strong>{queue.length + practiceQueue.length}</strong>
           <span>til oppfølging</span>
+          {queue[0] ? (
+            <Link
+              aria-label={`Start øverst i køen: ${queue[0].studentName} – ${queue[0].activityTitle}`}
+              className="nivaa-button nivaa-button--primary"
+              href={`/teacher/assignments/${queue[0].submissionId}`}
+            >
+              Start øverst i køen
+            </Link>
+          ) : null}
         </div>
       </header>
 
@@ -67,7 +76,7 @@ export default async function TeacherPage() {
             {queue.map((item, index) => (
               <li key={item.submissionId}>
                 <Link
-                  aria-label={`Vurder ${item.studentName} – ${item.activityTitle}`}
+                  aria-label={`Vurder ${item.studentName} – ${item.activityTitle}, ${statusLabel(item.status)}, ${dateFormatter.format(new Date(item.updatedAt))}`}
                   href={`/teacher/assignments/${item.submissionId}`}
                 >
                   <span className={styles.index} aria-hidden="true">
@@ -118,7 +127,7 @@ export default async function TeacherPage() {
             {practiceQueue.map((item, index) => (
               <li key={item.submissionId}>
                 <Link
-                  aria-label={`Følg opp ${item.studentName} – ${item.activityTitle}`}
+                  aria-label={`Følg opp ${item.studentName} – ${item.activityTitle}, ${practiceStatusLabel(item.status)}, ${dateFormatter.format(new Date(item.submittedAt))}`}
                   href={`/teacher/practice/${item.submissionId}`}
                 >
                   <span className={styles.index} aria-hidden="true">

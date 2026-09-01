@@ -8,7 +8,13 @@ import { DemoRoleSwitcher } from "./DemoRoleSwitcher";
 import styles from "./AdminShell.module.css";
 
 type IconName =
-  "chart" | "content" | "courses" | "people" | "reports" | "settings";
+  | "access"
+  | "chart"
+  | "content"
+  | "courses"
+  | "people"
+  | "reports"
+  | "settings";
 
 type NavigationItem = Readonly<{
   label: string;
@@ -20,12 +26,22 @@ const navigationItems: readonly NavigationItem[] = [
   { label: "Oversikt", icon: "chart" },
   { label: "Kurs", icon: "courses", href: "/admin/courses" },
   { label: "Deltakere", icon: "people" },
+  { label: "Tilganger", icon: "access", href: "/admin/access" },
   { label: "Innhold", icon: "content", href: "/editor/content" },
   { label: "Rapporter", icon: "reports", href: "/admin/reports" },
   { label: "Innstillinger", icon: "settings" },
 ];
 
 function NavigationIcon({ name }: { name: IconName }) {
+  if (name === "access") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <circle cx="8" cy="8" r="4.5" />
+        <path d="M8 12.5V20M8 16h4M14.5 5.5 20 11M17.5 8l2-2" />
+      </svg>
+    );
+  }
+
   if (name === "courses") {
     return (
       <svg aria-hidden="true" viewBox="0 0 24 24">
@@ -184,7 +200,7 @@ export function AdminShell({
               <NavigationIcon name="courses" />
               {topbarLabel}
             </span>
-            <span className={styles.userIcon} title={userName}>
+            <span aria-hidden="true" className={styles.userIcon}>
               {initialsFor(userName)}
             </span>
           </div>

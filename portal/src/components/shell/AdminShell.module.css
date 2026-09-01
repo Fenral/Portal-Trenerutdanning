@@ -75,19 +75,17 @@
 
 .navigationItem {
   display: grid;
-  min-height: 3rem;
+  min-height: 2.75rem;
   align-items: center;
   padding: 0 var(--nivaa-space-compact);
   border-radius: var(--nivaa-radius-control);
   gap: var(--nivaa-space-compact);
   grid-template-columns: 1.25rem minmax(0, 1fr) auto;
-  color: var(--nivaa-on-surface);
+  color: var(--nivaa-text-subtle);
   font-size: var(--nivaa-font-size-body-sm);
-  font-weight: 560;
+  font-weight: 650;
   text-decoration: none;
-  transition:
-    background-color var(--nivaa-transition-fast),
-    color var(--nivaa-transition-fast);
+  transition: background-color var(--nivaa-transition-fast);
 }
 
 .navigationItem svg,
@@ -189,8 +187,9 @@
   justify-content: space-between;
   padding: 0 clamp(1rem, 3vw, 2rem);
   border-bottom: 1px solid var(--nivaa-border);
-  background: var(--nivaa-surface);
+  background: color-mix(in srgb, var(--nivaa-surface) 96%, transparent);
   gap: var(--nivaa-space-default);
+  backdrop-filter: blur(12px);
 }
 
 .context,

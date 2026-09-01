@@ -1,0 +1,61 @@
+.card {
+  display: flex;
+  align-items: center;
+  margin-top: var(--nivaa-space-spacious);
+  padding: var(--nivaa-space-comfortable) var(--nivaa-space-spacious);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+  gap: var(--nivaa-space-comfortable);
+}
+
+.badge {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-success-soft);
+  color: var(--nivaa-success);
+}
+
+.badge svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.copy {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 0.125rem;
+}
+
+.copy h2 {
+  font-size: var(--nivaa-font-size-h3);
+}
+
+.copy p {
+  margin: 0;
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.copy small {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 34rem) {
+  .card {
+    flex-wrap: wrap;
+  }
+}

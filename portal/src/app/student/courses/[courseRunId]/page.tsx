@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { LearningOverview } from "@/features/learning/LearningOverview";
+import { loadCourseSchedule } from "@/features/learning/course-timeline-data";
 import { loadStudentLearningPath } from "@/features/learning/student-learning-data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -17,5 +18,7 @@ export default async function StudentCoursePage({ params }: PageProps) {
 
   if (!learningPath) notFound();
 
-  return <LearningOverview learningPath={learningPath} />;
+  const schedule = await loadCourseSchedule(client, learningPath);
+
+  return <LearningOverview learningPath={learningPath} schedule={schedule} />;
 }

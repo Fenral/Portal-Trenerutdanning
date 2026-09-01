@@ -128,6 +128,11 @@ export function StudentShell({
 
         {demoMode ? <DemoRoleSwitcher currentRole="student" /> : null}
 
+        <div className={styles.activeCourse}>
+          <small>Aktivt kurs</small>
+          <strong>{courseTitle}</strong>
+        </div>
+
         <nav aria-label="Hovedmeny" className={styles.navigation}>
           <ul>
             {navigation.map((item) => {

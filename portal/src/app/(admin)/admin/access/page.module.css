@@ -1,0 +1,130 @@
+.page {
+  width: min(calc(100% - 2rem), var(--nivaa-content-max));
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 5rem) 0;
+}
+
+.hero {
+  padding-bottom: var(--nivaa-space-section);
+  border-bottom: 1px solid var(--nivaa-border);
+}
+
+.hero h1 {
+  margin-bottom: var(--nivaa-space-default);
+}
+
+.hero p:not(.eyebrow) {
+  max-width: 47rem;
+  margin-bottom: 0;
+  color: var(--nivaa-text-muted);
+}
+
+.eyebrow {
+  margin-bottom: var(--nivaa-space-default);
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-label);
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.note {
+  margin-top: var(--nivaa-space-comfortable);
+  padding: var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-info);
+  border-radius: var(--nivaa-radius-field);
+  background: var(--nivaa-info-soft);
+  color: var(--nivaa-info);
+}
+
+.note p {
+  max-width: 52rem;
+  margin: var(--nivaa-space-tight) 0 0;
+  color: var(--nivaa-text-subtle);
+}
+
+.card {
+  margin-top: var(--nivaa-space-comfortable);
+  padding: var(--nivaa-space-spacious);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+}
+
+.card h2 {
+  margin-bottom: var(--nivaa-space-default);
+  font-size: var(--nivaa-font-size-h3);
+}
+
+.empty {
+  margin: 0;
+  color: var(--nivaa-text-muted);
+}
+
+.runList {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: var(--nivaa-space-comfortable);
+  list-style: none;
+}
+
+.runList > li > h3 {
+  margin-bottom: var(--nivaa-space-tight);
+  font-size: var(--nivaa-font-size-body);
+}
+
+.personList {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.personList > li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: var(--nivaa-space-compact) 0;
+  gap: var(--nivaa-space-default);
+}
+
+.personList > li + li {
+  border-top: 1px solid var(--nivaa-border);
+}
+
+.person {
+  display: grid;
+  min-width: 0;
+}
+
+.person small {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-caption);
+}
+
+.rolePill {
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--nivaa-radius-pill);
+  background: var(--nivaa-primary-soft);
+  color: var(--nivaa-on-primary-soft);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.rolePill[data-role="course_teacher"] {
+  background: var(--nivaa-info-soft);
+  color: var(--nivaa-info);
+}
+
+.rolePill[data-role="administrator"] {
+  background: var(--nivaa-surface-subtle);
+  color: var(--nivaa-on-surface);
+}
+
+.rolePill[data-role="editor"] {
+  background: var(--nivaa-warning-soft);
+  color: var(--nivaa-warning);
+}

@@ -33,9 +33,9 @@
 }
 
 .formatBadge {
-  padding: 0.7rem 1rem;
+  padding: var(--nivaa-space-compact) var(--nivaa-space-default);
   border: 1px solid var(--nivaa-border);
-  border-radius: 999px;
+  border-radius: var(--nivaa-radius-pill);
   background: var(--nivaa-surface);
   color: var(--nivaa-primary);
   font-size: var(--nivaa-font-size-body-sm);
@@ -129,14 +129,15 @@
 .note {
   margin-top: var(--nivaa-space-comfortable);
   padding: var(--nivaa-space-comfortable);
-  border-left: 4px solid var(--nivaa-primary);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
   background: var(--nivaa-primary-soft);
 }
 
 .note p {
   max-width: 52rem;
   margin: var(--nivaa-space-tight) 0 0;
-  color: var(--nivaa-text-muted);
+  color: var(--nivaa-text-subtle);
 }
 
 @media (max-width: 48rem) {

@@ -103,8 +103,8 @@
 
 .callout {
   padding: var(--nivaa-space-comfortable);
-  border-left: 0.25rem solid var(--nivaa-info);
-  border-radius: 0 var(--nivaa-radius-inner) var(--nivaa-radius-inner) 0;
+  border: 1px solid var(--nivaa-info);
+  border-radius: var(--nivaa-radius-field);
   background: var(--nivaa-info-soft);
 }
 

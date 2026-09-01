@@ -1,0 +1,84 @@
+.card {
+  margin-top: var(--nivaa-space-spacious);
+  padding: var(--nivaa-space-spacious);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+}
+
+.card h2 {
+  margin-bottom: var(--nivaa-space-default);
+  font-size: var(--nivaa-font-size-h3);
+}
+
+.list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: var(--nivaa-space-compact) 0;
+  gap: var(--nivaa-space-default);
+  scroll-margin-top: 6rem;
+}
+
+.list li + li {
+  border-top: 1px solid var(--nivaa-border);
+}
+
+/* Markerer raden når tidslinjen har lenket hit */
+.list li:target {
+  margin: 0 calc(-1 * var(--nivaa-space-compact));
+  padding-inline: var(--nivaa-space-compact);
+  border-radius: var(--nivaa-radius-field);
+  background: var(--nivaa-primary-soft);
+}
+
+.list li:target + li {
+  border-top-color: transparent;
+}
+
+.copy {
+  display: flex;
+  align-items: baseline;
+  gap: var(--nivaa-space-tight);
+}
+
+.copy strong {
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 700;
+}
+
+.youthDrive {
+  padding: 0.125rem 0.625rem;
+  border-radius: var(--nivaa-radius-pill);
+  background: var(--nivaa-info-soft);
+  color: var(--nivaa-info);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.meta {
+  display: grid;
+  justify-items: end;
+  text-align: right;
+}
+
+.meta span {
+  font-size: var(--nivaa-font-size-body-sm);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.meta small {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-caption);
+}

@@ -88,11 +88,15 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.fieldGrid label,
-.sessionGrid label {
+.fieldGrid label:not(.checkbox),
+.sessionGrid label:not(.checkbox) {
   display: grid;
   align-content: start;
   gap: var(--nivaa-space-micro);
+}
+
+.fieldGrid label,
+.sessionGrid label {
   font-size: var(--nivaa-font-size-body-sm);
   font-weight: 700;
 }
@@ -134,11 +138,11 @@
 }
 
 .checkbox {
-  display: flex !important;
+  display: flex;
   min-height: 2.75rem;
   align-items: center;
   align-self: end;
-  gap: var(--nivaa-space-tight) !important;
+  gap: var(--nivaa-space-tight);
 }
 
 .checkbox input {

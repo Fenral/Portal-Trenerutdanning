@@ -1,10 +1,21 @@
 .page {
-  width: min(100%, 82rem);
+  width: min(100%, var(--nivaa-content-max));
   margin-inline: auto;
   padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1rem, 4vw, 3.5rem) 5rem;
 }
 
-.hero,
+.hero {
+  display: grid;
+  align-items: end;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-primary-soft);
+  box-shadow: var(--nivaa-shadow-card);
+  gap: var(--nivaa-space-section);
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
 .detailHero {
   display: grid;
   align-items: end;
@@ -28,6 +39,11 @@
   font-size: var(--nivaa-font-size-body-lg);
 }
 
+.hero > div > p:last-child {
+  color: var(--nivaa-text-subtle);
+  font-size: var(--nivaa-font-size-body);
+}
+
 .eyebrow {
   margin-bottom: var(--nivaa-space-tight);
   color: var(--nivaa-primary);
@@ -40,6 +56,7 @@
 .queueCount {
   display: grid;
   min-width: 10rem;
+  justify-items: start;
   padding-left: var(--nivaa-space-comfortable);
   border-left: 1px solid var(--nivaa-border-strong);
 }
@@ -48,6 +65,10 @@
   font-size: 2.5rem;
   letter-spacing: -0.06em;
   line-height: 1;
+}
+
+.queueCount :global(.nivaa-button) {
+  margin-top: var(--nivaa-space-default);
 }
 
 .queueCount span {
@@ -326,7 +347,8 @@
 .notice {
   margin-top: var(--nivaa-space-comfortable);
   padding: var(--nivaa-space-default);
-  border-left: 0.25rem solid var(--nivaa-error);
+  border: 1px solid var(--nivaa-error);
+  border-radius: var(--nivaa-radius-field);
   background: var(--nivaa-error-soft);
 }
 

@@ -40,7 +40,8 @@
 .participantList {
   overflow: hidden;
   border: 1px solid var(--nivaa-border);
-  border-radius: var(--nivaa-radius-surface);
+  border-radius: 0 0 var(--nivaa-radius-surface) var(--nivaa-radius-surface);
+  border-top: 0;
   background: var(--nivaa-surface);
   box-shadow: var(--nivaa-shadow-card);
 }
@@ -49,10 +50,9 @@
   display: flex;
   align-items: end;
   padding: var(--nivaa-space-default);
-  margin-bottom: var(--nivaa-space-default);
   border: 1px solid var(--nivaa-border);
-  border-radius: var(--nivaa-radius-surface);
-  background: var(--nivaa-surface);
+  border-radius: var(--nivaa-radius-surface) var(--nivaa-radius-surface) 0 0;
+  background: var(--nivaa-surface-subtle);
   gap: var(--nivaa-space-default);
 }
 
@@ -74,12 +74,12 @@
   border: 1px solid var(--nivaa-border-strong);
   border-radius: var(--nivaa-radius-control);
   background: var(--nivaa-surface);
-  color: var(--nivaa-text);
+  color: var(--nivaa-on-surface);
 }
 
 .listControls > strong {
   margin-left: auto;
-  padding-bottom: 0.7rem;
+  padding-bottom: var(--nivaa-space-compact);
   white-space: nowrap;
 }
 
@@ -87,15 +87,13 @@
   display: grid;
   min-height: 4.25rem;
   align-items: center;
-  padding: 0.7rem var(--nivaa-space-default);
+  padding: var(--nivaa-space-compact) var(--nivaa-space-default);
   border-bottom: 1px solid var(--nivaa-border);
   color: inherit;
   gap: var(--nivaa-space-default);
   grid-template-columns: minmax(13rem, 2fr) auto minmax(7rem, 0.8fr) 6rem auto;
   text-decoration: none;
-  transition:
-    background 150ms ease,
-    box-shadow 150ms ease;
+  transition: background-color var(--nivaa-transition-fast);
 }
 
 .participantRow:last-child {
@@ -113,7 +111,7 @@
   outline-offset: -3px;
 }
 
-.participantRow > div:first-child,
+.participantIdentity,
 .metric,
 .profileMetrics span {
   display: grid;
@@ -236,7 +234,7 @@
   overflow: hidden;
   border: 1px solid var(--nivaa-border);
   border-radius: var(--nivaa-radius-control);
-  background: var(--nivaa-background);
+  background: var(--nivaa-surface-subtle);
 }
 
 .moduleCard summary {
@@ -360,7 +358,7 @@
     auto;
 }
 
-.attendanceForm label {
+.attendanceForm label:not(.absenceChoice) {
   display: grid;
   gap: var(--nivaa-space-micro);
 }
@@ -384,10 +382,10 @@
 }
 
 .absenceChoice {
-  display: flex !important;
+  display: flex;
   align-items: center;
   min-height: 2.75rem;
-  gap: var(--nivaa-space-compact) !important;
+  gap: var(--nivaa-space-compact);
   font-weight: 700;
 }
 

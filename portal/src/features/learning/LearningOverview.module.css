@@ -76,9 +76,11 @@
   align-items: end;
   margin-top: clamp(1.5rem, 4vw, 3rem);
   padding: clamp(1.5rem, 4vw, 2.5rem);
+  border: 1px solid var(--nivaa-border);
   border-radius: var(--nivaa-radius-surface);
-  background: var(--nivaa-on-surface);
-  color: var(--nivaa-surface);
+  background: var(--nivaa-primary-soft);
+  color: var(--nivaa-on-surface);
+  box-shadow: var(--nivaa-shadow-card);
   gap: var(--nivaa-space-comfortable);
   grid-template-columns: minmax(0, 1fr) auto;
 }
@@ -91,17 +93,12 @@
 
 .nextAction > div > p:not(.eyebrow) {
   max-width: 58ch;
-  color: #d9e4dd;
+  color: var(--nivaa-text-subtle);
 }
 
 .nextAction .eyebrow,
 .completedPath .eyebrow {
-  color: #9fd6b7;
-}
-
-.nextAction :global(.nivaa-button--primary) {
-  background: var(--nivaa-success);
-  color: white;
+  color: var(--nivaa-primary);
 }
 
 .nextAction :global(.nivaa-button) {
@@ -113,7 +110,7 @@
   flex-wrap: wrap;
   margin-top: var(--nivaa-space-default);
   gap: var(--nivaa-space-comfortable);
-  color: #b9c9c0;
+  color: var(--nivaa-text-muted);
   font-size: var(--nivaa-font-size-caption);
 }
 

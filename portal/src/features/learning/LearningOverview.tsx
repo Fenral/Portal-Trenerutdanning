@@ -1,5 +1,13 @@
 import Link from "next/link";
 
+import {
+  DiplomaCard,
+  type DiplomaCardData,
+} from "@/features/completion/DiplomaCard";
+
+import { CourseSessions } from "./CourseSessions";
+import { CourseTimeline } from "./CourseTimeline";
+import type { CourseScheduleView } from "./course-timeline-data";
 import type {
   StudentLearningActivity,
   StudentLearningPathView,
@@ -58,8 +66,14 @@ function activityHref(
 }
 
 export function LearningOverview({
+  diploma,
   learningPath,
-}: Readonly<{ learningPath: StudentLearningPathView }>) {
+  schedule,
+}: Readonly<{
+  diploma?: DiplomaCardData | null;
+  learningPath: StudentLearningPathView;
+  schedule?: CourseScheduleView | null;
+}>) {
   const nextActivity = learningPath.nextActivity;
 
   return (
@@ -81,6 +95,15 @@ export function LearningOverview({
           </div>
         </div>
       </header>
+
+      {schedule ? (
+        <CourseTimeline
+          courseTitle={learningPath.courseTitle}
+          timeline={schedule.timeline}
+        />
+      ) : null}
+
+      {diploma ? <DiplomaCard diploma={diploma} /> : null}
 
       {nextActivity ? (
         <section className={styles.nextAction} aria-labelledby="next-title">
@@ -226,6 +249,8 @@ export function LearningOverview({
           </article>
         ))}
       </section>
+
+      {schedule ? <CourseSessions sessions={schedule.sessions} /> : null}
     </main>
   );
 }

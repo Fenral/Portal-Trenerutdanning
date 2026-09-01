@@ -84,8 +84,8 @@
 .errorMessage {
   margin: var(--nivaa-space-comfortable) 0 0;
   padding: var(--nivaa-space-default);
-  border-left: 0.25rem solid var(--nivaa-success);
-  border-radius: 0 var(--nivaa-radius-inner) var(--nivaa-radius-inner) 0;
+  border: 1px solid var(--nivaa-success);
+  border-radius: var(--nivaa-radius-field);
   background: var(--nivaa-success-soft);
 }
 

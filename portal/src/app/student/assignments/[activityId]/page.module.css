@@ -99,7 +99,8 @@
 .notice {
   margin-top: var(--nivaa-space-comfortable);
   padding: var(--nivaa-space-default);
-  border-left: 0.25rem solid var(--nivaa-error);
+  border: 1px solid var(--nivaa-error);
+  border-radius: var(--nivaa-radius-field);
   background: var(--nivaa-error-soft);
 }
 

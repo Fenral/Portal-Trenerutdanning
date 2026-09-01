@@ -99,7 +99,7 @@ Desktop bruker et fast sidefelt på 228–240 px, et verktøyfelt på 68–72 px
 
 ## Elevation & Depth
 
-Systemet er nesten flatt og skaper dybde med hvit flate, `border` og svært myke grønn-tonede skygger. Standardkort bruker `0 8px 24px rgba(16, 34, 27, 0.05)`; flytende menyer kan bruke `0 16px 40px rgba(16, 34, 27, 0.08)`. Begge kombineres med en 1 px kant, slik at informasjonen fortsatt har struktur når skygger ikke oppfattes. Innvendige seksjoner bruker kun tonet bakgrunn eller skillelinje. Harde skygger, glass, glow og flere stablede elevasjonsnivåer er ikke tillatt.
+Systemet er nesten flatt og skaper dybde med hvit flate, `border` og svært myke grønn-tonede skygger. Standardkort bruker et lagdelt par — `0 1px 2px rgba(16, 34, 27, 0.04), 0 8px 24px rgba(16, 34, 27, 0.05)` — der den korte skyggen forankrer kanten og den lange gir luft. Interaktive kort kan løftes til `0 2px 4px rgba(16, 34, 27, 0.05), 0 12px 32px rgba(16, 34, 27, 0.08)` med maks 1 px translateY på hover (180 ms, ease-out; deaktiveres ved redusert bevegelse). Flytende menyer kan bruke `0 16px 40px rgba(16, 34, 27, 0.08)`. Alle kombineres med en 1 px kant, slik at informasjonen fortsatt har struktur når skygger ikke oppfattes. Innvendige seksjoner bruker kun tonet bakgrunn eller skillelinje. Harde skygger, glass, glow og flere stablede elevasjonsnivåer er ikke tillatt.
 
 ## Shapes
 
@@ -138,15 +138,49 @@ Outline-ikoner bruker konsekvent strek og uten dekorative sportsmotiver. Pillrad
 
 ### `nav-item`
 
-- 48 px høy og 8 px radius.
-- Aktiv tilstand: `primary-soft` / `on-primary-soft`.
+- 44 px høy og 8 px radius; tekstfarge `#3D4C45` (`text-subtle`), vekt 650.
+- Aktiv tilstand: `primary-soft` / `on-primary-soft`, vekt 700.
 - Hoveddestinasjoner holdes stabile og synlige.
+
+### `course-context`
+
+- Kompakt boks øverst i sidefeltet: versal etikett «Aktivt kurs» over kursnavnet.
+- `surface-subtle` bakgrunn, 1 px `border`, 10 px radius.
+- Gir stabil kurskontekst uten å konkurrere med navigasjonen.
+
+### `timeline`
+
+- Horisontalt spor øverst i kursvisningen: samlinger (runde punkter) og
+  innleveringsfrister (avrundet kvadrat) sortert på dato.
+- Gjennomført: fylt `primary` med hake. Kommer: hvit flate med kantlinje.
+  Forfalt: `warning-soft` flate, `warning` kant og teksten «Forfalt» — aldri
+  farge alene.
+- «Du er her»-markør: 2 px stiplet `primary`-linje med versal etikett på
+  dagens posisjon; skjermlesere får dagens dato som tekst og
+  `aria-current="step"` på neste kommende hendelse.
+- Hvert punkt er en lenke: frist går til aktiviteten, samling til
+  samlingsraden lenger ned på siden. Overflyt ruller horisontalt med
+  bevart fokusring.
+
+### `diploma-card`
+
+- Vises på studentens hjem når kurset er fullført: suksess-tonet ikonflis,
+  kurs, fullføringsdato, diplomnummer og én primærknapp «Last ned diplom».
 
 ### `card`
 
 - Representerer én selvstendig oppgave eller kontekst, ikke hvert avsnitt.
 - Hvit flate, 16 px radius og 32 px padding.
 - Standard border og myk kortskygge.
+
+### `next-step` (neste-steg-/kø-hero)
+
+- Sidens ene dominante handlingskort: `primary-soft` flate, 1 px `border`,
+  16 px radius og kortskygge — aldri mørk/invertert flate.
+- Grønnsvart tittel, `text-subtle` brødtekst, `primary` eyebrow.
+- Én fylt `primary`-CTA; dominansen kommer fra størrelse og at dette er
+  flatens eneste fylte knapp.
+- Brukes for studentens «Anbefalt neste steg» og lærerens «N til oppfølging».
 
 ### `status`
 
@@ -182,6 +216,9 @@ Outline-ikoner bruker konsekvent strek og uten dekorative sportsmotiver. Pillrad
 
 - Ikke bygg bento-mosaikker eller «kortsuppe» av alle måltall.
 - Ikke bruk gradients, glassmorphism, glow eller harde skygger.
+- Ikke bruk tykke sidekanter (border-left/right > 1 px) som aksent på kort
+  eller varsler; callouts bruker full 1 px statuskant, `field`-radius og
+  `*-soft` flate.
 - Ikke bruk sirkulære prosentdiagrammer, streaks eller konkurrerende gamification.
 - Ikke bruk golfbilder, flaggdekor eller andre idrettsklisjeer som systemgrafikk.
 - Ikke overbruk piller, grønt eller flere like sterke hovedknapper.

@@ -63,7 +63,6 @@ export function TeacherShell({
       href: "/teacher/participants",
       icon: "people" as const,
     },
-    { label: "Vurderinger", href: "/teacher", icon: "review" as const },
   ];
 
   return (
@@ -78,42 +77,33 @@ export function TeacherShell({
 
         {demoMode ? <DemoRoleSwitcher currentRole="teacher" /> : null}
 
+        <div className={styles.activeCourse}>
+          <small>Ditt kurs</small>
+          <strong>{courseTitle}</strong>
+        </div>
+
         <nav aria-label="Hovedmeny" className={styles.navigation}>
           <ul>
             {navigation.map((item) => {
-              const current = Boolean(
-                item.href &&
-                (item.label === "Deltakere"
+              const current =
+                item.label === "Deltakere"
                   ? pathname.startsWith("/teacher/participants")
-                  : item.label === "Vurderinger"
-                    ? pathname.startsWith("/teacher/assignments") ||
-                      pathname.startsWith("/teacher/practice")
-                    : pathname === item.href),
-              );
+                  : pathname === item.href ||
+                    pathname.startsWith("/teacher/assignments") ||
+                    pathname.startsWith("/teacher/practice");
+              const exact = pathname === item.href;
 
               return (
                 <li key={item.label}>
-                  {item.href ? (
-                    <Link
-                      aria-current={current ? "page" : undefined}
-                      className={styles.navigationItem}
-                      data-active={current || undefined}
-                      href={item.href}
-                    >
-                      <Icon name={item.icon} />
-                      <span>{item.label}</span>
-                    </Link>
-                  ) : (
-                    <span
-                      aria-disabled="true"
-                      className={styles.navigationItem}
-                      data-disabled="true"
-                    >
-                      <Icon name={item.icon} />
-                      <span>{item.label}</span>
-                      <small>Senere</small>
-                    </span>
-                  )}
+                  <Link
+                    aria-current={exact ? "page" : current ? "true" : undefined}
+                    className={styles.navigationItem}
+                    data-active={current || undefined}
+                    href={item.href}
+                  >
+                    <Icon name={item.icon} />
+                    <span>{item.label}</span>
+                  </Link>
                 </li>
               );
             })}
