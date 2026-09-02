@@ -76,6 +76,78 @@ $$;
 revoke all on function private.enrollment_merge_rank(public.enrollments)
   from public, anon, authenticated;
 
+-- Har en enrollment registrert arbeid (fullføringer, innleveringer, bevis)?
+create function private.enrollment_has_activity(target_enrollment_id uuid)
+returns boolean
+language sql
+stable
+set search_path = ''
+as $$
+  select exists (
+      select 1 from public.activity_completions
+      where enrollment_id = target_enrollment_id
+    )
+    or exists (
+      select 1 from public.assignment_submissions
+      where enrollment_id = target_enrollment_id
+    )
+    or exists (
+      select 1 from public.practice_submissions
+      where enrollment_id = target_enrollment_id
+    )
+    or exists (
+      select 1 from public.certificates
+      where enrollment_id = target_enrollment_id
+    );
+$$;
+
+revoke all on function private.enrollment_has_activity(uuid)
+  from public, anon, authenticated;
+
+-- Fingeravtrykk av barneradene til en enrollment. Lagres i affected ved
+-- sammenslåing og sammenlignes ved reversering, slik at NY aktivitet på en
+-- flyttet enrollment gir manual_reversal_required i stedet for feilattribuering.
+create function private.enrollment_activity_fingerprint(target_enrollment_id uuid)
+returns jsonb
+language sql
+stable
+set search_path = ''
+as $$
+  select jsonb_build_object(
+    'activityCompletions', (
+      select count(*) from public.activity_completions
+      where enrollment_id = target_enrollment_id
+    ),
+    'assignmentSubmissions', (
+      select count(*) from public.assignment_submissions
+      where enrollment_id = target_enrollment_id
+    ),
+    'assignmentSubmissionsUpdatedAt', private.ts_jsonb((
+      select max(updated_at) from public.assignment_submissions
+      where enrollment_id = target_enrollment_id
+    )),
+    'practiceSubmissions', (
+      select count(*) from public.practice_submissions
+      where enrollment_id = target_enrollment_id
+    ),
+    'practiceSubmissionsUpdatedAt', private.ts_jsonb((
+      select max(updated_at) from public.practice_submissions
+      where enrollment_id = target_enrollment_id
+    )),
+    'enrollmentProgressUpdatedAt', private.ts_jsonb((
+      select max(updated_at) from public.enrollment_progress
+      where enrollment_id = target_enrollment_id
+    )),
+    'certificates', (
+      select count(*) from public.certificates
+      where enrollment_id = target_enrollment_id
+    )
+  );
+$$;
+
+revoke all on function private.enrollment_activity_fingerprint(uuid)
+  from public, anon, authenticated;
+
 create function public.merge_people(
   source_id uuid,
   target_id uuid,
@@ -128,6 +200,26 @@ begin
   select * into target_profile from public.profiles where id = target_id;
   if not found then
     raise exception using errcode = '22023', message = 'MERGE_TARGET_NOT_FOUND';
+  end if;
+
+  -- Anonymiserte profiler er juridisk isolert og kan aldri inngå i en
+  -- sammenslåing — verken som kilde eller mål.
+  if source_profile.normalized_email like '%@anonymisert.invalid'
+    or target_profile.normalized_email like '%@anonymisert.invalid' then
+    raise exception using errcode = '22023', message = 'MERGE_ANONYMIZED_PROFILE';
+  end if;
+
+  -- Sammenslåing flytter roller og innlogginger — profiler med global
+  -- administrator- eller redaktørrolle håndteres aldri her.
+  if exists (
+    select 1 from public.role_assignments
+    where profile_id in (source_id, target_id)
+      and role in ('administrator', 'editor')
+      and course_template_id is null
+      and course_run_id is null
+      and revoked_at is null
+  ) then
+    raise exception using errcode = '42501', message = 'MERGE_PRIVILEGED_PROFILE';
   end if;
 
   if exists (
@@ -209,6 +301,29 @@ begin
           'revokedAt', private.ts_jsonb(assignment.revoked_at)
         )
       );
+
+      -- Rollehistorikk: en flyttet aktiv rolle er i praksis en tildeling.
+      if assignment.revoked_at is null then
+        insert into public.audit_events (
+          actor_profile_id, action, entity_type, entity_id, reason,
+          before_data, after_data
+        )
+        values (
+          actor_profile_id,
+          'role.granted',
+          'role_assignment',
+          assignment.id::text,
+          btrim(target_reason),
+          jsonb_build_object('profileId', source_id),
+          jsonb_build_object(
+            'profileId', target_id,
+            'role', assignment.role,
+            'courseTemplateId', assignment.course_template_id,
+            'courseRunId', assignment.course_run_id,
+            'via', 'person.merged'
+          )
+        );
+      end if;
     end if;
   end loop;
 
@@ -237,14 +352,32 @@ begin
       source_enrollment.id as source_enrollment_id,
       target_enrollment.id as target_enrollment_id,
       source_enrollment.course_run_id,
-      private.enrollment_merge_rank(source_enrollment)
-        > private.enrollment_merge_rank(target_enrollment) as source_wins
+      private.enrollment_has_activity(source_enrollment.id)
+        as source_has_activity,
+      private.enrollment_has_activity(target_enrollment.id)
+        as target_has_activity,
+      case
+        -- Registrert arbeid veier tyngre enn statusrang: den beholdte
+        -- personens eget arbeid skal aldri strande på duplikatet.
+        when private.enrollment_has_activity(source_enrollment.id)
+          <> private.enrollment_has_activity(target_enrollment.id)
+        then private.enrollment_has_activity(source_enrollment.id)
+        else private.enrollment_merge_rank(source_enrollment)
+          > private.enrollment_merge_rank(target_enrollment)
+      end as source_wins
     from public.enrollments as source_enrollment
     join public.enrollments as target_enrollment
       on target_enrollment.course_run_id = source_enrollment.course_run_id
       and target_enrollment.profile_id = target_id
     where source_enrollment.profile_id = source_id
   loop
+    -- Har begge sider arbeid i samme kurs, kan ingen automatisk regel slå dem
+    -- sammen uten å strande noens arbeid. Stopp uten endringer.
+    if conflict.source_has_activity and conflict.target_has_activity then
+      raise exception using
+        errcode = '22023', message = 'MERGE_COURSE_CONFLICT';
+    end if;
+
     affected_rows := affected_rows || jsonb_build_object(
       'table', 'enrollment_conflicts',
       'courseRunId', conflict.course_run_id,
@@ -288,7 +421,9 @@ begin
           'profileId', target_id,
           'status', enrollment.status,
           'statusReason', enrollment.status_reason,
-          'statusChangedAt', private.ts_jsonb(enrollment.status_changed_at)
+          'statusChangedAt', private.ts_jsonb(enrollment.status_changed_at),
+          'activity',
+            private.enrollment_activity_fingerprint(conflict.source_enrollment_id)
         )
       );
 
@@ -313,7 +448,9 @@ begin
           'profileId', source_id,
           'status', 'withdrawn',
           'statusReason', 'Erstattet ved sammenslåing',
-          'statusChangedAt', private.ts_jsonb(now())
+          'statusChangedAt', private.ts_jsonb(now()),
+          'activity',
+            private.enrollment_activity_fingerprint(conflict.target_enrollment_id)
         )
       );
     else
@@ -343,7 +480,9 @@ begin
             'profileId', source_id,
             'status', 'withdrawn',
             'statusReason', 'Erstattet ved sammenslåing',
-            'statusChangedAt', private.ts_jsonb(now())
+            'statusChangedAt', private.ts_jsonb(now()),
+            'activity',
+              private.enrollment_activity_fingerprint(conflict.source_enrollment_id)
           )
         );
       end if;
@@ -377,7 +516,8 @@ begin
         'profileId', target_id,
         'status', enrollment.status,
         'statusReason', enrollment.status_reason,
-        'statusChangedAt', private.ts_jsonb(enrollment.status_changed_at)
+        'statusChangedAt', private.ts_jsonb(enrollment.status_changed_at),
+        'activity', private.enrollment_activity_fingerprint(enrollment.id)
       )
     );
   end loop;
@@ -511,7 +651,8 @@ begin
           'profileId', enrollment.profile_id,
           'status', enrollment.status,
           'statusReason', enrollment.status_reason,
-          'statusChangedAt', private.ts_jsonb(enrollment.status_changed_at)
+          'statusChangedAt', private.ts_jsonb(enrollment.status_changed_at),
+          'activity', private.enrollment_activity_fingerprint(enrollment.id)
         );
       end if;
     elsif entry ->> 'table' = 'invitations' then
@@ -664,6 +805,7 @@ as $$
 declare
   actor_profile_id uuid;
   profile_record public.profiles%rowtype;
+  anonymized_account_ids uuid[];
 begin
   actor_profile_id := private.current_profile_id();
 
@@ -701,11 +843,100 @@ begin
       errcode = '22023', message = 'ANONYMIZE_PROFILE_NOT_FOUND';
   end if;
 
+  -- Kontoer som peker på profilen nå, pluss kontoer en tidligere sammenslåing
+  -- har flyttet bort fra profilen: sletteforespørselen gjelder personen,
+  -- ikke bare profilraden.
+  select coalesce(array_agg(distinct account_user_id), '{}'::uuid[])
+  into anonymized_account_ids
+  from (
+    select user_id as account_user_id
+    from public.user_accounts
+    where profile_id = anonymize_person.target_profile_id
+    union
+    select (element ->> 'id')::uuid
+    from public.person_merges as merge_row
+    cross join lateral jsonb_array_elements(merge_row.affected) as element
+    where merge_row.source_profile_id = anonymize_person.target_profile_id
+      and merge_row.reversed_at is null
+      and element ->> 'table' = 'user_accounts'
+  ) as accounts;
+
   update public.user_accounts
   set
     is_active = false,
     normalized_email = 'anonymisert-' || user_id::text || '@anonymisert.invalid'
-  where profile_id = target_profile_id;
+  where user_id = any(anonymized_account_ids);
+
+  -- Auth-laget bærer også identifikatorer i klartekst.
+  update auth.users
+  set
+    email = 'anonymisert-' || id::text || '@anonymisert.invalid',
+    raw_user_meta_data = '{}'::jsonb,
+    phone = null
+  where id = any(anonymized_account_ids);
+
+  update auth.identities
+  set identity_data = jsonb_build_object(
+    'sub', user_id::text,
+    'email', 'anonymisert-' || user_id::text || '@anonymisert.invalid'
+  )
+  where user_id = any(anonymized_account_ids);
+
+  -- Invitasjoner personen har innløst (også via en tidligere sammenslåing)
+  -- og invitasjoner sendt til personens e-postadresse.
+  update public.invitations
+  set normalized_email = 'anonymisert-' || id::text || '@anonymisert.invalid'
+  where claimed_by = anonymize_person.target_profile_id
+    or normalized_email = profile_record.normalized_email
+    or id in (
+      select (element ->> 'id')::uuid
+      from public.person_merges as merge_row
+      cross join lateral jsonb_array_elements(merge_row.affected) as element
+      where merge_row.source_profile_id = anonymize_person.target_profile_id
+        and merge_row.reversed_at is null
+        and element ->> 'table' = 'invitations'
+    );
+
+  -- Kursbevis viser navnet i klartekst.
+  update public.certificates
+  set display_name = 'Anonymisert deltaker'
+  where enrollment_id in (
+    select enrollment.id
+    from public.enrollments as enrollment
+    where enrollment.profile_id = anonymize_person.target_profile_id
+  );
+
+  -- Sammenslåingssnapshots bærer fullt navn, e-post, telefon og klubb —
+  -- skrubb dem uansett hvilken side av sammenslåingen personen sto på.
+  update public.person_merges as merge_row
+  set source_snapshot = merge_row.source_snapshot || jsonb_build_object(
+    'display_name', 'Anonymisert deltaker',
+    'normalized_email',
+      'anonymisert-' || (merge_row.source_snapshot ->> 'id')
+        || '@anonymisert.invalid',
+    'phone', null,
+    'club_name', null,
+    'birth_year', null
+  )
+  where merge_row.source_profile_id = anonymize_person.target_profile_id
+    or merge_row.target_profile_id = anonymize_person.target_profile_id;
+
+  -- Profiler som tidligere ble slått sammen inn i denne personen bærer
+  -- fortsatt identifikatorer i egen rad — skrubb dem også.
+  update public.profiles
+  set
+    display_name = 'Anonymisert deltaker',
+    normalized_email = 'anonymisert-' || id::text || '@anonymisert.invalid',
+    phone = null,
+    club_name = null,
+    birth_year = null,
+    updated_at = now()
+  where id in (
+    select merge_row.source_profile_id
+    from public.person_merges as merge_row
+    where merge_row.target_profile_id = anonymize_person.target_profile_id
+      and merge_row.reversed_at is null
+  );
 
   -- Irreversible plassholdere; pseudonyme kursaggregater (enrollments,
   -- progresjon, oppmøte) beholdes urørt.

@@ -21,6 +21,9 @@ const mergeErrorNotices: Readonly<Record<string, string>> = {
   MERGE_REASON_REQUIRED: "merge-reason-required",
   MERGE_ALREADY_MERGED: "merge-already-merged",
   MERGE_TARGET_MERGED: "merge-already-merged",
+  MERGE_COURSE_CONFLICT: "merge-course-conflict",
+  MERGE_PRIVILEGED_PROFILE: "merge-privileged",
+  MERGE_ANONYMIZED_PROFILE: "merge-anonymized",
 };
 
 export async function mergePeopleAction(formData: FormData): Promise<never> {

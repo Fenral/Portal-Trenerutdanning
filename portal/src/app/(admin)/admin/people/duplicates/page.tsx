@@ -45,6 +45,18 @@ const notices: Readonly<
     text: "En av profilene inngår allerede i en aktiv sammenslåing.",
     ok: false,
   },
+  "merge-course-conflict": {
+    text: "Begge profilene har registrert aktivitet i samme kurs. Ingen endringer er gjort — kurset må håndteres manuelt først.",
+    ok: false,
+  },
+  "merge-privileged": {
+    text: "Profiler med administrator- eller redaktørrolle kan ikke slås sammen her.",
+    ok: false,
+  },
+  "merge-anonymized": {
+    text: "Anonymiserte profiler kan ikke inngå i en sammenslåing.",
+    ok: false,
+  },
   "merge-error": { text: "Sammenslåingen kunne ikke gjennomføres.", ok: false },
   "anonymize-ok": {
     text: "Deltakeren er anonymisert. Pseudonyme kursaggregater er beholdt.",
@@ -270,6 +282,12 @@ export default async function AdminDuplicatesPage({
                           required
                           type="text"
                         />
+                        <p className={styles.mergeHint}>
+                          Kurs der bare én av profilene har registrert
+                          aktivitet, beholdes med aktiviteten. Har begge
+                          aktivitet i samme kurs, stoppes sammenslåingen uten
+                          endringer.
+                        </p>
                         <button
                           className="nivaa-button nivaa-button--secondary"
                           type="submit"

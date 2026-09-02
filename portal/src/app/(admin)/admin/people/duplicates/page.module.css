@@ -242,7 +242,8 @@
   margin-top: var(--nivaa-space-tight);
 }
 
-.approverHint {
+.approverHint,
+.mergeHint {
   margin: 0;
   color: var(--nivaa-text-muted);
   font-size: var(--nivaa-font-size-body-sm);
