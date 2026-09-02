@@ -126,6 +126,72 @@
   font-size: var(--nivaa-font-size-body-sm);
 }
 
+.courseReportCard {
+  padding: var(--nivaa-space-comfortable);
+  border-bottom: 1px solid var(--nivaa-border);
+}
+
+.courseReportCard:last-child {
+  border-bottom: 0;
+}
+
+.courseReportHeader {
+  display: grid;
+  align-items: center;
+  gap: var(--nivaa-space-default);
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.reportTypeList {
+  display: grid;
+  margin: var(--nivaa-space-default) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reportTypeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--nivaa-space-tight) 0;
+  border-top: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-default);
+}
+
+.reportTypeLabel {
+  color: var(--nivaa-text-subtle);
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 650;
+}
+
+.formatLinks {
+  display: inline-flex;
+  gap: var(--nivaa-space-tight);
+}
+
+.formatLink {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--nivaa-border-strong);
+  border-radius: var(--nivaa-radius-control);
+  background: var(--nivaa-surface);
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background-color var(--nivaa-transition-fast),
+    border-color var(--nivaa-transition-fast);
+}
+
+.formatLink:hover {
+  border-color: var(--nivaa-primary);
+  background: var(--nivaa-primary-soft);
+  color: var(--nivaa-on-primary-soft);
+}
+
 .note {
   margin-top: var(--nivaa-space-comfortable);
   padding: var(--nivaa-space-comfortable);
