@@ -91,7 +91,9 @@ test("administrator sees duplicate suggestions with signals and manual merge", a
   await expect(
     page.getByRole("heading", { name: "Anonymisering (personvern)" }),
   ).toBeVisible();
-  await expect(page.getByText("Kan ikke angres.")).toBeVisible();
+  // «Kan ikke angres.» står både i advarselen og i bekreftelsesteksten;
+  // sjekk advarselsblokken (role=note) entydig.
+  await expect(page.getByRole("note")).toContainText("Kan ikke angres.");
   await expect(page.getByRole("button", { name: /Slett/ })).toHaveCount(0);
   await expect(
     page.getByRole("button", { name: "Anonymiser deltaker" }),

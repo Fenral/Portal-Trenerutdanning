@@ -72,7 +72,15 @@ const notices: Readonly<
     ok: false,
   },
   "anonymize-approver-invalid": {
-    text: "Anonymisering krever godkjenning fra en annen administrator.",
+    text: "Anonymisering krever godkjenning fra en annen aktiv administrator enn både utfører og deltaker.",
+    ok: false,
+  },
+  "anonymize-privileged": {
+    text: "Deltakere med aktiv administrator- eller redaktørrolle kan ikke anonymiseres. Revoker rollene først.",
+    ok: false,
+  },
+  "anonymize-self": {
+    text: "Du kan ikke anonymisere deg selv.",
     ok: false,
   },
   "anonymize-error": {
@@ -135,8 +143,8 @@ export default async function AdminDuplicatesPage({
         .order("merged_at", { ascending: false }),
       admin
         .from("role_assignments")
-        .select("profile_id")
-        .eq("role", "administrator")
+        .select("profile_id,role")
+        .in("role", ["administrator", "editor"])
         .is("revoked_at", null),
       admin
         .from("user_accounts")
@@ -167,18 +175,34 @@ export default async function AdminDuplicatesPage({
     duplicateCandidates(profiles, activelyMergedSources),
   );
 
-  const anonymizableProfiles = profiles.filter(
-    (profile) => !isAnonymized(profile),
+  const privilegedRoles = (adminRolesResult.data ?? []) as {
+    profile_id: string;
+    role: string;
+  }[];
+  const privilegedProfileIds = new Set(
+    privilegedRoles.map((row) => row.profile_id),
   );
-  const approverProfiles = (
-    (adminRolesResult.data ?? []) as {
-      profile_id: string;
-    }[]
-  )
+
+  // Profiler med aktiv administrator- eller redaktørrolle kan ikke
+  // anonymiseres (rollene må revokeres først) og tilbys derfor ikke som mål.
+  const anonymizableProfiles = profiles.filter(
+    (profile) =>
+      !isAnonymized(profile) && !privilegedProfileIds.has(profile.id),
+  );
+
+  // Godkjenner: en annen aktiv administrator enn den innloggede utføreren.
+  // Målet kan aldri dukke opp her — målnedtrekket utelukker administratorer,
+  // og godkjennerlisten består utelukkende av administratorer.
+  // Kjent restrisiko: godkjenneren autentiseres ikke med egen sesjon; ekte
+  // to-personskontroll (godkjenner-innlogging) er en senere leveranse.
+  const approverProfiles = privilegedRoles
+    .filter((row) => row.role === "administrator")
     .map((row) => profileById.get(row.profile_id))
     .filter(
       (profile): profile is ProfileRow =>
-        profile !== undefined && profile.id !== ownProfileId,
+        profile !== undefined &&
+        profile.id !== ownProfileId &&
+        !isAnonymized(profile),
     );
 
   const notice = query.notice ? notices[query.notice] : undefined;
