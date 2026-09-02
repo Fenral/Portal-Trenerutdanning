@@ -352,6 +352,77 @@
   background: var(--nivaa-error-soft);
 }
 
+.cards {
+  display: grid;
+  margin-top: var(--nivaa-space-section);
+  gap: var(--nivaa-space-comfortable);
+}
+
+.sessionSummary {
+  margin: 0 0 var(--nivaa-space-tight);
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.cardLink {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 700;
+  text-underline-offset: 0.25rem;
+}
+
+.moduleList {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: var(--nivaa-space-default);
+  list-style: none;
+}
+
+.moduleList > li {
+  padding: var(--nivaa-space-default);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-canvas);
+}
+
+.activityHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--nivaa-space-default);
+}
+
+.activityType {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.activityContent {
+  margin-top: var(--nivaa-space-default);
+}
+
+.activityContent > summary {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  color: var(--nivaa-primary);
+  cursor: pointer;
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 700;
+}
+
+.activityContent[open] > summary {
+  margin-bottom: var(--nivaa-space-default);
+}
+
 @media (max-width: 72rem) {
   .queue li a {
     grid-template-columns:

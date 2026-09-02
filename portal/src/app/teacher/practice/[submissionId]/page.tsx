@@ -57,8 +57,8 @@ export default async function TeacherPracticePage({
 
   return (
     <main className={styles.page} id="main-content">
-      <Link className={styles.backLink} href="/teacher">
-        ← Til vurderingskøen
+      <Link className={styles.backLink} href="/teacher/practice">
+        ← Til praksiskøen
       </Link>
 
       <header className={styles.detailHero}>

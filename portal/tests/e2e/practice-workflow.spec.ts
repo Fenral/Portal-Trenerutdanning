@@ -26,6 +26,7 @@ test("student logs 45 hours and teacher approves the practice", async ({
   ).toBeVisible();
 
   await page.goto("/test-login?as=teacher-t3");
+  await page.getByRole("link", { name: "Praksis", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Praksis til oppfølging" }),
   ).toBeVisible();

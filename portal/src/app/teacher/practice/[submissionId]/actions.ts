@@ -29,7 +29,7 @@ export async function reviewPracticeAction(formData: FormData): Promise<never> {
   }
 
   revalidatePath(detailPath);
-  revalidatePath("/teacher");
+  revalidatePath("/teacher/practice");
   revalidatePath("/student/practice");
   revalidatePath("/student");
   redirect(`${detailPath}?notice=updated`);
