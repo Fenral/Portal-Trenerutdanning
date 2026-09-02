@@ -1,0 +1,196 @@
+.page {
+  width: min(calc(100% - 2rem), var(--nivaa-content-max));
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4rem) 0;
+}
+
+.hero {
+  padding-bottom: var(--nivaa-space-spacious);
+  border-bottom: 1px solid var(--nivaa-border);
+}
+
+.hero h1 {
+  margin-bottom: var(--nivaa-space-compact);
+}
+
+.hero p:not(.eyebrow) {
+  max-width: 47rem;
+  margin-bottom: 0;
+  color: var(--nivaa-text-muted);
+}
+
+.eyebrow {
+  margin-bottom: var(--nivaa-space-default);
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-label);
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.notice {
+  margin-top: var(--nivaa-space-comfortable);
+  padding: var(--nivaa-space-default) var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-error);
+  border-radius: var(--nivaa-radius-field);
+  background: var(--nivaa-error-soft);
+  color: var(--nivaa-error);
+}
+
+.notice[data-ok] {
+  border-color: var(--nivaa-success);
+  background: var(--nivaa-success-soft);
+  color: var(--nivaa-success);
+}
+
+/* 8/4-grid: hastende drift i hovedkolonnen, definisjoner og status i kontekst. */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+  gap: var(--nivaa-space-spacious);
+  align-items: start;
+  margin-top: var(--nivaa-space-spacious);
+}
+
+.mainColumn,
+.contextColumn {
+  display: grid;
+  gap: var(--nivaa-space-spacious);
+}
+
+@media (max-width: 960px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.card {
+  padding: var(--nivaa-space-spacious);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+}
+
+.card h2 {
+  margin-bottom: var(--nivaa-space-default);
+  font-size: var(--nivaa-font-size-h3);
+}
+
+.sectionHint {
+  max-width: 44rem;
+  margin: 0 0 var(--nivaa-space-default);
+  color: var(--nivaa-text-muted);
+}
+
+.empty {
+  margin: 0;
+  color: var(--nivaa-text-muted);
+}
+
+.taskList,
+.incidentList {
+  display: grid;
+  gap: var(--nivaa-space-default);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.task {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nivaa-space-default);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-surface-subtle);
+}
+
+.task > div {
+  display: grid;
+  gap: var(--nivaa-space-micro);
+}
+
+.task small,
+.incidentList small {
+  color: var(--nivaa-text-muted);
+}
+
+.incidentList li {
+  display: grid;
+  gap: var(--nivaa-space-micro);
+  padding: var(--nivaa-space-default) 0;
+  border-bottom: 1px solid var(--nivaa-border);
+}
+
+.incidentList li:last-child {
+  border-bottom: 0;
+}
+
+.inlineLink {
+  font-weight: 650;
+  color: var(--nivaa-primary);
+}
+
+.portfolioTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.portfolioTable th,
+.portfolioTable td {
+  padding: var(--nivaa-space-compact) var(--nivaa-space-default);
+  border-bottom: 1px solid var(--nivaa-border);
+  text-align: left;
+}
+
+.portfolioTable thead th {
+  font-size: var(--nivaa-font-size-label);
+  font-weight: 700;
+}
+
+.portfolioTable tbody th {
+  font-weight: 650;
+}
+
+.tableFootnote {
+  margin: var(--nivaa-space-default) 0 0;
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.definitions,
+.statusList {
+  display: grid;
+  gap: var(--nivaa-space-default);
+  margin: 0;
+}
+
+.definitions dt,
+.statusList dt {
+  font-size: var(--nivaa-font-size-label);
+  font-weight: 700;
+}
+
+.definitions dd {
+  margin: var(--nivaa-space-micro) 0 0;
+  color: var(--nivaa-text-muted);
+}
+
+.statusList div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--nivaa-space-default);
+}
+
+.statusList dd {
+  margin: 0;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}

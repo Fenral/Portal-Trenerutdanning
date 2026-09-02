@@ -24,7 +24,7 @@ type NavigationItem = Readonly<{
 }>;
 
 const navigationItems: readonly NavigationItem[] = [
-  { label: "Oversikt", icon: "chart" },
+  { label: "Oversikt", icon: "chart", href: "/admin" },
   { label: "Kurs", icon: "courses", href: "/admin/courses" },
   { label: "Deltakere", icon: "people", href: "/admin/people/duplicates" },
   { label: "Tilganger", icon: "access", href: "/admin/access" },
@@ -131,7 +131,8 @@ export function AdminShell({
   const pathname = usePathname();
   const availableNavigationItems = navigationItems.map((item) =>
     roleLabel === "Redaktør" &&
-    (item.label === "Kurs" ||
+    (item.label === "Oversikt" ||
+      item.label === "Kurs" ||
       item.label === "Deltakere" ||
       item.label === "Rapporter" ||
       item.label === "Innsikt")
@@ -156,8 +157,13 @@ export function AdminShell({
           <nav aria-label="Hovedmeny">
             <ul>
               {availableNavigationItems.map((item) => {
+                // «Oversikt» (/admin) er prefiks for alle admin-sider og
+                // markeres derfor kun på eksakt treff.
                 const isCurrent = Boolean(
-                  item.href && pathname.startsWith(item.href),
+                  item.href &&
+                  (item.href === "/admin"
+                    ? pathname === "/admin"
+                    : pathname.startsWith(item.href)),
                 );
 
                 return (

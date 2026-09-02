@@ -1433,3 +1433,20 @@ values
   ('a7100000-0000-0000-0000-000000000002', 'a7000000-0000-0000-0000-000000000001', '2026-06-01T00:00:00+02:00', 40),
   ('a7100000-0000-0000-0000-000000000003', 'a7000000-0000-0000-0000-000000000001', '2026-10-01T00:00:00+02:00', 65),
   ('a7100000-0000-0000-0000-000000000004', 'a7000000-0000-0000-0000-000000000001', '2027-03-01T00:00:00+01:00', 100);
+
+-- Åpen Ungdomsdriven-driftsoppgave for administratorens driftskø:
+-- Jakob Fjell valgte Ungdomsdriven uten registrert oppmøte, og differansen
+-- skal faktureres i Checkin/økonomisystemet (aldri i portalen).
+insert into public.course_session_selections (enrollment_id, course_run_id, session_id)
+select enrollment.id, enrollment.course_run_id, 'f1010000-0000-0000-0001-000000000002'
+from public.enrollments as enrollment
+where enrollment.course_run_id = 'b1010000-0000-0000-0000-000000000001'
+  and enrollment.profile_id = 'c0000000-0000-0000-0000-000000000011'
+on conflict do nothing;
+
+insert into public.completion_admin_tasks (enrollment_id, course_run_id, task_code)
+select enrollment.id, enrollment.course_run_id, 'invoice_youth_drive_difference'
+from public.enrollments as enrollment
+where enrollment.course_run_id = 'b1010000-0000-0000-0000-000000000001'
+  and enrollment.profile_id = 'c0000000-0000-0000-0000-000000000011'
+on conflict (enrollment_id, task_code) do nothing;
