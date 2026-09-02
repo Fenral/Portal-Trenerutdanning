@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  ANONYMIZED_EMAIL_SUFFIX,
   DUPLICATE_THRESHOLD,
+  duplicateCandidates,
   duplicateScore,
   duplicateSignals,
   normalizeEmailLocalPart,
@@ -158,5 +160,36 @@ describe("suggestDuplicates", () => {
       signals: ["navn", "klubb", "telefon"],
     });
     expect(suggestions[0]?.score).toBeGreaterThanOrEqual(DUPLICATE_THRESHOLD);
+  });
+});
+
+describe("duplicateCandidates", () => {
+  it("filters out anonymized profiles and active merge sources", () => {
+    const row = (id: string, email: string) => ({
+      id,
+      display_name: "Nora Vik",
+      normalized_email: email,
+      club_name: "Fjordglimt GK",
+      phone: "90000101",
+    });
+
+    const candidates = duplicateCandidates(
+      [
+        row("p1", "nora@example.com"),
+        row("p2", `anonymisert-p2${ANONYMIZED_EMAIL_SUFFIX}`),
+        row("p3", "nora.k@example.com"),
+      ],
+      new Set(["p3"]),
+    );
+
+    expect(candidates).toEqual([
+      {
+        id: "p1",
+        name: "Nora Vik",
+        club: "Fjordglimt GK",
+        email: "nora@example.com",
+        phone: "90000101",
+      },
+    ]);
   });
 });

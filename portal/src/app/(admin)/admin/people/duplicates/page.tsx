@@ -2,9 +2,10 @@ import { notFound } from "next/navigation";
 
 import { isAdministrator } from "@/features/access/require-administrator";
 import {
+  ANONYMIZED_EMAIL_SUFFIX,
   DUPLICATE_THRESHOLD,
+  duplicateCandidates,
   suggestDuplicates,
-  type DuplicateProfile,
 } from "@/features/people/duplicate-score";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -100,7 +101,7 @@ const dateFormatter = new Intl.DateTimeFormat("nb-NO", {
 });
 
 function isAnonymized(profile: ProfileRow): boolean {
-  return profile.normalized_email.endsWith("@anonymisert.invalid");
+  return profile.normalized_email.endsWith(ANONYMIZED_EMAIL_SUFFIX);
 }
 
 export default async function AdminDuplicatesPage({
@@ -158,19 +159,9 @@ export default async function AdminDuplicatesPage({
       .filter((merge) => merge.reversed_at === null)
       .map((merge) => merge.source_profile_id),
   );
-  const candidates: DuplicateProfile[] = profiles
-    .filter(
-      (profile) =>
-        !isAnonymized(profile) && !activelyMergedSources.has(profile.id),
-    )
-    .map((profile) => ({
-      id: profile.id,
-      name: profile.display_name,
-      club: profile.club_name,
-      email: profile.normalized_email,
-      phone: profile.phone,
-    }));
-  const suggestions = suggestDuplicates(candidates);
+  const suggestions = suggestDuplicates(
+    duplicateCandidates(profiles, activelyMergedSources),
+  );
 
   const anonymizableProfiles = profiles.filter(
     (profile) => !isAnonymized(profile),

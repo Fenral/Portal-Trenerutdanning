@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { loadAdminDashboard } from "@/features/reporting/admin-dashboard-query";
 
@@ -150,6 +150,57 @@ describe("loadAdminDashboard", () => {
       mockClient({ ...baseRows, notification_deliveries: [] }),
     );
     expect(empty.lastNotificationDeliveredAt).toBeNull();
+  });
+
+  it("follows reportDefinitions.course_progress.excludeStatuses instead of a hardcoded status", async () => {
+    vi.resetModules();
+    vi.doMock("@/features/reporting/definitions", async (importOriginal) => {
+      const actual =
+        await importOriginal<
+          typeof import("@/features/reporting/definitions")
+        >();
+      return {
+        ...actual,
+        reportDefinitions: {
+          ...actual.reportDefinitions,
+          course_progress: {
+            ...actual.reportDefinitions.course_progress,
+            excludeStatuses: ["withdrawn", "invited"],
+          },
+        },
+      };
+    });
+    try {
+      const { loadAdminDashboard: load } =
+        await import("@/features/reporting/admin-dashboard-query");
+      const dashboard = await load(
+        mockClient({
+          ...baseRows,
+          enrollments: [
+            ...baseRows.enrollments,
+            {
+              id: "enr-4",
+              profile_id: "p-3",
+              course_run_id: runId,
+              status: "invited",
+            },
+          ],
+          enrollment_progress: [
+            ...baseRows.enrollment_progress,
+            { enrollment_id: "enr-4", percentage: 0 },
+          ],
+        }),
+      );
+
+      // Med «invited» i excludeStatuses skal både antall og snitt følge etter.
+      expect(dashboard.portfolio[0]).toMatchObject({
+        activeParticipantCount: 2,
+        cohortAverageProgress: 50,
+      });
+    } finally {
+      vi.doUnmock("@/features/reporting/definitions");
+      vi.resetModules();
+    }
   });
 
   it("uses null cohort average when a level has no participants", async () => {

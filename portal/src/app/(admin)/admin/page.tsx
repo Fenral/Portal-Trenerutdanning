@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { isAdministrator } from "@/features/access/require-administrator";
+import { DUPLICATE_THRESHOLD } from "@/features/people/duplicate-score";
 import { loadAdminDashboard } from "@/features/reporting/admin-dashboard-query";
 import { reportDefinitions } from "@/features/reporting/definitions";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -147,7 +148,7 @@ export default async function AdminOverviewPage({
             <p className={styles.sectionHint}>
               {dashboard.duplicateSuggestionCount === 0
                 ? "Ingen duplikatforslag over terskelen nå."
-                : `${dashboard.duplicateSuggestionCount} profilpar har duplikatscore på 80 eller mer og venter på manuell vurdering.`}
+                : `${dashboard.duplicateSuggestionCount} profilpar har duplikatscore på ${DUPLICATE_THRESHOLD} eller mer og venter på manuell vurdering.`}
             </p>
             <Link className={styles.inlineLink} href="/admin/people/duplicates">
               Gå til duplikatvurdering

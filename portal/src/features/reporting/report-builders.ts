@@ -192,13 +192,18 @@ function participantIdentity(base: ParticipantBase, profileId: string) {
   };
 }
 
-function cohortAverage(
+/**
+ * Kullsnitt per rapportdefinisjon: snitt av verdiene for påmeldinger som
+ * ikke har en status i definition.excludeStatuses. Eksportert slik at
+ * driftssiden bruker nøyaktig samme formel som rapportene.
+ */
+export function cohortAverage(
   definition: ReportDefinition,
-  base: ParticipantBase,
+  enrollments: ReadonlyArray<Readonly<{ id: string; status: string }>>,
   valueByEnrollment: ReadonlyMap<string, number>,
   decimals = 0,
 ): number {
-  const included = base.enrollments.filter(
+  const included = enrollments.filter(
     (enrollment) => !definition.excludeStatuses.includes(enrollment.status),
   );
   if (included.length === 0) return 0;
@@ -361,7 +366,7 @@ async function buildCourseProgressReport(
 
   return tableFor(reportDefinitions.course_progress, base, generatedAt, {
     summary: [
-      `Kullsnitt progresjon (ekskl. trukket): ${cohortAverage(reportDefinitions.course_progress, base, percentageByEnrollment)} %`,
+      `Kullsnitt progresjon (ekskl. trukket): ${cohortAverage(reportDefinitions.course_progress, base.enrollments, percentageByEnrollment)} %`,
       `Antall deltakere i rapporten: ${rows.length}`,
     ],
     columns: [
@@ -439,7 +444,7 @@ async function buildPracticeReport(
 
   return tableFor(reportDefinitions.practice, base, generatedAt, {
     summary: [
-      `Kullsnitt praksistimer (ekskl. trukket): ${cohortAverage(reportDefinitions.practice, base, totalHoursByEnrollment, 1)}`,
+      `Kullsnitt praksistimer (ekskl. trukket): ${cohortAverage(reportDefinitions.practice, base.enrollments, totalHoursByEnrollment, 1)}`,
     ],
     columns: [
       "Navn",
@@ -502,7 +507,7 @@ async function buildAttendanceReport(
 
   return tableFor(reportDefinitions.attendance, base, generatedAt, {
     summary: [
-      `Kullsnitt oppmøte (ekskl. trukket): ${cohortAverage(reportDefinitions.attendance, base, percentageByEnrollment)} %`,
+      `Kullsnitt oppmøte (ekskl. trukket): ${cohortAverage(reportDefinitions.attendance, base.enrollments, percentageByEnrollment)} %`,
     ],
     columns: [
       "Navn",

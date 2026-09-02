@@ -83,3 +83,15 @@ test("course teacher gets 404 on the direct /admin URL", async ({ page }) => {
     page.getByRole("heading", { name: "Driftsoversikt" }),
   ).toHaveCount(0);
 });
+
+// Redaktør-rollen mangler testfixture (ingen editor-profil i seed.sql og
+// ingen alias i test-login); porten er rolleagnostisk (isAdministrator),
+// så redaktør er dekket ved konstruksjon, men ikke bevist her.
+test("course lead gets 404 on the direct /admin URL", async ({ page }) => {
+  await page.goto("/test-login?as=teacher-t3");
+  const response = await page.goto("/admin");
+  expect(response?.status()).toBe(404);
+  await expect(
+    page.getByRole("heading", { name: "Driftsoversikt" }),
+  ).toHaveCount(0);
+});

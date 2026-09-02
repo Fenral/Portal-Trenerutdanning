@@ -1,9 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import {
+  duplicateCandidates,
   suggestDuplicates,
-  type DuplicateProfile,
 } from "@/features/people/duplicate-score";
+
+import { reportDefinitions } from "./definitions";
+import { cohortAverage } from "./report-builders";
 
 /**
  * Én typed projeksjon for administratorens driftsside: åpne
@@ -161,26 +164,14 @@ export async function loadAdminDashboard(
     }),
   );
 
-  // Duplikatforslag: samme filter som duplikatsiden — anonymiserte profiler
-  // og profiler i aktiv sammenslåing foreslås ikke. Terskel ≥ 80 ligger i
-  // suggestDuplicates.
+  // Samme kandidatfilter som duplikatsiden (duplicateCandidates); terskelen
+  // ligger i suggestDuplicates.
   const activelyMergedSources = new Set(
     (mergesResult.data ?? []).map((merge) => merge.source_profile_id),
   );
-  const candidates: DuplicateProfile[] = profiles
-    .filter(
-      (profile) =>
-        !profile.normalized_email.endsWith("@anonymisert.invalid") &&
-        !activelyMergedSources.has(profile.id),
-    )
-    .map((profile) => ({
-      id: profile.id,
-      name: profile.display_name,
-      club: profile.club_name,
-      email: profile.normalized_email,
-      phone: profile.phone,
-    }));
-  const duplicateSuggestionCount = suggestDuplicates(candidates).length;
+  const duplicateSuggestionCount = suggestDuplicates(
+    duplicateCandidates(profiles, activelyMergedSources),
+  ).length;
 
   const progressByEnrollment = new Map(
     (progressResult.data ?? []).map((row) => [
@@ -201,21 +192,16 @@ export async function loadAdminDashboard(
           .filter((run) => run.template_id === template.id)
           .map((run) => run.id),
       );
+      const definition = reportDefinitions.course_progress;
       const activeEnrollments = enrollments.filter(
         (enrollment) =>
           levelRunIds.has(enrollment.course_run_id) &&
-          enrollment.status !== "withdrawn",
+          !definition.excludeStatuses.includes(enrollment.status),
       );
       const cohortAverageProgress =
         activeEnrollments.length === 0
           ? null
-          : Math.round(
-              activeEnrollments.reduce(
-                (sum, enrollment) =>
-                  sum + (progressByEnrollment.get(enrollment.id) ?? 0),
-                0,
-              ) / activeEnrollments.length,
-            );
+          : cohortAverage(definition, activeEnrollments, progressByEnrollment);
       return {
         level: template.level,
         templateTitle: template.title,

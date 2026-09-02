@@ -8,6 +8,9 @@
 
 export const DUPLICATE_THRESHOLD = 80;
 
+/** Suffiks satt av anonymize_person i databasen (se person_merges-migrasjonen). */
+export const ANONYMIZED_EMAIL_SUFFIX = "@anonymisert.invalid";
+
 // Navn er grunnsignalet; hvert støttesignal løfter paret over terskelen.
 const NAME_WEIGHT = 50;
 const SUPPORT_WEIGHT = 30;
@@ -106,6 +109,37 @@ export function duplicateScore(
   if (!signals.includes("navn")) return 0;
   const supportCount = signals.length - 1;
   return Math.min(100, NAME_WEIGHT + supportCount * SUPPORT_WEIGHT);
+}
+
+export type DuplicateProfileRow = Readonly<{
+  id: string;
+  display_name: string;
+  normalized_email: string;
+  club_name: string | null;
+  phone: string | null;
+}>;
+
+/**
+ * Ett felles kandidatfilter for alle flater som viser duplikatforslag:
+ * anonymiserte profiler og profiler i en aktiv sammenslåing foreslås ikke.
+ */
+export function duplicateCandidates(
+  profiles: readonly DuplicateProfileRow[],
+  activelyMergedSourceIds: ReadonlySet<string>,
+): DuplicateProfile[] {
+  return profiles
+    .filter(
+      (profile) =>
+        !profile.normalized_email.endsWith(ANONYMIZED_EMAIL_SUFFIX) &&
+        !activelyMergedSourceIds.has(profile.id),
+    )
+    .map((profile) => ({
+      id: profile.id,
+      name: profile.display_name,
+      club: profile.club_name,
+      email: profile.normalized_email,
+      phone: profile.phone,
+    }));
 }
 
 /**
