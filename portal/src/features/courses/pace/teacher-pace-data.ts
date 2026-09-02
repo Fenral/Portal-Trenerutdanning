@@ -57,7 +57,7 @@ export async function loadPaceByEnrollment(
   }
   if (planByCourseRun.size === 0) return {};
 
-  const [milestonesResult, deadlines] = await Promise.all([
+  const [milestonesResult, deadlines, submittedResult] = await Promise.all([
     client
       .from("pace_milestones")
       .select("plan_id,at,percent")
@@ -69,8 +69,24 @@ export async function loadPaceByEnrollment(
       client,
       participants.map((participant) => participant.enrollmentId),
     ),
+    client
+      .from("assignment_submissions")
+      .select("enrollment_id,activity_id")
+      .eq("status", "submitted")
+      .in(
+        "enrollment_id",
+        participants.map((participant) => participant.enrollmentId),
+      ),
   ]);
   assertNoQueryError(milestonesResult.error);
+  assertNoQueryError(submittedResult.error);
+
+  // Work submitted and awaiting teacher review is not the student's neglect.
+  const awaitingReview = new Set(
+    (submittedResult.data ?? []).map(
+      (row) => `${row.enrollment_id}:${row.activity_id}`,
+    ),
+  );
 
   const milestonesByPlan = new Map<string, PaceMilestone[]>();
   for (const row of milestonesResult.data ?? []) {
@@ -87,6 +103,9 @@ export async function loadPaceByEnrollment(
     const hardDeadlineOverdue = participant.modules.some((learningModule) =>
       learningModule.activities.some((activity) => {
         if (!activity.required || activity.completed) return false;
+        if (awaitingReview.has(`${participant.enrollmentId}:${activity.id}`)) {
+          return false;
+        }
         const deadline = deadlines.effectiveDeadline(
           participant.enrollmentId,
           activity.id,
