@@ -92,7 +92,7 @@ export function buildCourseTimeline(
         kind: "session",
         title: session.title,
         dateLabel: sessionDateLabel(session.startsAt, session.endsAt, now),
-        href: `#session-${session.id}`,
+        href: `/student/sessions#session-${session.id}`,
         state: session.endsAt.getTime() < now.getTime() ? "done" : "upcoming",
       },
     });

@@ -18,6 +18,48 @@ function fileTypeFor(mimeType: string): string {
   return "Fil";
 }
 
+export function ResourceLinkList({
+  resources,
+  testId,
+}: Readonly<{
+  resources: readonly StudentResourceView[];
+  testId?: string;
+}>) {
+  return (
+    <ul className={styles.fileList} data-testid={testId}>
+      {resources.map((resource) => (
+        <li key={resource.id}>
+          <div className={styles.fileIcon} aria-hidden="true">
+            {fileTypeFor(resource.mimeType).slice(0, 1)}
+          </div>
+          <div className={styles.fileCopy}>
+            <strong>{resource.title}</strong>
+            <span>
+              {fileTypeFor(resource.mimeType)} ·{" "}
+              {formatBytes(resource.byteSize)}
+            </span>
+            {resource.description ? (
+              <small>{resource.description}</small>
+            ) : null}
+          </div>
+          <div className={styles.fileActions}>
+            {resource.mimeType === "application/pdf" ? (
+              <a
+                href={`/resources/${resource.assetId}`}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Vis
+              </a>
+            ) : null}
+            <a href={`/resources/${resource.assetId}?download=1`}>Last ned</a>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function StudentResources({
   resources,
 }: Readonly<{ resources: readonly StudentResourceView[] }>) {
@@ -26,39 +68,7 @@ export function StudentResources({
       <p className={styles.eyebrow}>Delt med kullet</p>
       <h2 id="resources-title">Filer</h2>
       {resources.length ? (
-        <ul data-testid="student-resources">
-          {resources.map((resource) => (
-            <li key={resource.id}>
-              <div className={styles.fileIcon} aria-hidden="true">
-                {fileTypeFor(resource.mimeType).slice(0, 1)}
-              </div>
-              <div className={styles.fileCopy}>
-                <strong>{resource.title}</strong>
-                <span>
-                  {fileTypeFor(resource.mimeType)} ·{" "}
-                  {formatBytes(resource.byteSize)}
-                </span>
-                {resource.description ? (
-                  <small>{resource.description}</small>
-                ) : null}
-              </div>
-              <div className={styles.fileActions}>
-                {resource.mimeType === "application/pdf" ? (
-                  <a
-                    href={`/resources/${resource.assetId}`}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    Vis
-                  </a>
-                ) : null}
-                <a href={`/resources/${resource.assetId}?download=1`}>
-                  Last ned
-                </a>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <ResourceLinkList resources={resources} testId="student-resources" />
       ) : (
         <p className={styles.noResources}>
           Ingen filer er delt med studentene i denne aktiviteten.

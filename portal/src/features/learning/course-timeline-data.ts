@@ -41,6 +41,40 @@ export type CourseScheduleView = Readonly<{
   sessions: readonly CourseSessionInfo[];
 }>;
 
+function toSessionInfo(session: SessionRow, now: Date): CourseSessionInfo {
+  return {
+    id: session.id,
+    title: session.title,
+    dateLabel: sessionDateLabel(
+      new Date(session.starts_at),
+      new Date(session.ends_at),
+      now,
+    ),
+    locationText: session.location_text,
+    isYouthDrive: session.session_type === "youth_drive",
+  };
+}
+
+export async function loadCourseSessionInfos(
+  client: SupabaseClient,
+  courseRunId: string,
+  now: Date = new Date(),
+): Promise<readonly CourseSessionInfo[]> {
+  const { data, error } = await client
+    .from("course_sessions")
+    .select("id,title,starts_at,ends_at,location_text,session_type,sort_order")
+    .eq("course_run_id", courseRunId)
+    .order("starts_at");
+
+  if (error) {
+    throw new Error(`COURSE_SESSIONS_QUERY_FAILED:${error.message}`);
+  }
+
+  return ((data ?? []) as SessionRow[]).map((session) =>
+    toSessionInfo(session, now),
+  );
+}
+
 export async function loadCourseSchedule(
   client: SupabaseClient,
   learningPath: StudentLearningPathView,
@@ -126,16 +160,6 @@ export async function loadCourseSchedule(
 
   return {
     timeline,
-    sessions: sessionRows.map((session) => ({
-      id: session.id,
-      title: session.title,
-      dateLabel: sessionDateLabel(
-        new Date(session.starts_at),
-        new Date(session.ends_at),
-        now,
-      ),
-      locationText: session.location_text,
-      isYouthDrive: session.session_type === "youth_drive",
-    })),
+    sessions: sessionRows.map((session) => toSessionInfo(session, now)),
   };
 }

@@ -8,7 +8,13 @@ import { DemoRoleSwitcher } from "./DemoRoleSwitcher";
 import styles from "./StudentShell.module.css";
 
 type IconName =
-  "home" | "learning" | "practice" | "submissions" | "certificates" | "help";
+  | "home"
+  | "learning"
+  | "sessions"
+  | "practice"
+  | "submissions"
+  | "certificates"
+  | "help";
 
 type NavigationItem = Readonly<{
   label: string;
@@ -30,6 +36,15 @@ function Icon({ name }: { name: IconName }) {
     return (
       <svg aria-hidden="true" viewBox="0 0 24 24">
         <path d="M4 5.5A3.5 3.5 0 0 1 7.5 4H12v16H7.5A3.5 3.5 0 0 0 4 21.5v-16ZM20 5.5A3.5 3.5 0 0 0 16.5 4H12v16h4.5a3.5 3.5 0 0 1 3.5 1.5v-16Z" />
+      </svg>
+    );
+  }
+
+  if (name === "sessions") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <rect height="15" rx="1.5" width="16" x="4" y="5.5" />
+        <path d="M4 10.5h16M8.5 3v2.5M15.5 3v2.5" />
       </svg>
     );
   }
@@ -102,6 +117,7 @@ export function StudentShell({
         ? `/student/courses/${courseRunId}`
         : "/student/content",
     },
+    { label: "Samlinger", icon: "sessions", href: "/student/sessions" },
     { label: "Praksis", icon: "practice", href: "/student/practice" },
     {
       label: "Innleveringer",

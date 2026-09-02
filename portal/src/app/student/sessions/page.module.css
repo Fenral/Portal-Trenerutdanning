@@ -1,0 +1,35 @@
+.page {
+  width: min(72rem, 100%);
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 4.5rem) clamp(1rem, 4vw, 3.5rem) 5rem;
+}
+
+.header {
+  max-width: 46rem;
+  margin-bottom: var(--nivaa-space-spacious);
+}
+
+.header h1 {
+  margin-bottom: var(--nivaa-space-tight);
+}
+
+.header p {
+  max-width: 38rem;
+  margin: 0;
+  color: var(--nivaa-text-muted);
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: var(--nivaa-space-tight);
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.cards {
+  display: grid;
+  gap: var(--nivaa-space-comfortable);
+}

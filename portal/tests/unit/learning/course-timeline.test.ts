@@ -98,6 +98,6 @@ describe("buildCourseTimeline", () => {
       view.events.map((event) => [event.id, event.href]),
     );
     expect(hrefs["deadline-a1"]).toBe("/student/assignments/a1");
-    expect(hrefs["session-s1"]).toBe("#session-s1");
+    expect(hrefs["session-s1"]).toBe("/student/sessions#session-s1");
   });
 });

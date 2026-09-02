@@ -1,20 +1,32 @@
+import type { StudentResourceView } from "@/features/content/student-data";
+
 import type { CourseSessionInfo } from "./course-timeline-data";
+import { ResourceLinkList } from "./StudentResources";
 
 import styles from "./CourseSessions.module.css";
 
+export type SessionWithResources = Readonly<{
+  session: CourseSessionInfo;
+  resources: readonly StudentResourceView[];
+}>;
+
 export function CourseSessions({
   sessions,
-}: Readonly<{ sessions: readonly CourseSessionInfo[] }>) {
+}: Readonly<{ sessions: readonly SessionWithResources[] }>) {
   if (sessions.length === 0) return null;
 
   return (
-    <section aria-labelledby="course-sessions-title" className={styles.card}>
-      <h2 id="course-sessions-title">Samlinger</h2>
-      <ul className={styles.list}>
-        {sessions.map((session) => (
-          <li id={`session-${session.id}`} key={session.id}>
+    <>
+      {sessions.map(({ session, resources }) => (
+        <section
+          aria-labelledby={`session-title-${session.id}`}
+          className={styles.card}
+          id={`session-${session.id}`}
+          key={session.id}
+        >
+          <header className={styles.head}>
             <div className={styles.copy}>
-              <strong>{session.title}</strong>
+              <h2 id={`session-title-${session.id}`}>{session.title}</h2>
               {session.isYouthDrive ? (
                 <span className={styles.youthDrive}>Ungdomsdriven</span>
               ) : null}
@@ -25,9 +37,16 @@ export function CourseSessions({
                 <small>{session.locationText}</small>
               ) : null}
             </div>
-          </li>
-        ))}
-      </ul>
-    </section>
+          </header>
+          {resources.length ? (
+            <ResourceLinkList resources={resources} />
+          ) : (
+            <p className={styles.noFiles}>
+              Filer til samlingen publiseres av kurslæreren.
+            </p>
+          )}
+        </section>
+      ))}
+    </>
   );
 }

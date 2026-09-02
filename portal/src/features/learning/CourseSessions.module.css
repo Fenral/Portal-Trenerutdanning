@@ -1,58 +1,34 @@
 .card {
-  margin-top: var(--nivaa-space-spacious);
   padding: var(--nivaa-space-spacious);
   border: 1px solid var(--nivaa-border);
   border-radius: var(--nivaa-radius-surface);
   background: var(--nivaa-surface);
   box-shadow: var(--nivaa-shadow-card);
-}
-
-.card h2 {
-  margin-bottom: var(--nivaa-space-default);
-  font-size: var(--nivaa-font-size-h3);
-}
-
-.list {
-  display: grid;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.list li {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: var(--nivaa-space-compact) 0;
-  gap: var(--nivaa-space-default);
   scroll-margin-top: 6rem;
 }
 
-.list li + li {
-  border-top: 1px solid var(--nivaa-border);
-}
-
-/* Markerer raden når tidslinjen har lenket hit */
-.list li:target {
-  margin: 0 calc(-1 * var(--nivaa-space-compact));
-  padding-inline: var(--nivaa-space-compact);
-  border-radius: var(--nivaa-radius-field);
+/* Markerer kortet når tidslinjen har lenket hit */
+.card:target {
+  border-color: var(--nivaa-border-strong);
   background: var(--nivaa-primary-soft);
 }
 
-.list li:target + li {
-  border-top-color: transparent;
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--nivaa-space-default);
+  gap: var(--nivaa-space-default);
+}
+
+.card h2 {
+  font-size: var(--nivaa-font-size-h3);
 }
 
 .copy {
   display: flex;
   align-items: baseline;
   gap: var(--nivaa-space-tight);
-}
-
-.copy strong {
-  font-size: var(--nivaa-font-size-body-sm);
-  font-weight: 700;
 }
 
 .youthDrive {
@@ -81,4 +57,10 @@
 .meta small {
   color: var(--nivaa-text-muted);
   font-size: var(--nivaa-font-size-caption);
+}
+
+.noFiles {
+  margin: 0;
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
 }

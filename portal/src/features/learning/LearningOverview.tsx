@@ -5,7 +5,6 @@ import {
   type DiplomaCardData,
 } from "@/features/completion/DiplomaCard";
 
-import { CourseSessions } from "./CourseSessions";
 import { CourseTimeline } from "./CourseTimeline";
 import type { CourseScheduleView } from "./course-timeline-data";
 import type {
@@ -249,8 +248,6 @@ export function LearningOverview({
           </article>
         ))}
       </section>
-
-      {schedule ? <CourseSessions sessions={schedule.sessions} /> : null}
     </main>
   );
 }

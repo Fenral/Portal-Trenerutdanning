@@ -21,7 +21,7 @@
   margin-bottom: var(--nivaa-space-comfortable);
 }
 
-.resources ul {
+.fileList {
   display: grid;
   margin: 0;
   padding: 0;
@@ -29,7 +29,7 @@
   list-style: none;
 }
 
-.resources li {
+.fileList li {
   display: grid;
   padding-bottom: var(--nivaa-space-default);
   border-bottom: 1px solid var(--nivaa-border);

@@ -78,6 +78,9 @@ export type StudentResourceView = Readonly<{
   byteSize: number;
 }>;
 
+export type StudentSessionResource = StudentResourceView &
+  Readonly<{ courseSessionId: string | null }>;
+
 export type StudentContentView = Readonly<{
   item: ContentItemRow;
   revisionNumber: number;
@@ -207,6 +210,83 @@ export async function loadStudentContentCatalog(
         courseTitle: courseById.get(binding.course_run_id) ?? "Aktivt kurs",
       },
     ];
+  });
+}
+
+export async function loadStudentSessionResources(
+  client: SupabaseClient,
+  courseRunId: string,
+): Promise<readonly StudentSessionResource[]> {
+  const { data: bindingData, error: bindingError } = await client
+    .from("course_resource_bindings")
+    .select("course_run_id,resource_item_id,resource_revision_id")
+    .eq("course_run_id", courseRunId);
+  assertNoQueryError(bindingError);
+
+  const bindings = (bindingData ?? []) as ResourceBindingRow[];
+  if (!bindings.length) return [];
+
+  const itemIds = [...new Set(bindings.map((row) => row.resource_item_id))];
+  const revisionIds = [
+    ...new Set(bindings.map((row) => row.resource_revision_id)),
+  ];
+
+  const [itemsResult, revisionsResult] = await Promise.all([
+    client
+      .from("resource_items")
+      .select("id,title,description,course_session_id,created_at")
+      .eq("audience", "course_members")
+      .in("id", itemIds)
+      .order("created_at"),
+    client
+      .from("resource_revisions")
+      .select("id,resource_item_id,revision_number,media_asset_id")
+      .in("id", revisionIds),
+  ]);
+
+  assertNoQueryError(itemsResult.error);
+  assertNoQueryError(revisionsResult.error);
+
+  const items = (itemsResult.data ?? []) as ReadonlyArray<
+    ResourceItemRow & Readonly<{ course_session_id: string | null }>
+  >;
+  const revisions = (revisionsResult.data ?? []) as ResourceRevisionRow[];
+  const assetIds = [
+    ...new Set(revisions.map((revision) => revision.media_asset_id)),
+  ];
+  const { data: assetData, error: assetError } = assetIds.length
+    ? await client
+        .from("media_assets")
+        .select("id,original_filename,mime_type,byte_size")
+        .in("id", assetIds)
+    : { data: [], error: null };
+  assertNoQueryError(assetError);
+
+  const revisionByItemId = new Map(
+    revisions.map((revision) => [revision.resource_item_id, revision]),
+  );
+  const assetById = new Map(
+    ((assetData ?? []) as MediaAssetRow[]).map((asset) => [asset.id, asset]),
+  );
+
+  return items.flatMap((item) => {
+    const revision = revisionByItemId.get(item.id);
+    const asset = revision ? assetById.get(revision.media_asset_id) : null;
+    return revision && asset
+      ? [
+          {
+            id: item.id,
+            title: item.title,
+            description: item.description,
+            courseSessionId: item.course_session_id,
+            revisionNumber: revision.revision_number,
+            assetId: asset.id,
+            filename: asset.original_filename,
+            mimeType: asset.mime_type,
+            byteSize: asset.byte_size,
+          },
+        ]
+      : [];
   });
 }
 
