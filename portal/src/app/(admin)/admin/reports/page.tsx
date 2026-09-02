@@ -73,14 +73,14 @@ export default async function AdminReportsPage() {
                       </span>
                       <span className={styles.formatLinks}>
                         <a
-                          aria-label={`${definition.label} for ${course.title} som Excel`}
+                          aria-label={`${definition.label} for ${course.title} ${course.displayYear}${course.locationName ? ` ${course.locationName}` : ""} som Excel`}
                           className={styles.formatLink}
                           href={`/api/reports/${type}/${course.id}?format=xlsx`}
                         >
                           Excel
                         </a>
                         <a
-                          aria-label={`${definition.label} for ${course.title} som PDF`}
+                          aria-label={`${definition.label} for ${course.title} ${course.displayYear}${course.locationName ? ` ${course.locationName}` : ""} som PDF`}
                           className={styles.formatLink}
                           href={`/api/reports/${type}/${course.id}?format=pdf`}
                         >
