@@ -1,6 +1,6 @@
 begin;
 
-select plan(37);
+select plan(38);
 
 select has_function(
   'public', 'merge_people', array['uuid', 'uuid', 'text'],
@@ -311,15 +311,23 @@ select is(
 );
 
 -- Funn 3: anonymisering deaktiverer kontoer som en merge har flyttet bort.
+-- Herding (funn 5 i 20261105090000): et aktivt merge-skall kan ikke
+-- anonymiseres direkte — sletteforespørselen rettes mot den overlevende
+-- profilen, hvis kjede dekker skallet.
 set local role authenticated;
 
 select lives_ok(
   $$select public.merge_people('17000000-0000-0000-0000-000000000008', '17000000-0000-0000-0000-000000000009', 'Duplikat')$$,
   'merge moving an account succeeds'
 );
-select lives_ok(
+select throws_ok(
   $$select public.anonymize_person('17000000-0000-0000-0000-000000000008', 'SAK-2026-08', '17000000-0000-0000-0000-000000000007')$$,
-  'anonymizing a merged-away profile succeeds'
+  '22023', 'ANONYMIZE_MERGED_SOURCE',
+  'anonymizing an active merge source is refused'
+);
+select lives_ok(
+  $$select public.anonymize_person('17000000-0000-0000-0000-000000000009', 'SAK-2026-08', '17000000-0000-0000-0000-000000000007')$$,
+  'anonymizing the surviving profile succeeds'
 );
 
 reset role;

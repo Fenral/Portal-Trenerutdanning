@@ -72,6 +72,7 @@ const anonymizeErrorNotices: Readonly<Record<string, string>> = {
   ANONYMIZE_APPROVER_ANONYMIZED: "anonymize-approver-invalid",
   ANONYMIZE_TARGET_PRIVILEGED: "anonymize-privileged",
   ANONYMIZE_SELF_FORBIDDEN: "anonymize-self",
+  ANONYMIZE_MERGED_SOURCE: "anonymize-merged-source",
 };
 
 export async function anonymizePersonAction(

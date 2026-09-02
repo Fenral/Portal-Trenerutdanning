@@ -83,6 +83,10 @@ const notices: Readonly<
     text: "Du kan ikke anonymisere deg selv.",
     ok: false,
   },
+  "anonymize-merged-source": {
+    text: "Profilen er slått sammen inn i en annen profil. Anonymiser den profilen som ble beholdt, eller reverser sammenslåingen først.",
+    ok: false,
+  },
   "anonymize-error": {
     text: "Anonymiseringen kunne ikke gjennomføres.",
     ok: false,
@@ -184,10 +188,14 @@ export default async function AdminDuplicatesPage({
   );
 
   // Profiler med aktiv administrator- eller redaktørrolle kan ikke
-  // anonymiseres (rollene må revokeres først) og tilbys derfor ikke som mål.
+  // anonymiseres (rollene må revokeres først). Duplikat-skall som selv er
+  // slått sammen inn i en annen profil tilbys heller ikke — anonymisering må
+  // rettes mot den overlevende profilen, som dekker hele kjeden.
   const anonymizableProfiles = profiles.filter(
     (profile) =>
-      !isAnonymized(profile) && !privilegedProfileIds.has(profile.id),
+      !isAnonymized(profile) &&
+      !privilegedProfileIds.has(profile.id) &&
+      !activelyMergedSources.has(profile.id),
   );
 
   // Godkjenner: en annen aktiv administrator enn den innloggede utføreren.

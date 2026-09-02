@@ -11,6 +11,9 @@
 --           uinnløste invitasjoner til duplikatenes e-postadresser.
 --   Funn 4: anonymize_person manglet privilegert-mål-vern, selvanonymiserings-
 --           vern og robust godkjennerkontroll, og revokerte ikke målets roller.
+--   Funn 5: anonymisering av et merge-skall (aktiv kilde i en ureversert
+--           sammenslåing) lot kursbevis og roller flyttet nedstrøms stå igjen
+--           i klartekst/aktive; slike mål avvises nå.
 
 -- Funn 1: registrert arbeid = en rad i en hvilken som helst aktivitetsbærende
 -- tabell. enrollment_progress auto-initialiseres ved påmelding, så der teller
@@ -228,6 +231,21 @@ begin
   if not found then
     raise exception using
       errcode = '22023', message = 'ANONYMIZE_PROFILE_NOT_FOUND';
+  end if;
+
+  -- Funn 5: et duplikat-skall som selv er slått sammen inn i en annen profil
+  -- kan ikke anonymiseres — merge-kjeden traverseres kun oppstrøms, så
+  -- enrollments (og dermed kursbevis) og roller mergen flyttet NEDSTRØMS
+  -- ligger utenfor kjeden og ville beholdt klartekstnavn og aktive roller.
+  -- Sletteforespørselen må rettes mot den overlevende profilen (som dekker
+  -- hele kjeden), eller sammenslåingen må reverseres først.
+  if exists (
+    select 1 from public.person_merges
+    where source_profile_id = anonymize_person.target_profile_id
+      and reversed_at is null
+  ) then
+    raise exception using
+      errcode = '22023', message = 'ANONYMIZE_MERGED_SOURCE';
   end if;
 
   -- Funn 4a: privilegerte mål avvises — administrator-/redaktørroller må

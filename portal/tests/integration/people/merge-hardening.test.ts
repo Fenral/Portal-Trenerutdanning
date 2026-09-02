@@ -322,6 +322,76 @@ describe("merge hardening: anonymization chain (finding 3)", () => {
   });
 });
 
+describe("merge hardening: merged-away sources (finding 5)", () => {
+  it("refuses to anonymize an active merge source and scrubs via the survivor", async () => {
+    const sourceId = await createProfile(
+      "Sigurd Kildenavn",
+      `sigurd.${suffix}@merge.invalid`,
+    );
+    const targetId = await createProfile(
+      "Sigurd K Kildenavn",
+      `sigurd.k.${suffix}@merge.invalid`,
+    );
+    const sourceEnrollmentId = await enroll(sourceId, runAId);
+    const certificate = await adminClient.from("certificates").insert({
+      enrollment_id: sourceEnrollmentId,
+      course_run_id: runAId,
+      certificate_number: `HARD-${suffix}-5`,
+      template_version: "v1",
+      display_name: "Sigurd Kildenavn",
+      course_title: "Herdingstest",
+      completed_on: "2027-11-20",
+    });
+    assertNoError(certificate.error);
+
+    const merge = await adminSession.rpc("merge_people", {
+      source_id: sourceId,
+      target_id: targetId,
+      target_reason: "Duplikat med kursbevis",
+    });
+    assertNoError(merge.error);
+
+    // Skallet kan ikke anonymiseres — enrollments er flyttet ut av kjeden,
+    // så en «vellykket» anonymisering ville latt kursbeviset stå i klartekst.
+    const shellAttempt = await adminSession.rpc("anonymize_person", {
+      target_profile_id: sourceId,
+      case_reference: `SAK-HARD-${suffix}-5A`,
+      approver_profile_id: approverProfileId,
+    });
+    expect(shellAttempt.error?.message).toBe("ANONYMIZE_MERGED_SOURCE");
+
+    // Ingen delvis skrubbing skjedde ved avvisningen.
+    const untouched = await adminClient
+      .from("profiles")
+      .select("display_name")
+      .eq("id", sourceId)
+      .single();
+    assertNoError(untouched.error);
+    expect((untouched.data as { display_name: string }).display_name).toBe(
+      "Sigurd Kildenavn",
+    );
+
+    // Riktig vei: anonymiser den overlevende profilen — kjeden dekker skallet
+    // og kursbeviset på den flyttede enrollmenten.
+    const survivor = await adminSession.rpc("anonymize_person", {
+      target_profile_id: targetId,
+      case_reference: `SAK-HARD-${suffix}-5B`,
+      approver_profile_id: approverProfileId,
+    });
+    assertNoError(survivor.error);
+
+    const scrubbed = await adminClient
+      .from("certificates")
+      .select("display_name")
+      .eq("enrollment_id", sourceEnrollmentId)
+      .single();
+    assertNoError(scrubbed.error);
+    expect((scrubbed.data as { display_name: string }).display_name).toBe(
+      "Anonymisert deltaker",
+    );
+  });
+});
+
 describe("merge hardening: approver and target guards (finding 4)", () => {
   it("refuses the target as approver and refuses privileged targets", async () => {
     const adminTargetId = await createProfile(
