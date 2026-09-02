@@ -74,6 +74,12 @@ const anonymizeErrorNotices: Readonly<Record<string, string>> = {
 export async function anonymizePersonAction(
   formData: FormData,
 ): Promise<never> {
+  // WCAG 3.3.4: irreversible handling krever eksplisitt bekreftelse,
+  // validert server-side (ikke bare `required` i klienten).
+  if (textValue(formData, "confirm") !== "yes") {
+    finish("anonymize-confirm-required");
+  }
+
   if (!textValue(formData, "approverProfileId")) {
     finish("anonymize-approver-invalid");
   }

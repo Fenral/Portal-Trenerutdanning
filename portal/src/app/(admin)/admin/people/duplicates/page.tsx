@@ -63,6 +63,10 @@ const notices: Readonly<
     text: "Deltakeren er anonymisert. Pseudonyme kursaggregater er beholdt.",
     ok: true,
   },
+  "anonymize-confirm-required": {
+    text: "Kryss av for å bekrefte varig anonymisering før du sender inn.",
+    ok: false,
+  },
   "anonymize-case-required": {
     text: "Saksreferanse er påkrevd for anonymisering.",
     ok: false,
@@ -388,6 +392,14 @@ export default async function AdminDuplicatesPage({
                   ikke godkjennes før en administrator til finnes.
                 </p>
               ) : null}
+
+              <label className={styles.confirmCheck}>
+                <input name="confirm" required type="checkbox" value="yes" />
+                <span>
+                  Jeg bekrefter varig anonymisering av valgt deltaker. Dette kan
+                  ikke angres.
+                </span>
+              </label>
 
               <button
                 className="nivaa-button nivaa-button--secondary"
