@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const assignmentTitle = "Innlevering: Planlegg en inkluderende golføkt";
+const assignmentTitle = "Planlegg en inkluderende golføkt";
 const activityId = "a3200000-0000-0000-0000-000000000007";
 const pdfBytes = Buffer.from("%PDF-1.4\n% demo assignment\n");
 

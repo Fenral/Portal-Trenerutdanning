@@ -722,7 +722,7 @@ values
     'a3200000-0000-0000-0000-000000000007',
     'a3000000-0000-0000-0000-000000000001',
     'a3100000-0000-0000-0000-000000000005',
-    'Innlevering: Planlegg en inkluderende golføkt',
+    'Planlegg en inkluderende golføkt',
     'assignment',
     'submission_approved',
     null,
