@@ -11,12 +11,19 @@ const serverClient = vi.hoisted(() => ({
   create: vi.fn(),
 }));
 
-const environment = vi.hoisted(() => ({
-  getE2EDemoPassword: vi.fn((): string => {
-    throw new Error("PASSWORD_MUST_NOT_BE_READ");
-  }),
-  isE2ETestMode: vi.fn(() => false),
-}));
+const environment = vi.hoisted(() => {
+  const isE2ETestMode = vi.fn(() => false);
+  return {
+    getE2EDemoPassword: vi.fn((): string => {
+      throw new Error("PASSWORD_MUST_NOT_BE_READ");
+    }),
+    isE2ETestMode,
+    // Speiler den ekte implementasjonen i @/lib/supabase/environment.
+    isDemoMode: vi.fn(
+      () => isE2ETestMode() || process.env.DEMO_MODE === "true",
+    ),
+  };
+});
 
 vi.mock("next/navigation", () => navigation);
 vi.mock("@/lib/supabase/environment", () => environment);
