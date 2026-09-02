@@ -42,7 +42,7 @@
   justify-items: center;
   padding: var(--nivaa-space-spacious);
   border: 1px dashed var(--nivaa-border-strong);
-  border-radius: var(--nivaa-radius-card);
+  border-radius: var(--nivaa-radius-surface);
   background: var(--nivaa-surface);
   text-align: center;
 }

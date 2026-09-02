@@ -45,3 +45,6 @@ next-env.d.ts
 
 # Local design-hook cache
 .impeccable/
+
+.vercel
+.env*

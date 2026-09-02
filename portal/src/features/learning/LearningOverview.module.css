@@ -229,6 +229,12 @@
 
 .module {
   scroll-margin-top: 6rem;
+}
+
+@media (max-width: 48rem) {
+  .module {
+    scroll-margin-top: 18rem;
+  }
   overflow: hidden;
   border: 1px solid var(--nivaa-border);
   border-radius: var(--nivaa-radius-surface);

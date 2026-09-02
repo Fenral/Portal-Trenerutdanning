@@ -7,7 +7,7 @@
   overflow: hidden;
   padding: var(--nivaa-space-default) var(--nivaa-space-comfortable);
   border: 1px solid color-mix(in srgb, var(--nivaa-primary) 30%, transparent);
-  border-radius: var(--nivaa-radius-card);
+  border-radius: var(--nivaa-radius-surface);
   background:
     radial-gradient(
       circle at 12% 15%,

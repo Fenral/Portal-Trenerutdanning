@@ -7,6 +7,13 @@
   scroll-margin-top: 6rem;
 }
 
+/* Mobil: sticky topp-navigasjon er ~17rem høy; ankermål må klarere den. */
+@media (max-width: 48rem) {
+  .card {
+    scroll-margin-top: 18rem;
+  }
+}
+
 /* Markerer kortet når tidslinjen har lenket hit */
 .card:target {
   border-color: var(--nivaa-border-strong);
