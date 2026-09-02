@@ -59,7 +59,7 @@ export default async function TeacherPage() {
             {queue.map((item, index) => (
               <li key={item.submissionId}>
                 <Link
-                  aria-label={`Vurder ${item.studentName} – ${item.activityTitle}, ${statusLabel(item.status)}, ${dateFormatter.format(new Date(item.updatedAt))}`}
+                  aria-label={`Vurder ${item.studentName}, ${item.clubName}, ${item.activityTitle}, versjon ${item.versionNumber} ${item.courseTitle}, ${statusLabel(item.status)}, ${dateFormatter.format(new Date(item.updatedAt))}`}
                   href={`/teacher/assignments/${item.submissionId}`}
                 >
                   <span className={styles.index} aria-hidden="true">

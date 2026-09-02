@@ -37,9 +37,7 @@ test("teacher and student exchange 1:1 messages with unread markers", async ({
 
   await teacherPage.getByLabel("Melding til Emil Berg").fill(teacherMessage);
   await teacherPage.getByRole("button", { name: "Send melding" }).click();
-  await expect(teacherPage.getByRole("status")).toContainText(
-    "Meldingen er sendt",
-  );
+  await expect(teacherPage.getByText("Meldingen er sendt.")).toBeFocused();
   await expect(teacherPage.getByText(teacherMessage)).toBeVisible();
 
   // Trådlisten viser samtalen; axe på lærerflaten.
@@ -75,9 +73,7 @@ test("teacher and student exchange 1:1 messages with unread markers", async ({
   await expect(studentPage.getByText(teacherMessage)).toBeVisible();
   await studentPage.getByLabel("Svar til Liv Trener 3").fill(studentReply);
   await studentPage.getByRole("button", { name: "Send svar" }).click();
-  await expect(studentPage.getByRole("status")).toContainText(
-    "Meldingen er sendt",
-  );
+  await expect(studentPage.getByText("Meldingen er sendt.")).toBeFocused();
 
   // Tråden er lest: menymerket er borte.
   await expect(

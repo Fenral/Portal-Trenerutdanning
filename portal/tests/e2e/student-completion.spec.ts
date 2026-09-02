@@ -7,7 +7,9 @@ test("a student can complete a reach-end lesson and sees updated progress", asyn
 
   await expect(page.getByText("20 %", { exact: true })).toBeVisible();
   await page
-    .getByRole("link", { name: "Fortsett Planlegging av treningsøkt" })
+    .getByRole("link", {
+      name: "Fortsett aktiviteten: Planlegging av treningsøkt",
+    })
     .click();
   await expect(
     page.getByRole("heading", { name: "Planlegging av treningsøkt" }),

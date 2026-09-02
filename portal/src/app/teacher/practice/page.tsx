@@ -58,7 +58,7 @@ export default async function TeacherPracticeQueuePage() {
             {practiceQueue.map((item, index) => (
               <li key={item.submissionId}>
                 <Link
-                  aria-label={`Følg opp ${item.studentName} – ${item.activityTitle}, ${practiceStatusLabel(item.status)}, ${dateFormatter.format(new Date(item.submittedAt))}`}
+                  aria-label={`Følg opp ${item.studentName}, ${item.clubName}, ${formatDuration(item.totalMinutes)}, versjon ${item.versionNumber} ${item.courseTitle}, ${practiceStatusLabel(item.status)}, ${dateFormatter.format(new Date(item.submittedAt))}`}
                   href={`/teacher/practice/${item.submissionId}`}
                 >
                   <span className={styles.index} aria-hidden="true">

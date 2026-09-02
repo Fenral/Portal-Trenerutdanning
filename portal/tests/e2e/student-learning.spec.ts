@@ -14,7 +14,7 @@ test("student sees one next action and an exact reason for a locked test", async
   await expect(page.getByText("40 %", { exact: true })).toBeVisible();
   await expect(
     page.getByRole("link", {
-      name: "Fortsett Ballfluktslover og balltreff",
+      name: "Fortsett aktiviteten: Ballfluktslover og balltreff",
     }),
   ).toBeVisible();
   await expect(
@@ -47,7 +47,9 @@ test("learning path and lesson stay usable on mobile", async ({ page }) => {
     page.getByRole("heading", { name: "Fortsett der du slapp" }),
   ).toBeVisible();
   await page
-    .getByRole("link", { name: "Fortsett Ballfluktslover og balltreff" })
+    .getByRole("link", {
+      name: "Fortsett aktiviteten: Ballfluktslover og balltreff",
+    })
     .click();
   await expect(
     page.getByRole("heading", { name: "Ballfluktslover og balltreff" }),

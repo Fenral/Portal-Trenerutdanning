@@ -119,7 +119,7 @@ export function LearningOverview({
             </div>
           </div>
           <Link
-            aria-label={`Fortsett ${nextActivity.title}`}
+            aria-label={`Fortsett aktiviteten: ${nextActivity.title}`}
             className="nivaa-button nivaa-button--primary"
             href={activityHref(learningPath, nextActivity)}
           >
@@ -210,7 +210,7 @@ export function LearningOverview({
                 return (
                   <li key={activity.id}>
                     <Link
-                      aria-label={`Åpne ${activity.title}`}
+                      aria-label={`Åpne ${activity.title}, ${activityTypeLabels[activity.activityType]}${!activity.required ? ", valgfri" : ""}, ${status.label}`}
                       href={activityHref(learningPath, activity)}
                     >
                       <span

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { MessageThread } from "@/components/ui/MessageThread";
 import threadStyles from "@/components/ui/MessageThread.module.css";
+import { ThreadNotice } from "@/components/ui/ThreadNotice";
 import { loadStudentIdentity } from "@/features/content/student-data";
 import { loadStudentThread } from "@/features/messaging/data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -13,13 +14,13 @@ import styles from "../../messages.module.css";
 export const dynamic = "force-dynamic";
 
 const NOTICES: Record<string, { text: string; tone: "ok" | "error" }> = {
-  "message-sent": { text: "✓ Meldingen er sendt.", tone: "ok" },
+  "message-sent": { text: "Meldingen er sendt.", tone: "ok" },
   "message-error": {
-    text: "✕ Meldingen kunne ikke sendes. Prøv igjen senere.",
+    text: "Meldingen kunne ikke sendes. Prøv igjen senere.",
     tone: "error",
   },
   "message-invalid": {
-    text: "✕ Skriv en melding på 1–4000 tegn.",
+    text: "Skriv en melding på 1–4000 tegn.",
     tone: "error",
   },
 };
@@ -63,15 +64,7 @@ export default async function StudentThreadPage({
         <p>Svaret ditt går kun til {thread.teacherName}.</p>
       </header>
 
-      {notice ? (
-        <p
-          className={threadStyles.notice}
-          data-tone={notice.tone === "error" ? "error" : undefined}
-          role={notice.tone === "error" ? "alert" : "status"}
-        >
-          {notice.text}
-        </p>
-      ) : null}
+      {notice ? <ThreadNotice text={notice.text} tone={notice.tone} /> : null}
 
       <MessageThread
         counterpartName={thread.teacherName}
