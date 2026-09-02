@@ -59,12 +59,17 @@ export async function loadCourseSessionInfos(
   client: SupabaseClient,
   courseRunId: string,
   now: Date = new Date(),
+  options: Readonly<{ attendanceTrackedOnly?: boolean }> = {},
 ): Promise<readonly CourseSessionInfo[]> {
-  const { data, error } = await client
+  let query = client
     .from("course_sessions")
     .select("id,title,starts_at,ends_at,location_text,session_type,sort_order")
-    .eq("course_run_id", courseRunId)
-    .order("starts_at");
+    .eq("course_run_id", courseRunId);
+  if (options.attendanceTrackedOnly) {
+    // Samme filter som oppmøteføringen i attendance/teacher-data.ts.
+    query = query.eq("session_type", "regular").eq("is_required", true);
+  }
+  const { data, error } = await query.order("starts_at");
 
   if (error) {
     throw new Error(`COURSE_SESSIONS_QUERY_FAILED:${error.message}`);

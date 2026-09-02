@@ -42,11 +42,20 @@ for (const path of ["/teacher/sessions", "/teacher/course"]) {
   });
 }
 
-test("students are not authorized for the teacher course view", async ({
+test("students are not authorized for any teacher workspace", async ({
   page,
 }) => {
   await page.goto("/test-login?as=student");
-  const response = await page.goto("/teacher/course");
 
-  expect(response?.status()).toBe(404);
+  for (const path of [
+    "/teacher",
+    "/teacher/course",
+    "/teacher/sessions",
+    "/teacher/practice",
+    "/teacher/participants",
+  ]) {
+    const response = await page.goto(path);
+
+    expect(response?.status(), path).toBe(404);
+  }
 });

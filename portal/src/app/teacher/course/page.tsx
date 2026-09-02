@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { resolveTeacherCourseAccess } from "@/features/access/teacher-course";
 import { ContentDocument } from "@/features/content/document-schema";
 import { ContentRenderer } from "@/features/learning/ContentRenderer";
 import cardStyles from "@/features/learning/CourseSessions.module.css";
@@ -24,26 +25,11 @@ function assertNoQueryError(error: { message: string } | null): void {
 
 export default async function TeacherCoursePage() {
   const client = await createSupabaseServerClient();
-  const { data: run, error: runError } = await client
-    .from("course_runs")
-    .select("id,title,template_id")
-    .order("start_year", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  assertNoQueryError(runError);
-  if (!run) notFound();
-
-  // Server-autorisasjon: kun kurslærer/kursleder på kurset ser lesevisningen.
-  // RLS begrenser role_assignments til egne rader for ikke-administratorer.
-  const staffRoles = await client
-    .from("role_assignments")
-    .select("id")
-    .in("role", ["course_teacher", "course_lead"])
-    .is("revoked_at", null)
-    .or(`course_run_id.eq.${run.id},course_template_id.eq.${run.template_id}`)
-    .limit(1);
-  assertNoQueryError(staffRoles.error);
-  if (!staffRoles.data?.length) notFound();
+  // Server-autorisasjon: kun kurslærer/kursleder ser lesevisningen, og kun
+  // for en kjøring de har rolle på (via run eller mal).
+  const access = await resolveTeacherCourseAccess(client);
+  if (!access.isTeacher || !access.run) notFound();
+  const run = access.run;
 
   const pathResult = await client
     .from("learning_paths")

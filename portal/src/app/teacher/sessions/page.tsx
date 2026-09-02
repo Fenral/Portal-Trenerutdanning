@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
+import { resolveTeacherCourseAccess } from "@/features/access/teacher-course";
 import { summarizeSessionAttendance } from "@/features/attendance/session-summary";
 import { loadCourseSessionInfos } from "@/features/learning/course-timeline-data";
 import cardStyles from "@/features/learning/CourseSessions.module.css";
@@ -11,16 +13,16 @@ export const dynamic = "force-dynamic";
 
 export default async function TeacherSessionsPage() {
   const client = await createSupabaseServerClient();
-  const { data: run, error: runError } = await client
-    .from("course_runs")
-    .select("id,title")
-    .order("start_year", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (runError)
-    throw new Error(`TEACHER_SESSIONS_QUERY_FAILED:${runError.message}`);
+  const access = await resolveTeacherCourseAccess(client);
+  if (!access.isTeacher) notFound();
+  const run = access.run;
 
-  const sessions = run ? await loadCourseSessionInfos(client, run.id) : [];
+  // Kun samlinger som kan oppmøteføres – samme filter som attendance-editoren.
+  const sessions = run
+    ? await loadCourseSessionInfos(client, run.id, new Date(), {
+        attendanceTrackedOnly: true,
+      })
+    : [];
   const [enrollmentsResult, attendanceResult] = run
     ? await Promise.all([
         client
@@ -30,7 +32,7 @@ export default async function TeacherSessionsPage() {
           .neq("status", "withdrawn"),
         client
           .from("attendance_records")
-          .select("session_id,present_minutes")
+          .select("session_id,planned_minutes,present_minutes")
           .in(
             "session_id",
             sessions.map((session) => session.id),
@@ -48,6 +50,7 @@ export default async function TeacherSessionsPage() {
   const summaries = summarizeSessionAttendance(
     (attendanceResult.data ?? []).map((record) => ({
       sessionId: record.session_id,
+      plannedMinutes: record.planned_minutes,
       presentMinutes: record.present_minutes,
     })),
   );
@@ -90,11 +93,6 @@ export default async function TeacherSessionsPage() {
                 <header className={cardStyles.head}>
                   <div className={cardStyles.copy}>
                     <h2 id={`session-title-${session.id}`}>{session.title}</h2>
-                    {session.isYouthDrive ? (
-                      <span className={cardStyles.youthDrive}>
-                        Ungdomsdriven
-                      </span>
-                    ) : null}
                   </div>
                   <div className={cardStyles.meta}>
                     <span>{session.dateLabel}</span>
@@ -105,7 +103,7 @@ export default async function TeacherSessionsPage() {
                 </header>
                 <p className={styles.sessionSummary}>
                   {summary
-                    ? `✓ ${summary.present} av ${participantCount} deltakere tilstede · ${summary.registered} registrert`
+                    ? `✓ Oppmøte ført for ${summary.registered} av ${participantCount} deltakere · ${summary.withAbsence} med fravær`
                     : "◇ Oppmøte er ikke registrert ennå."}
                 </p>
                 <Link className={styles.cardLink} href="/teacher/participants">

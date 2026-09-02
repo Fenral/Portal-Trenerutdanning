@@ -1,13 +1,17 @@
 export type SessionAttendanceSummary = Readonly<{
   /** Antall deltakere med registrert oppmøterad for samlingen. */
   registered: number;
-  /** Antall av dem som var tilstede (mer enn 0 minutter). */
-  present: number;
+  /** Antall av dem med registrert fravær (færre minutter enn planlagt). */
+  withAbsence: number;
 }>;
 
 export function summarizeSessionAttendance(
   records: ReadonlyArray<
-    Readonly<{ sessionId: string; presentMinutes: number }>
+    Readonly<{
+      sessionId: string;
+      plannedMinutes: number;
+      presentMinutes: number;
+    }>
   >,
 ): ReadonlyMap<string, SessionAttendanceSummary> {
   const summaries = new Map<string, SessionAttendanceSummary>();
@@ -15,11 +19,13 @@ export function summarizeSessionAttendance(
   for (const record of records) {
     const current = summaries.get(record.sessionId) ?? {
       registered: 0,
-      present: 0,
+      withAbsence: 0,
     };
     summaries.set(record.sessionId, {
       registered: current.registered + 1,
-      present: current.present + (record.presentMinutes > 0 ? 1 : 0),
+      withAbsence:
+        current.withAbsence +
+        (record.presentMinutes < record.plannedMinutes ? 1 : 0),
     });
   }
 

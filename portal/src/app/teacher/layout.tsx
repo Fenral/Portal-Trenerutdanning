@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { TeacherShell } from "@/components/shell/TeacherShell";
+import { resolveTeacherCourseAccess } from "@/features/access/teacher-course";
 import { isDemoMode } from "@/lib/supabase/environment";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -15,21 +16,17 @@ export default async function TeacherLayout({
 
   if (!user) notFound();
 
-  const [profileResult, courseResult] = await Promise.all([
+  const [profileResult, access] = await Promise.all([
     client.from("profiles").select("display_name").limit(1).maybeSingle(),
-    client
-      .from("course_runs")
-      .select("title")
-      .order("start_year", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+    resolveTeacherCourseAccess(client),
   ]);
 
-  if (profileResult.error || courseResult.error) notFound();
+  if (profileResult.error) notFound();
+  if (!access.isTeacher) notFound();
 
   return (
     <TeacherShell
-      courseTitle={courseResult.data?.title ?? "Aktivt kurs"}
+      courseTitle={access.run?.title ?? "Aktivt kurs"}
       demoMode={isDemoMode()}
       userName={profileResult.data?.display_name ?? "Kurslærer"}
     >
