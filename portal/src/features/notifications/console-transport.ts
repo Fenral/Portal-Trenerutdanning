@@ -1,8 +1,12 @@
+import { randomUUID } from "node:crypto";
+
 import { maskEmail } from "@/features/access/invitations/claim-invitation";
 
 import type {
+  EmailMessage,
   InvitationNotification,
   NotificationTransport,
+  SendResult,
 } from "./transport";
 
 type ConsoleTransportOptions = Readonly<{
@@ -19,12 +23,18 @@ export class ConsoleNotificationTransport implements NotificationTransport {
     this.#write = options.write;
   }
 
-  async sendInvitation(notification: InvitationNotification): Promise<void> {
+  #assertNotProduction(): void {
     if (this.#runtimeEnvironment === "production") {
       throw new Error(
         "Console notification transport is disabled in production",
       );
     }
+  }
+
+  async sendInvitation(
+    notification: InvitationNotification,
+  ): Promise<SendResult> {
+    this.#assertNotProduction();
 
     this.#write({
       event: "invitation.email.preview",
@@ -32,5 +42,20 @@ export class ConsoleNotificationTransport implements NotificationTransport {
       recipient: maskEmail(notification.recipientEmail),
       correlationId: notification.correlationId,
     });
+
+    return { providerMessageId: `console:${randomUUID()}` };
+  }
+
+  async sendEmail(message: EmailMessage): Promise<SendResult> {
+    this.#assertNotProduction();
+
+    this.#write({
+      event: "notification.email.preview",
+      recipient: maskEmail(message.to),
+      subject: message.subject,
+      correlationId: message.correlationId,
+    });
+
+    return { providerMessageId: `console:${randomUUID()}` };
   }
 }

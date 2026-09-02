@@ -10,6 +10,22 @@ function textValue(formData: FormData, name: string): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
+export async function sendReminderAction(formData: FormData): Promise<never> {
+  const enrollmentId = textValue(formData, "enrollmentId");
+  if (!enrollmentId) redirect("/teacher/participants");
+  const detailPath = `/teacher/participants/${enrollmentId}`;
+
+  const client = await createSupabaseServerClient();
+  const result = await client.rpc("enqueue_due_reminder", {
+    target_enrollment_id: enrollmentId,
+  });
+
+  if (result.error) redirect(`${detailPath}?notice=reminder-error`);
+
+  revalidatePath(detailPath);
+  redirect(`${detailPath}?notice=reminder-sent`);
+}
+
 export async function recordAttendanceAction(
   formData: FormData,
 ): Promise<never> {

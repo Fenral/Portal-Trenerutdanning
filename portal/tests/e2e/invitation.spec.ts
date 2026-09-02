@@ -58,8 +58,15 @@ function assertNoSupabaseError(error: { message: string } | null): void {
 class CaptureNotificationTransport implements NotificationTransport {
   notification: InvitationNotification | null = null;
 
-  async sendInvitation(notification: InvitationNotification): Promise<void> {
+  async sendInvitation(
+    notification: InvitationNotification,
+  ): Promise<Readonly<{ providerMessageId: string }>> {
     this.notification = notification;
+    return { providerMessageId: "capture:1" };
+  }
+
+  async sendEmail(): Promise<Readonly<{ providerMessageId: string }>> {
+    return { providerMessageId: "capture:2" };
   }
 }
 

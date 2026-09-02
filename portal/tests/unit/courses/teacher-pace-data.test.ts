@@ -81,7 +81,11 @@ describe("loadPaceByEnrollment", () => {
     const client = fakeClient({
       ...baseTables,
       assignment_submissions: [
-        { enrollment_id: "enr-submitted", activity_id: "act-1", status: "submitted" },
+        {
+          enrollment_id: "enr-submitted",
+          activity_id: "act-1",
+          status: "submitted",
+        },
         { enrollment_id: "enr-draft", activity_id: "act-1", status: "draft" },
         {
           enrollment_id: "enr-revision",

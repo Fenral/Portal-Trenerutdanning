@@ -40,4 +40,12 @@ test("teacher filters compact participant rows and opens module profile", async 
   ).toBeVisible();
   await page.getByText("Golfteknikk", { exact: true }).click();
   await expect(page.getByText("Ballfluktslover og balltreff")).toBeVisible();
+
+  await page.goto("/teacher/participants");
+  await page.getByRole("link").filter({ hasText: "Trond" }).first().click();
+  await page.getByRole("button", { name: "Send påminnelse" }).click();
+  await expect(page.getByRole("status")).toContainText(
+    "Påminnelsen er lagt i utsendingskøen",
+    { timeout: 15_000 },
+  );
 });

@@ -141,7 +141,10 @@ describe("invitation creation", () => {
       markDelivered: vi.fn().mockResolvedValue(undefined),
     };
     const transport: NotificationTransport = {
-      sendInvitation: vi.fn().mockResolvedValue(undefined),
+      sendInvitation: vi
+        .fn()
+        .mockResolvedValue({ providerMessageId: "fake:1" }),
+      sendEmail: vi.fn().mockResolvedValue({ providerMessageId: "fake:2" }),
     };
 
     await expect(

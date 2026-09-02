@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 
 import { recordAttendanceAction } from "../actions";
 import styles from "../participants.module.css";
@@ -46,6 +46,7 @@ type ParticipantAttendanceViewProps = Readonly<{
     }>[];
   }>;
   notice?: string;
+  actions?: ReactNode;
 }>;
 
 const dateFormatter = new Intl.DateTimeFormat("nb-NO", {
@@ -77,6 +78,7 @@ export function ParticipantAttendanceView({
   enrollmentId,
   participant,
   notice,
+  actions,
 }: ParticipantAttendanceViewProps) {
   const [drafts, setDrafts] = useState<Record<string, AttendanceDraft>>(() =>
     Object.fromEntries(
@@ -194,6 +196,7 @@ export function ParticipantAttendanceView({
             </strong>
           </span>
         </div>
+        {actions}
       </header>
 
       {notice ? (
