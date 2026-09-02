@@ -26,7 +26,7 @@ type NavigationItem = Readonly<{
 const navigationItems: readonly NavigationItem[] = [
   { label: "Oversikt", icon: "chart" },
   { label: "Kurs", icon: "courses", href: "/admin/courses" },
-  { label: "Deltakere", icon: "people" },
+  { label: "Deltakere", icon: "people", href: "/admin/people/duplicates" },
   { label: "Tilganger", icon: "access", href: "/admin/access" },
   { label: "Innhold", icon: "content", href: "/editor/content" },
   { label: "Rapporter", icon: "reports", href: "/admin/reports" },
@@ -132,6 +132,7 @@ export function AdminShell({
   const availableNavigationItems = navigationItems.map((item) =>
     roleLabel === "Redaktør" &&
     (item.label === "Kurs" ||
+      item.label === "Deltakere" ||
       item.label === "Rapporter" ||
       item.label === "Innsikt")
       ? { ...item, href: undefined }
