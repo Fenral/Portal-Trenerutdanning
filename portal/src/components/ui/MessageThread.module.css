@@ -1,0 +1,213 @@
+/* Delte meldingsflater for lærer-inbox og student-meldinger. */
+
+.threadList {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+  list-style: none;
+}
+
+.threadList li + li {
+  border-top: 1px solid var(--nivaa-border);
+}
+
+.threadRow {
+  display: grid;
+  min-height: 4.5rem;
+  align-items: center;
+  padding: var(--nivaa-space-default) var(--nivaa-space-comfortable);
+  gap: var(--nivaa-space-default);
+  grid-template-columns: minmax(9rem, 0.8fr) minmax(0, 1.6fr) auto auto 1rem;
+  color: var(--nivaa-on-surface);
+  text-decoration: none;
+  transition: background-color var(--nivaa-transition-fast);
+}
+
+.threadRow:hover {
+  background: var(--nivaa-surface-subtle);
+}
+
+.threadName {
+  display: grid;
+  gap: var(--nivaa-space-micro);
+  min-width: 0;
+}
+
+.threadName strong,
+.threadExcerpt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.threadName small,
+.threadTime {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.threadExcerpt {
+  margin: 0;
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.unread {
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--nivaa-radius-pill);
+  background: var(--nivaa-primary-soft);
+  color: var(--nivaa-on-primary-soft);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.readState {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-caption);
+  white-space: nowrap;
+}
+
+.threadArrow {
+  color: var(--nivaa-primary);
+  font-size: 1.1rem;
+}
+
+.thread {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: var(--nivaa-space-default);
+  list-style: none;
+}
+
+.message {
+  display: grid;
+  width: min(100%, 46rem);
+  padding: var(--nivaa-space-default) var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-surface-subtle);
+  gap: var(--nivaa-space-tight);
+}
+
+.message[data-own] {
+  justify-self: end;
+  background: var(--nivaa-primary-soft);
+}
+
+.messageMeta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--nivaa-space-default);
+}
+
+.messageMeta strong {
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.messageMeta time {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-caption);
+  white-space: nowrap;
+}
+
+.messageBody {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.composer {
+  display: grid;
+  margin-top: var(--nivaa-space-spacious);
+  padding: var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+  gap: var(--nivaa-space-compact);
+}
+
+.composer label {
+  display: grid;
+  gap: var(--nivaa-space-tight);
+  font-size: var(--nivaa-font-size-label);
+  font-weight: 650;
+}
+
+.composer textarea {
+  min-height: 7rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--nivaa-border-strong);
+  border-radius: var(--nivaa-radius-field);
+  background: var(--nivaa-surface);
+  color: var(--nivaa-on-surface);
+  font: inherit;
+  resize: vertical;
+}
+
+.composer textarea:focus-visible {
+  outline: 3px solid var(--nivaa-focus);
+  outline-offset: 1px;
+}
+
+.composerFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nivaa-space-default);
+}
+
+.composerFooter small {
+  color: var(--nivaa-text-muted);
+}
+
+.empty {
+  padding: var(--nivaa-space-section);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+}
+
+.empty h2 {
+  margin-bottom: var(--nivaa-space-tight);
+}
+
+.empty p {
+  margin: 0;
+  color: var(--nivaa-text-muted);
+}
+
+.notice {
+  margin-bottom: var(--nivaa-space-comfortable);
+  padding: var(--nivaa-space-compact) var(--nivaa-space-default);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-field);
+  background: var(--nivaa-success-soft);
+  color: var(--nivaa-success);
+  font-weight: 650;
+}
+
+.notice[data-tone="error"] {
+  background: var(--nivaa-error-soft);
+  color: var(--nivaa-error);
+}
+
+@media (max-width: 720px) {
+  .threadRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .threadExcerpt,
+  .threadTime,
+  .threadArrow {
+    display: none;
+  }
+}

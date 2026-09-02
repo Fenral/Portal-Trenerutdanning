@@ -104,8 +104,7 @@ export function TeacherShell({
       isCurrent: (path) =>
         path === "/teacher" || path.startsWith("/teacher/assignments"),
     },
-    // Inbox aktiveres når meldingsflaten bygges i neste fase.
-    { label: "Inbox", icon: "inbox" },
+    { label: "Inbox", icon: "inbox", href: "/teacher/inbox" },
   ];
 
   return (

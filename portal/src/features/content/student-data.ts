@@ -52,6 +52,7 @@ type MediaAssetRow = Readonly<{
 }>;
 
 export type StudentIdentityView = Readonly<{
+  profileId: string | null;
   displayName: string;
   courseTitle: string;
   courseRunId: string | null;
@@ -120,7 +121,7 @@ export async function loadStudentIdentity(
   client: SupabaseClient,
 ): Promise<StudentIdentityView> {
   const [profileResult, coursesResult] = await Promise.all([
-    client.from("profiles").select("display_name").limit(1).maybeSingle(),
+    client.from("profiles").select("id,display_name").limit(1).maybeSingle(),
     client
       .from("course_runs")
       .select("id,title,start_year")
@@ -132,6 +133,7 @@ export async function loadStudentIdentity(
   assertNoQueryError(coursesResult.error);
 
   return {
+    profileId: profileResult.data?.id ?? null,
     displayName: profileResult.data?.display_name ?? "Student",
     courseTitle: coursesResult.data?.[0]?.title ?? "Aktivt kurs",
     courseRunId: coursesResult.data?.[0]?.id ?? null,

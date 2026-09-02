@@ -13,6 +13,7 @@ type IconName =
   | "sessions"
   | "practice"
   | "submissions"
+  | "messages"
   | "certificates"
   | "help";
 
@@ -20,6 +21,7 @@ type NavigationItem = Readonly<{
   label: string;
   icon: IconName;
   href?: string;
+  badge?: number;
 }>;
 
 function Icon({ name }: { name: IconName }) {
@@ -68,6 +70,15 @@ function Icon({ name }: { name: IconName }) {
     );
   }
 
+  if (name === "messages") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <rect height="13" rx="1.5" width="16" x="4" y="5.5" />
+        <path d="m4.5 7 7.5 5.5L19.5 7" />
+      </svg>
+    );
+  }
+
   if (name === "help") {
     return (
       <svg aria-hidden="true" viewBox="0 0 24 24">
@@ -99,12 +110,14 @@ export function StudentShell({
   courseRunId,
   courseTitle,
   demoMode = false,
+  unreadMessages = 0,
   userName,
 }: Readonly<{
   children: ReactNode;
   courseRunId: string | null;
   courseTitle: string;
   demoMode?: boolean;
+  unreadMessages?: number;
   userName: string;
 }>) {
   const pathname = usePathname();
@@ -123,6 +136,12 @@ export function StudentShell({
       label: "Innleveringer",
       icon: "submissions",
       href: "/student/assignments",
+    },
+    {
+      label: "Meldinger",
+      icon: "messages",
+      href: "/student/messages",
+      badge: unreadMessages,
     },
     {
       label: "Mine diplomer",
@@ -172,6 +191,11 @@ export function StudentShell({
                     >
                       <Icon name={item.icon} />
                       <span>{item.label}</span>
+                      {item.badge ? (
+                        <span className={styles.navBadge}>
+                          {item.badge} uleste
+                        </span>
+                      ) : null}
                     </Link>
                   ) : (
                     <span

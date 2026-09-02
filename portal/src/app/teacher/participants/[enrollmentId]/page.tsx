@@ -45,15 +45,23 @@ export default async function TeacherParticipantPage({
       ) : null}
       <ParticipantAttendanceView
         actions={
-          <form action={sendReminderAction}>
-            <input name="enrollmentId" type="hidden" value={enrollmentId} />
-            <button
+          <>
+            <Link
               className="nivaa-button nivaa-button--secondary"
-              type="submit"
+              href={`/teacher/inbox/${enrollmentId}`}
             >
-              Send påminnelse
-            </button>
-          </form>
+              Send melding
+            </Link>
+            <form action={sendReminderAction}>
+              <input name="enrollmentId" type="hidden" value={enrollmentId} />
+              <button
+                className="nivaa-button nivaa-button--secondary"
+                type="submit"
+              >
+                Send påminnelse
+              </button>
+            </form>
+          </>
         }
         enrollmentId={enrollmentId}
         notice={reminderNotice ? undefined : query.notice}

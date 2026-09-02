@@ -17,6 +17,7 @@ const ALL_TEMPLATES: readonly NotificationTemplate[] = [
   "access_withdrawn",
   "access_reopened",
   "completion",
+  "message_received",
 ];
 
 const FORBIDDEN_VALUES = {
@@ -24,6 +25,7 @@ const FORBIDDEN_VALUES = {
   submissionText: "Hemmelig innleveringstekst",
   phone: "90000101",
   rawToken: "RAW_SECRET_TOKEN_VALUE",
+  messageBody: "Privat meldingstekst til deltakeren",
 } as const;
 
 describe("notificationKey", () => {
@@ -99,6 +101,12 @@ describe("renderEmail", () => {
     expect(
       renderEmail("due_reminder", { ...params, dueOn: undefined }).text,
     ).not.toContain("Frist");
+  });
+
+  it("message_received nudges to the portal without the message text", () => {
+    const email = renderEmail("message_received", params);
+    expect(email.subject).toContain("Trener 3");
+    expect(email.text).toContain("Logg inn i portalen");
   });
 
   it("review_result announces availability without the result itself", () => {

@@ -61,11 +61,19 @@ async function sendNotificationEmail(
     course_run_id: string;
   };
 
+  // Meldingsvarsler kan gå til motparten (f.eks. lærer) i stedet for
+  // deltakeren på enrollmenten; payload bærer da recipientProfileId.
+  const recipientProfileId =
+    typeof event.payload.recipientProfileId === "string" &&
+    event.payload.recipientProfileId
+      ? event.payload.recipientProfileId
+      : profile_id;
+
   const [profile, courseRun] = await Promise.all([
     options.client
       .from("profiles")
       .select("display_name,normalized_email")
-      .eq("id", profile_id)
+      .eq("id", recipientProfileId)
       .single(),
     options.client
       .from("course_runs")

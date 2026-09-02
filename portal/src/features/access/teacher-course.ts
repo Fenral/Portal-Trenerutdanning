@@ -7,8 +7,8 @@ export type TeacherCourseRun = Readonly<{
 }>;
 
 export type TeacherCourseAccess = Readonly<
-  | { isTeacher: false; run: null }
-  | { isTeacher: true; run: TeacherCourseRun | null }
+  | { isTeacher: false; run: null; profileId: null }
+  | { isTeacher: true; run: TeacherCourseRun | null; profileId: string }
 >;
 
 function assertNoQueryError(error: { message: string } | null): void {
@@ -25,7 +25,7 @@ export async function resolveTeacherCourseAccess(
 ): Promise<TeacherCourseAccess> {
   const roles = await client
     .from("role_assignments")
-    .select("course_run_id,course_template_id")
+    .select("profile_id,course_run_id,course_template_id")
     .in("role", ["course_teacher", "course_lead"])
     .is("revoked_at", null);
   assertNoQueryError(roles.error);
@@ -37,8 +37,10 @@ export async function resolveTeacherCourseAccess(
     if (role.course_template_id) templateIds.add(role.course_template_id);
   }
   if (runIds.size === 0 && templateIds.size === 0) {
-    return { isTeacher: false, run: null };
+    return { isTeacher: false, run: null, profileId: null };
   }
+  // RLS begrenser role_assignments til egne rader; profilen er lærerens egen.
+  const profileId = (roles.data ?? [])[0].profile_id as string;
 
   const filters = [
     ...(runIds.size > 0 ? [`id.in.(${[...runIds].join(",")})`] : []),
@@ -68,5 +70,6 @@ export async function resolveTeacherCourseAccess(
           templateId: run.data.template_id,
         }
       : null,
+    profileId,
   };
 }

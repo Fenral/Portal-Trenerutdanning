@@ -130,6 +130,20 @@
   color: var(--nivaa-text-muted);
 }
 
+.navBadge {
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--nivaa-radius-pill);
+  background: var(--nivaa-primary-soft);
+  color: var(--nivaa-on-primary-soft);
+  font-size: 0.6875rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.navigationItem[data-active] .navBadge {
+  background: var(--nivaa-surface);
+}
+
 .navigationItem small {
   color: var(--nivaa-on-disabled);
   font-size: 0.625rem;

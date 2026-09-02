@@ -6,7 +6,8 @@ export type NotificationTemplate =
   | "recommended_before_session"
   | "access_withdrawn"
   | "access_reopened"
-  | "completion";
+  | "completion"
+  | "message_received";
 
 export type EmailTemplateParams = Readonly<{
   firstName: string;
@@ -78,6 +79,12 @@ const COPY: Record<NotificationTemplate, TemplateCopy> = {
     subject: (course) => `Gratulerer – ${course} er fullført`,
     body: (course) =>
       `du har fullført ${course}. Diplomet ditt er tilgjengelig i portalen.`,
+  },
+  // PII: selve meldingsteksten skal ALDRI inn i e-posten — kun et varsel.
+  message_received: {
+    subject: (course) => `Ny melding i ${course}`,
+    body: (course) =>
+      `du har fått en ny melding i ${course}. Logg inn i portalen for å lese og svare.`,
   },
 };
 
