@@ -7,10 +7,46 @@ import { sortDemoParticipants } from "@/features/demo/participants";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-import { setUniversityCompletionAction } from "./actions";
+import {
+  reopenEnrollmentAction,
+  setUniversityCompletionAction,
+  withdrawEnrollmentAction,
+} from "./actions";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
+
+const statusSignals: Readonly<
+  Record<string, Readonly<{ symbol: string; label: string; tone: string }>>
+> = {
+  invited: { symbol: "…", label: "Invitert", tone: "neutral" },
+  active: { symbol: "●", label: "Aktiv", tone: "neutral" },
+  completed: { symbol: "✓", label: "Fullført", tone: "success" },
+  withdrawn: { symbol: "⊘", label: "Trukket", tone: "attention" },
+};
+
+const notices: Readonly<
+  Record<string, Readonly<{ text: string; ok: boolean }>>
+> = {
+  "university-saved": { text: "Universitetsstatusen er lagret.", ok: true },
+  "university-error": {
+    text: "Universitetsstatusen kunne ikke lagres.",
+    ok: false,
+  },
+  "lifecycle-withdrawn": {
+    text: "Deltakeren er trukket fra kurset. Handlingen kan angres med «Gjenåpne».",
+    ok: true,
+  },
+  "lifecycle-reopened": {
+    text: "Deltakeren er gjenåpnet og har tilgang igjen. Frister er uendret.",
+    ok: true,
+  },
+  "lifecycle-reason-required": {
+    text: "Skriv en begrunnelse før deltakeren trekkes.",
+    ok: false,
+  },
+  "lifecycle-error": { text: "Statusendringen kunne ikke lagres.", ok: false },
+};
 
 type PageProps = Readonly<{
   params: Promise<{ courseRunId: string }>;
@@ -47,9 +83,8 @@ export default async function AdminCourseDetailPage({
 
   const enrollments = await admin
     .from("enrollments")
-    .select("id,profile_id,status")
-    .eq("course_run_id", courseRunId)
-    .neq("status", "withdrawn");
+    .select("id,profile_id,status,status_reason")
+    .eq("course_run_id", courseRunId);
   if (enrollments.error) throw new Error(enrollments.error.message);
   const enrollmentRows = enrollments.data ?? [];
   const enrollmentIds = enrollmentRows.map((enrollment) => enrollment.id);
@@ -106,6 +141,7 @@ export default async function AdminCourseDetailPage({
       );
       return {
         ...enrollment,
+        statusReason: enrollment.status_reason,
         name: profile?.display_name ?? "Ukjent deltaker",
         club: profile?.club_name ?? "Ukjent klubb",
         email: profile?.normalized_email ?? "",
@@ -116,6 +152,7 @@ export default async function AdminCourseDetailPage({
     }),
     (participant) => participant.name,
   );
+  const notice = query.notice ? notices[query.notice] : undefined;
 
   return (
     <main className={styles.page} id="main-content">
@@ -128,81 +165,146 @@ export default async function AdminCourseDetailPage({
           <h1>{course.data.title}</h1>
           <p>Progresjon, oppmøte og manuelt kontrollert universitetskrav.</p>
         </div>
-        <strong>{participants.length} deltakere</strong>
+        <strong>
+          {participants.filter((p) => p.status !== "withdrawn").length}{" "}
+          deltakere
+          {participants.some((p) => p.status === "withdrawn")
+            ? ` · ${participants.filter((p) => p.status === "withdrawn").length} trukket`
+            : ""}
+        </strong>
       </header>
 
-      {query.notice ? (
-        <p
-          className={styles.notice}
-          role={query.notice === "university-saved" ? "status" : "alert"}
-        >
-          {query.notice === "university-saved"
-            ? "Universitetsstatusen er lagret."
-            : "Universitetsstatusen kunne ikke lagres."}
+      {notice ? (
+        <p className={styles.notice} role={notice.ok ? "status" : "alert"}>
+          {notice.text}
         </p>
       ) : null}
 
       <section aria-label="Deltakere i kullet" className={styles.participants}>
-        {participants.map((participant) => (
-          <article className={styles.participant} key={participant.id}>
-            <div className={styles.identity}>
-              <strong>{participant.name}</strong>
-              <small>
-                {participant.club} · {participant.email}
-              </small>
-            </div>
-            <dl>
-              <div>
-                <dt>Progresjon</dt>
-                <dd>{participant.progress} %</dd>
-              </div>
-              <div>
-                <dt>Oppmøte</dt>
-                <dd>{participant.attendance} %</dd>
-              </div>
-              <div>
-                <dt>Status</dt>
-                <dd>
-                  {participant.status === "completed" ? "Fullført" : "Aktiv"}
-                </dd>
-              </div>
-            </dl>
-
-            {template.data.level >= 2 ? (
-              <form action={setUniversityCompletionAction}>
-                <input name="courseRunId" type="hidden" value={courseRunId} />
-                <input
-                  name="enrollmentId"
-                  type="hidden"
-                  value={participant.id}
-                />
-                <label>
-                  <input
-                    defaultChecked={participant.universityCompleted}
-                    name="completed"
-                    type="checkbox"
-                  />
-                  <span>Universitet fullført for {participant.name}</span>
-                </label>
+        {participants.map((participant) => {
+          const signal =
+            statusSignals[participant.status] ?? statusSignals.active;
+          return (
+            <article className={styles.participant} key={participant.id}>
+              <div className={styles.identity}>
+                <strong>{participant.name}</strong>
                 <small>
-                  {participant.universityCompleted
-                    ? "Universitet fullført"
-                    : "Ikke kontrollert"}
+                  {participant.club} · {participant.email}
                 </small>
-                <button
-                  className="nivaa-button nivaa-button--secondary"
-                  type="submit"
-                >
-                  Lagre universitetsstatus for {participant.name}
-                </button>
-              </form>
-            ) : (
-              <span className={styles.notRequired}>
-                Universitet ikke påkrevd
-              </span>
-            )}
-          </article>
-        ))}
+              </div>
+              <dl>
+                <div>
+                  <dt>Progresjon</dt>
+                  <dd>{participant.progress} %</dd>
+                </div>
+                <div>
+                  <dt>Oppmøte</dt>
+                  <dd>{participant.attendance} %</dd>
+                </div>
+                <div>
+                  <dt>Status</dt>
+                  <dd>
+                    <span className={styles.statusPill} data-tone={signal.tone}>
+                      <span aria-hidden="true">{signal.symbol}</span>
+                      <span>{signal.label}</span>
+                    </span>
+                  </dd>
+                </div>
+              </dl>
+
+              <div className={styles.lifecycle}>
+                {participant.status === "active" ? (
+                  <form action={withdrawEnrollmentAction}>
+                    <input
+                      name="courseRunId"
+                      type="hidden"
+                      value={courseRunId}
+                    />
+                    <input
+                      name="enrollmentId"
+                      type="hidden"
+                      value={participant.id}
+                    />
+                    <label htmlFor={`withdraw-reason-${participant.id}`}>
+                      Begrunnelse for å trekke {participant.name}
+                    </label>
+                    <input
+                      className={styles.reasonInput}
+                      id={`withdraw-reason-${participant.id}`}
+                      name="reason"
+                      required
+                      type="text"
+                    />
+                    <button
+                      className="nivaa-button nivaa-button--secondary"
+                      type="submit"
+                    >
+                      Trekk deltaker
+                    </button>
+                  </form>
+                ) : null}
+                {participant.status === "withdrawn" ? (
+                  <form action={reopenEnrollmentAction}>
+                    <input
+                      name="courseRunId"
+                      type="hidden"
+                      value={courseRunId}
+                    />
+                    <input
+                      name="enrollmentId"
+                      type="hidden"
+                      value={participant.id}
+                    />
+                    {participant.statusReason ? (
+                      <small>Begrunnelse: {participant.statusReason}</small>
+                    ) : null}
+                    <button
+                      className="nivaa-button nivaa-button--secondary"
+                      type="submit"
+                    >
+                      Gjenåpne
+                    </button>
+                  </form>
+                ) : null}
+              </div>
+
+              {participant.status !== "withdrawn" &&
+              template.data.level >= 2 ? (
+                <form action={setUniversityCompletionAction}>
+                  <input name="courseRunId" type="hidden" value={courseRunId} />
+                  <input
+                    name="enrollmentId"
+                    type="hidden"
+                    value={participant.id}
+                  />
+                  <label>
+                    <input
+                      defaultChecked={participant.universityCompleted}
+                      name="completed"
+                      type="checkbox"
+                    />
+                    <span>Universitet fullført for {participant.name}</span>
+                  </label>
+                  <small>
+                    {participant.universityCompleted
+                      ? "Universitet fullført"
+                      : "Ikke kontrollert"}
+                  </small>
+                  <button
+                    className="nivaa-button nivaa-button--secondary"
+                    type="submit"
+                  >
+                    Lagre universitetsstatus for {participant.name}
+                  </button>
+                </form>
+              ) : participant.status !== "withdrawn" ? (
+                <span className={styles.notRequired}>
+                  Universitet ikke påkrevd
+                </span>
+              ) : null}
+            </article>
+          );
+        })}
       </section>
     </main>
   );

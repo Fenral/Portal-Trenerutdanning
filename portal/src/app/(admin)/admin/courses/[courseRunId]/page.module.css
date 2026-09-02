@@ -66,10 +66,52 @@
   background: var(--nivaa-surface);
   box-shadow: var(--nivaa-shadow-card);
   gap: var(--nivaa-space-comfortable);
-  grid-template-columns: minmax(14rem, 1.2fr) minmax(18rem, 1fr) minmax(
-      17rem,
-      1fr
-    );
+  grid-template-columns:
+    minmax(13rem, 1.1fr) minmax(16rem, 1fr) minmax(13rem, 0.9fr)
+    minmax(14rem, 1fr);
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--nivaa-radius-pill);
+  background: var(--nivaa-primary-soft);
+  color: var(--nivaa-on-primary-soft);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 700;
+  gap: var(--nivaa-space-micro);
+}
+
+.statusPill[data-tone="success"] {
+  background: var(--nivaa-success-soft);
+  color: var(--nivaa-success);
+}
+
+.statusPill[data-tone="attention"] {
+  background: var(--nivaa-warning-soft);
+  color: var(--nivaa-warning);
+}
+
+.lifecycle form {
+  display: grid;
+  justify-items: start;
+  gap: var(--nivaa-space-tight);
+}
+
+.lifecycle label {
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 700;
+}
+
+.reasonInput {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--nivaa-border-strong);
+  border-radius: var(--nivaa-radius-control);
+  background: var(--nivaa-surface);
+  color: var(--nivaa-on-surface);
 }
 
 .identity {
@@ -135,7 +177,8 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .identity {
+  .identity,
+  .lifecycle {
     grid-column: 1 / -1;
   }
 }
