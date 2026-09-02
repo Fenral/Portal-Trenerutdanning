@@ -1,0 +1,370 @@
+.page {
+  width: min(calc(100% - 2rem), var(--nivaa-content-max));
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 5rem) 0;
+}
+
+.hero {
+  padding-bottom: var(--nivaa-space-section);
+  border-bottom: 1px solid var(--nivaa-border);
+}
+
+.hero h1 {
+  margin-bottom: var(--nivaa-space-default);
+}
+
+.hero p:not(.eyebrow) {
+  max-width: 48rem;
+  margin: 0;
+  color: var(--nivaa-text-muted);
+}
+
+.eyebrow {
+  margin-bottom: var(--nivaa-space-default);
+  color: var(--nivaa-primary);
+  font-size: var(--nivaa-font-size-label);
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.grid {
+  display: grid;
+  margin-top: var(--nivaa-space-section);
+  gap: var(--nivaa-space-spacious);
+  grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+}
+
+@media (max-width: 64rem) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* AI-panelet er den eneste flaten som bruker kobolt (--nivaa-ai). */
+.aiPanel {
+  overflow: hidden;
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+}
+
+.aiPanelHeader {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  padding: var(--nivaa-space-spacious);
+  border-bottom: 1px solid var(--nivaa-border);
+  background: var(--nivaa-ai-soft);
+  gap: var(--nivaa-space-default);
+}
+
+.aiPanelHeader h2 {
+  margin: 0 0 var(--nivaa-space-tight);
+}
+
+.aiEyebrow {
+  margin: 0 0 var(--nivaa-space-tight);
+  color: var(--nivaa-on-ai-soft);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.aiIntro {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--nivaa-text-subtle);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.readOnlyBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--nivaa-space-micro) var(--nivaa-space-compact);
+  border: 1px solid var(--nivaa-on-ai-soft);
+  border-radius: var(--nivaa-radius-pill);
+  background: var(--nivaa-surface);
+  color: var(--nivaa-on-ai-soft);
+  font-size: var(--nivaa-font-size-label);
+  font-weight: 700;
+  gap: var(--nivaa-space-tight);
+  white-space: nowrap;
+}
+
+.readOnlyBadge svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.aiForm {
+  display: grid;
+  padding: var(--nivaa-space-spacious);
+  gap: var(--nivaa-space-comfortable);
+}
+
+.courseField,
+.freeTextField {
+  display: grid;
+  gap: var(--nivaa-space-tight);
+}
+
+.courseField label,
+.freeTextField label,
+.questionSet legend {
+  font-size: var(--nivaa-font-size-label);
+  font-weight: 700;
+}
+
+.courseField select {
+  max-width: 28rem;
+  height: 3rem;
+  padding: 0 var(--nivaa-space-default);
+  border: 1px solid var(--nivaa-border-strong);
+  border-radius: var(--nivaa-radius-field);
+  background: var(--nivaa-surface);
+  color: var(--nivaa-on-surface);
+  font: inherit;
+}
+
+.courseField select:focus-visible,
+.questionButton:focus-visible,
+.tableScroll:focus-visible {
+  outline: 3px solid var(--nivaa-focus);
+  outline-offset: 3px;
+}
+
+.fieldHint {
+  margin: 0;
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.questionSet {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.questionSet legend {
+  margin-bottom: var(--nivaa-space-compact);
+  padding: 0;
+}
+
+.questionButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--nivaa-space-compact);
+}
+
+.questionButton {
+  min-height: 2.75rem;
+  padding: var(--nivaa-space-compact) var(--nivaa-space-default);
+  border: 1px solid var(--nivaa-ai);
+  border-radius: var(--nivaa-radius-control);
+  background: var(--nivaa-surface);
+  color: var(--nivaa-ai);
+  cursor: pointer;
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 700;
+  transition: background var(--nivaa-transition-fast);
+}
+
+.questionButton:hover:not(:disabled) {
+  background: var(--nivaa-ai-soft);
+  color: var(--nivaa-on-ai-soft);
+}
+
+.questionButton:disabled {
+  border-color: var(--nivaa-border-strong);
+  background: var(--nivaa-disabled);
+  color: var(--nivaa-on-disabled);
+  cursor: default;
+}
+
+.freeTextField input {
+  max-width: 34rem;
+  height: 3rem;
+  padding: 0 var(--nivaa-space-default);
+  border: 1px solid var(--nivaa-border-strong);
+  border-radius: var(--nivaa-radius-field);
+  font: inherit;
+}
+
+.freeTextField input:disabled {
+  border-color: var(--nivaa-border);
+  background: var(--nivaa-disabled);
+  color: var(--nivaa-on-disabled);
+}
+
+.answerRegion {
+  border-top: 1px solid var(--nivaa-border);
+}
+
+.answerRegion:empty {
+  display: none;
+  border-top: 0;
+}
+
+.pending,
+.errorNote {
+  margin: 0;
+  padding: var(--nivaa-space-comfortable) var(--nivaa-space-spacious);
+}
+
+.pending {
+  color: var(--nivaa-text-muted);
+}
+
+.errorNote {
+  display: flex;
+  align-items: baseline;
+  color: var(--nivaa-error);
+  font-weight: 650;
+  gap: var(--nivaa-space-tight);
+}
+
+.answer {
+  display: grid;
+  padding: var(--nivaa-space-spacious);
+  gap: var(--nivaa-space-comfortable);
+}
+
+.answerHeader {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--nivaa-space-default);
+}
+
+.answerHeader h3 {
+  margin: 0;
+}
+
+.answerEyebrow {
+  margin: 0 0 var(--nivaa-space-micro);
+  color: var(--nivaa-on-ai-soft);
+  font-size: var(--nivaa-font-size-caption);
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.headline {
+  margin: 0;
+  padding: var(--nivaa-space-default) var(--nivaa-space-comfortable);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-ai-soft);
+  color: var(--nivaa-on-surface);
+  font-size: var(--nivaa-font-size-h3);
+  font-weight: 700;
+  font-feature-settings:
+    "tnum" 1,
+    "ss01" 1;
+}
+
+.answerMeta {
+  display: grid;
+  margin: 0;
+  gap: var(--nivaa-space-compact);
+}
+
+.answerMeta div {
+  display: grid;
+  gap: var(--nivaa-space-micro);
+}
+
+.answerMeta dt {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-label);
+  font-weight: 700;
+}
+
+.answerMeta dd {
+  margin: 0;
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.tableScroll {
+  overflow-x: auto;
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-inner);
+}
+
+.tableScroll table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.tableScroll th,
+.tableScroll td {
+  padding: var(--nivaa-space-compact) var(--nivaa-space-default);
+  border-bottom: 1px solid var(--nivaa-border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tableScroll thead th {
+  background: var(--nivaa-surface-subtle);
+  font-size: var(--nivaa-font-size-label);
+}
+
+.tableScroll tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.context {
+  padding: var(--nivaa-space-spacious);
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-surface);
+  box-shadow: var(--nivaa-shadow-card);
+  align-self: start;
+}
+
+.context h2 {
+  margin: 0 0 var(--nivaa-space-compact);
+  font-size: var(--nivaa-font-size-h3);
+}
+
+.context > p {
+  margin: 0 0 var(--nivaa-space-comfortable);
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.definitionList {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  gap: var(--nivaa-space-default);
+  list-style: none;
+}
+
+.definitionList li {
+  display: grid;
+  padding-bottom: var(--nivaa-space-default);
+  border-bottom: 1px solid var(--nivaa-border);
+  gap: var(--nivaa-space-micro);
+}
+
+.definitionList li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.definitionList strong {
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.definitionList span {
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}

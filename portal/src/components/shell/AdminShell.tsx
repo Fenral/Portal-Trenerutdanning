@@ -12,6 +12,7 @@ type IconName =
   | "chart"
   | "content"
   | "courses"
+  | "insights"
   | "people"
   | "reports"
   | "settings";
@@ -29,6 +30,7 @@ const navigationItems: readonly NavigationItem[] = [
   { label: "Tilganger", icon: "access", href: "/admin/access" },
   { label: "Innhold", icon: "content", href: "/editor/content" },
   { label: "Rapporter", icon: "reports", href: "/admin/reports" },
+  { label: "Innsikt", icon: "insights", href: "/admin/insights/ai-query" },
   { label: "Innstillinger", icon: "settings" },
 ];
 
@@ -64,6 +66,15 @@ function NavigationIcon({ name }: { name: IconName }) {
       <svg aria-hidden="true" viewBox="0 0 24 24">
         <path d="M6 3.5h8l4 4V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z" />
         <path d="M14 3.5V8h4M8 12h7M8 16h7" />
+      </svg>
+    );
+  }
+
+  if (name === "insights") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <circle cx="10.5" cy="10.5" r="6" />
+        <path d="M15 15l5 5M10.5 7.5v6M7.5 10.5h6" />
       </svg>
     );
   }
@@ -120,7 +131,9 @@ export function AdminShell({
   const pathname = usePathname();
   const availableNavigationItems = navigationItems.map((item) =>
     roleLabel === "Redaktør" &&
-    (item.label === "Kurs" || item.label === "Rapporter")
+    (item.label === "Kurs" ||
+      item.label === "Rapporter" ||
+      item.label === "Innsikt")
       ? { ...item, href: undefined }
       : item,
   );
