@@ -66,6 +66,57 @@ test("student finds session files and shared course files", async ({
   ).toEqual([]);
 });
 
+test("editor moves a shared file to a session and back", async ({
+  browser,
+}) => {
+  const adminPage = await browser.newPage();
+  await adminPage.goto("/test-login?as=admin");
+  await adminPage.goto("/editor/content");
+  await adminPage
+    .getByRole("link")
+    .filter({ hasText: "Ballfluktslover og balltreff" })
+    .click();
+
+  const resourceCard = adminPage
+    .locator("article")
+    .filter({ hasText: "Observasjonsskjema" });
+  await resourceCard
+    .getByLabel("Hører til samling")
+    .selectOption({ label: "Samling 2" });
+  await resourceCard
+    .getByRole("button", { name: "Lagre samlingsvalg" })
+    .click();
+  await expect(adminPage.getByText(/Samlingsvalget er lagret/)).toBeVisible();
+
+  const studentPage = await browser.newPage();
+  await studentPage.goto("/test-login?as=student");
+  await studentPage.goto("/student/sessions");
+  const sessionTwo = studentPage.getByRole("region", {
+    exact: true,
+    name: "Samling 2",
+  });
+  await expect(sessionTwo.getByText("Observasjonsskjema")).toBeVisible();
+  const shared = studentPage.getByRole("region", {
+    name: "Felles for kurset",
+  });
+  await expect(shared.getByText("Observasjonsskjema")).toHaveCount(0);
+
+  // Tilbakestill til «Felles for kurset» så seed-tilstanden består.
+  await resourceCard
+    .getByLabel("Hører til samling")
+    .selectOption({ label: "Felles for kurset" });
+  await resourceCard
+    .getByRole("button", { name: "Lagre samlingsvalg" })
+    .click();
+  await expect(adminPage.getByText(/Samlingsvalget er lagret/)).toBeVisible();
+
+  await studentPage.reload();
+  await expect(shared.getByText("Observasjonsskjema")).toBeVisible();
+
+  await adminPage.close();
+  await studentPage.close();
+});
+
 test("timeline session click lands on the session card", async ({ page }) => {
   await page.goto("/test-login?as=student");
   await page

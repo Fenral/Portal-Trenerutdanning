@@ -72,6 +72,11 @@ export default async function ContentEditorPage({
           Kladden er lagret. Studentene ser fortsatt publisert versjon.
         </p>
       ) : null}
+      {query["session-saved"] === "1" ? (
+        <p className={styles.successBanner} role="status">
+          Samlingsvalget er lagret. Studentene ser filen under riktig samling.
+        </p>
+      ) : null}
       {query.published === "1" ? (
         <p className={styles.successBanner} role="status">
           Ny versjon er publisert. Bare valgte kull er oppdatert.
@@ -199,7 +204,11 @@ export default async function ContentEditorPage({
         </aside>
       </div>
 
-      <ResourcePanel resources={content.resources} />
+      <ResourcePanel
+        itemId={content.item.id}
+        resources={content.resources}
+        sessionOptions={content.sessionOptions}
+      />
 
       <section className={styles.panel} aria-labelledby="history-heading">
         <div className={styles.panelHeading}>

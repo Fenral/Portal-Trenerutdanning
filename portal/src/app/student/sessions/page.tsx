@@ -44,29 +44,43 @@ export default async function StudentSessionsPage() {
         </p>
       </header>
 
-      <div className={styles.cards}>
-        <CourseSessions sessions={grouped.sessions} />
+      {grouped.sessions.length === 0 && grouped.shared.length === 0 ? (
+        <section
+          aria-labelledby="sessions-empty-title"
+          className={styles.emptyState}
+        >
+          <span aria-hidden="true">◇</span>
+          <h2 id="sessions-empty-title">Ingen samlinger er lagt inn ennå</h2>
+          <p>
+            Når kurslæreren planlegger samlinger og publiserer filer, finner du
+            dem her.
+          </p>
+        </section>
+      ) : (
+        <div className={styles.cards}>
+          <CourseSessions sessions={grouped.sessions} />
 
-        {grouped.shared.length ? (
-          <section
-            aria-labelledby="shared-resources-title"
-            className={cardStyles.card}
-          >
-            <header className={cardStyles.head}>
-              <div className={cardStyles.copy}>
-                <h2 id="shared-resources-title">Felles for kurset</h2>
-              </div>
-              <div className={cardStyles.meta}>
-                <span>
-                  {grouped.shared.length}{" "}
-                  {grouped.shared.length === 1 ? "fil" : "filer"}
-                </span>
-              </div>
-            </header>
-            <ResourceLinkList resources={grouped.shared} />
-          </section>
-        ) : null}
-      </div>
+          {grouped.shared.length ? (
+            <section
+              aria-labelledby="shared-resources-title"
+              className={cardStyles.card}
+            >
+              <header className={cardStyles.head}>
+                <div className={cardStyles.copy}>
+                  <h2 id="shared-resources-title">Felles for kurset</h2>
+                </div>
+                <div className={cardStyles.meta}>
+                  <span>
+                    {grouped.shared.length}{" "}
+                    {grouped.shared.length === 1 ? "fil" : "filer"}
+                  </span>
+                </div>
+              </header>
+              <ResourceLinkList resources={grouped.shared} />
+            </section>
+          ) : null}
+        </div>
+      )}
     </main>
   );
 }

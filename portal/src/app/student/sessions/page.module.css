@@ -33,3 +33,27 @@
   display: grid;
   gap: var(--nivaa-space-comfortable);
 }
+
+.emptyState {
+  display: grid;
+  max-width: 46rem;
+  min-height: 16rem;
+  place-content: center;
+  justify-items: center;
+  padding: var(--nivaa-space-spacious);
+  border: 1px dashed var(--nivaa-border-strong);
+  border-radius: var(--nivaa-radius-card);
+  background: var(--nivaa-surface);
+  text-align: center;
+}
+
+.emptyState > span {
+  color: var(--nivaa-primary);
+  font-size: 3rem;
+}
+
+.emptyState p {
+  max-width: 30rem;
+  margin: 0;
+  color: var(--nivaa-text-muted);
+}

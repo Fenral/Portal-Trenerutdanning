@@ -1,5 +1,9 @@
-import type { ResourceView } from "@/features/content/editor-data";
+import type {
+  ResourceView,
+  SessionOption,
+} from "@/features/content/editor-data";
 
+import { setResourceSessionAction } from "./actions";
 import styles from "./page.module.css";
 
 const dateFormatter = new Intl.DateTimeFormat("nb-NO", {
@@ -27,9 +31,13 @@ function fileTypeFor(mimeType: string): string {
 }
 
 export function ResourcePanel({
+  itemId,
   resources,
+  sessionOptions,
 }: {
+  itemId: string;
   resources: readonly ResourceView[];
+  sessionOptions: readonly SessionOption[];
 }) {
   return (
     <section className={styles.panel} aria-labelledby="resources-heading">
@@ -42,81 +50,122 @@ export function ResourcePanel({
       </div>
 
       <div className={styles.resourceList}>
-        {resources.map((resource) => (
-          <article className={styles.resourceCard} key={resource.id}>
-            <div className={styles.resourceIcon} aria-hidden="true">
-              {resource.published
-                ? fileTypeFor(resource.published.mimeType).slice(0, 1)
-                : "–"}
-            </div>
-            <div className={styles.resourceBody}>
-              <div className={styles.resourceTitleLine}>
-                <div>
-                  <h3>{resource.title}</h3>
-                  <p>{resource.description}</p>
-                </div>
-                <span
-                  className={styles.audienceBadge}
-                  data-audience={resource.audience}
-                >
-                  {resource.audience === "teachers"
-                    ? "Kun lærere"
-                    : "Lærere og studenter"}
-                </span>
+        {resources.map((resource) => {
+          const resourceSessions = sessionOptions.filter((option) =>
+            resource.courseRunIds.includes(option.courseRunId),
+          );
+          const hasMultipleRuns = new Set(resource.courseRunIds).size > 1;
+
+          return (
+            <article className={styles.resourceCard} key={resource.id}>
+              <div className={styles.resourceIcon} aria-hidden="true">
+                {resource.published
+                  ? fileTypeFor(resource.published.mimeType).slice(0, 1)
+                  : "–"}
               </div>
-
-              {resource.published ? (
-                <div className={styles.fileMeta}>
-                  <strong>{resource.published.filename}</strong>
-                  <span>{fileTypeFor(resource.published.mimeType)}</span>
-                  <span>{formatBytes(resource.published.byteSize)}</span>
-                  <span>Publisert v{resource.published.revisionNumber}</span>
-                  {resource.draftRevisionNumber ? (
-                    <span>Kladd v{resource.draftRevisionNumber}</span>
-                  ) : null}
-                </div>
-              ) : (
-                <p>Ingen publisert fil.</p>
-              )}
-
-              <div className={styles.resourceActions}>
-                {resource.published?.mimeType === "application/pdf" ? (
-                  <a
-                    className="nivaa-button nivaa-button--secondary"
-                    href={`/resources/${resource.published.assetId}`}
-                    rel="noreferrer"
-                    target="_blank"
+              <div className={styles.resourceBody}>
+                <div className={styles.resourceTitleLine}>
+                  <div>
+                    <h3>{resource.title}</h3>
+                    <p>{resource.description}</p>
+                  </div>
+                  <span
+                    className={styles.audienceBadge}
+                    data-audience={resource.audience}
                   >
-                    Forhåndsvis PDF
-                  </a>
-                ) : null}
+                    {resource.audience === "teachers"
+                      ? "Kun lærere"
+                      : "Lærere og studenter"}
+                  </span>
+                </div>
+
                 {resource.published ? (
-                  <a
-                    className="nivaa-button nivaa-button--secondary"
-                    href={`/resources/${resource.published.assetId}?download=1`}
+                  <div className={styles.fileMeta}>
+                    <strong>{resource.published.filename}</strong>
+                    <span>{fileTypeFor(resource.published.mimeType)}</span>
+                    <span>{formatBytes(resource.published.byteSize)}</span>
+                    <span>Publisert v{resource.published.revisionNumber}</span>
+                    {resource.draftRevisionNumber ? (
+                      <span>Kladd v{resource.draftRevisionNumber}</span>
+                    ) : null}
+                  </div>
+                ) : (
+                  <p>Ingen publisert fil.</p>
+                )}
+
+                <div className={styles.resourceActions}>
+                  {resource.published?.mimeType === "application/pdf" ? (
+                    <a
+                      className="nivaa-button nivaa-button--secondary"
+                      href={`/resources/${resource.published.assetId}`}
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      Forhåndsvis PDF
+                    </a>
+                  ) : null}
+                  {resource.published ? (
+                    <a
+                      className="nivaa-button nivaa-button--secondary"
+                      href={`/resources/${resource.published.assetId}?download=1`}
+                    >
+                      Last ned
+                    </a>
+                  ) : null}
+                  <details className={styles.historyDetails}>
+                    <summary>Versjonshistorikk</summary>
+                    <ol>
+                      {resource.history.map((revision) => (
+                        <li key={`${resource.id}-${revision.revisionNumber}`}>
+                          <strong>v{revision.revisionNumber}</strong>
+                          <span>{revision.status}</span>
+                          <small>
+                            {dateFormatter.format(new Date(revision.updatedAt))}{" "}
+                            · {revision.changeNote}
+                          </small>
+                        </li>
+                      ))}
+                    </ol>
+                  </details>
+                </div>
+
+                {resourceSessions.length ? (
+                  <form
+                    action={setResourceSessionAction.bind(
+                      null,
+                      itemId,
+                      resource.id,
+                    )}
+                    className={styles.sessionForm}
                   >
-                    Last ned
-                  </a>
+                    <label>
+                      <span>Hører til samling</span>
+                      <select
+                        defaultValue={resource.courseSessionId ?? ""}
+                        name="course-session-id"
+                      >
+                        <option value="">Felles for kurset</option>
+                        {resourceSessions.map((option) => (
+                          <option key={option.id} value={option.id}>
+                            {hasMultipleRuns && option.courseTitle
+                              ? `${option.title} · ${option.courseTitle}`
+                              : option.title}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <button
+                      className="nivaa-button nivaa-button--secondary"
+                      type="submit"
+                    >
+                      Lagre samlingsvalg
+                    </button>
+                  </form>
                 ) : null}
-                <details className={styles.historyDetails}>
-                  <summary>Versjonshistorikk</summary>
-                  <ol>
-                    {resource.history.map((revision) => (
-                      <li key={`${resource.id}-${revision.revisionNumber}`}>
-                        <strong>v{revision.revisionNumber}</strong>
-                        <span>{revision.status}</span>
-                        <small>
-                          {dateFormatter.format(new Date(revision.updatedAt))} ·{" "}
-                          {revision.changeNote}
-                        </small>
-                      </li>
-                    ))}
-                  </ol>
-                </details>
               </div>
-            </div>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </div>
 
       <aside className={styles.uploadNotice}>

@@ -43,6 +43,13 @@ type ResourceItemRow = Readonly<{
   title: string;
   description: string | null;
   audience: ResourceAudience;
+  course_session_id: string | null;
+}>;
+
+type CourseSessionRow = Readonly<{
+  id: string;
+  course_run_id: string;
+  title: string;
 }>;
 
 type ResourceRevisionRow = Readonly<{
@@ -111,6 +118,15 @@ export type ResourceView = Readonly<{
     }>
   >;
   courseTitles: readonly string[];
+  courseRunIds: readonly string[];
+  courseSessionId: string | null;
+}>;
+
+export type SessionOption = Readonly<{
+  id: string;
+  courseRunId: string;
+  title: string;
+  courseTitle: string;
 }>;
 
 export type ContentEditorView = Readonly<{
@@ -120,6 +136,7 @@ export type ContentEditorView = Readonly<{
   history: readonly ContentRevisionView[];
   courseBindings: readonly CourseBindingView[];
   resources: readonly ResourceView[];
+  sessionOptions: readonly SessionOption[];
 }>;
 
 export type ContentCatalogItem = Readonly<{
@@ -248,7 +265,7 @@ export async function loadContentEditor(
         .eq("content_item_id", itemId),
       adminClient
         .from("resource_items")
-        .select("id,title,description,audience")
+        .select("id,title,description,audience,course_session_id")
         .eq("content_item_id", itemId)
         .order("created_at"),
     ]);
@@ -314,16 +331,46 @@ export async function loadContentEditor(
   const assetIds = [
     ...new Set(resourceRevisions.map((revision) => revision.media_asset_id)),
   ];
-  const { data: assetData, error: assetError } = assetIds.length
-    ? await adminClient
-        .from("media_assets")
-        .select("id,original_filename,mime_type,byte_size")
-        .in("id", assetIds)
-    : { data: [], error: null };
+  const boundRunIds = [
+    ...new Set(resourceBindings.map((binding) => binding.course_run_id)),
+  ];
+  const missingRunIds = boundRunIds.filter(
+    (runId) => !courseRuns.some((course) => course.id === runId),
+  );
+  const [assetsResult, sessionsResult, missingRunsResult] = await Promise.all([
+    assetIds.length
+      ? adminClient
+          .from("media_assets")
+          .select("id,original_filename,mime_type,byte_size")
+          .in("id", assetIds)
+      : Promise.resolve({ data: [], error: null }),
+    boundRunIds.length
+      ? adminClient
+          .from("course_sessions")
+          .select("id,course_run_id,title")
+          .in("course_run_id", boundRunIds)
+          .order("sort_order")
+      : Promise.resolve({ data: [], error: null }),
+    missingRunIds.length
+      ? adminClient
+          .from("course_runs")
+          .select("id,title,status")
+          .in("id", missingRunIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
 
-  assertNoQueryError(assetError);
-  const assets = (assetData ?? []) as MediaAssetRow[];
-  const courseById = new Map(courseRuns.map((course) => [course.id, course]));
+  assertNoQueryError(assetsResult.error);
+  assertNoQueryError(sessionsResult.error);
+  assertNoQueryError(missingRunsResult.error);
+  const assets = (assetsResult.data ?? []) as MediaAssetRow[];
+  const sessionRows = (sessionsResult.data ?? []) as CourseSessionRow[];
+  const allCourseRuns = [
+    ...courseRuns,
+    ...((missingRunsResult.data ?? []) as CourseRunRow[]),
+  ];
+  const courseById = new Map(
+    allCourseRuns.map((course) => [course.id, course]),
+  );
   const assetById = new Map(assets.map((asset) => [asset.id, asset]));
 
   return {
@@ -388,7 +435,17 @@ export async function loadContentEditor(
             const course = courseById.get(binding.course_run_id);
             return course ? [course.title] : [];
           }),
+        courseRunIds: resourceBindings
+          .filter((binding) => binding.resource_item_id === resource.id)
+          .map((binding) => binding.course_run_id),
+        courseSessionId: resource.course_session_id,
       };
     }),
+    sessionOptions: sessionRows.map((session) => ({
+      id: session.id,
+      courseRunId: session.course_run_id,
+      title: session.title,
+      courseTitle: courseById.get(session.course_run_id)?.title ?? "",
+    })),
   };
 }

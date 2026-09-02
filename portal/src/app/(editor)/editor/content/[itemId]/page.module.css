@@ -387,3 +387,29 @@
     grid-column: 1 / -1;
   }
 }
+
+.sessionForm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  margin-top: var(--nivaa-space-default);
+  gap: var(--nivaa-space-tight) var(--nivaa-space-default);
+}
+
+.sessionForm label {
+  display: grid;
+  flex: 1 1 14rem;
+  gap: var(--nivaa-space-tight);
+  font-size: var(--nivaa-font-size-body-sm);
+  font-weight: 700;
+}
+
+.sessionForm select {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--nivaa-border-strong);
+  border-radius: var(--nivaa-radius-field);
+  background: var(--nivaa-surface);
+  color: var(--nivaa-on-surface);
+  font-weight: 450;
+}

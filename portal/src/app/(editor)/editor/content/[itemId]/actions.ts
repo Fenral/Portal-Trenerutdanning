@@ -85,6 +85,32 @@ export async function saveContentDraftAction(
   redirect(`/editor/content/${itemId}?saved=1`);
 }
 
+export async function setResourceSessionAction(
+  rawItemId: string,
+  rawResourceId: string,
+  formData: FormData,
+): Promise<never> {
+  const itemId = IdSchema.parse(rawItemId);
+  const resourceId = IdSchema.parse(rawResourceId);
+  const { serverClient, identity } = await requireContentManager();
+  const sessionValue = textValue(formData, "course-session-id");
+  const courseSessionId = sessionValue ? IdSchema.parse(sessionValue) : null;
+
+  const { error } = await serverClient.rpc("set_resource_session", {
+    target_resource_item_id: resourceId,
+    actor_profile_id: identity.profileId,
+    target_course_session_id: courseSessionId,
+  });
+
+  if (error) {
+    redirect(`/editor/content/${itemId}?error=session`);
+  }
+
+  revalidatePath(`/editor/content/${itemId}`);
+  revalidatePath("/student/sessions");
+  redirect(`/editor/content/${itemId}?session-saved=1`);
+}
+
 export async function publishContentAction(
   rawItemId: string,
   formData: FormData,
