@@ -94,4 +94,18 @@ describe("report Excel export", () => {
     expect(new TextDecoder().decode(first.slice(0, 2))).toBe("PK");
     expect(Buffer.from(first).equals(Buffer.from(second))).toBe(true);
   });
+
+  it("strips XML-illegal control characters so Excel accepts the file", () => {
+    const dirty = `Klubb${String.fromCharCode(1)}med${String.fromCharCode(11)}GK`;
+    const workbook = generateReportWorkbook({
+      ...table,
+      rows: [[dirty, "x@example.no", 10, "Aktiv"]],
+    });
+    const xml = sheetXml(workbook);
+
+    expect(xml).toContain("KlubbmedGK");
+    for (const code of [1, 8, 11, 12, 14, 31, 127]) {
+      expect(xml).not.toContain(String.fromCharCode(code));
+    }
+  });
 });

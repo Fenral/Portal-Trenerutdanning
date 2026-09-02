@@ -6,12 +6,17 @@ import { strToU8, zipSync, type Zippable } from "fflate";
  */
 
 export function escapeXml(value: string) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&apos;");
+  return (
+    value
+      // XML 1.0 forbyr disse kontrolltegnene; Excel avviser hele filen om de slipper inn.
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&apos;")
+  );
 }
 
 export function columnName(index: number) {
