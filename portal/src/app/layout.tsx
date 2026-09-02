@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
+import { IBM_Plex_Mono, Manrope } from "next/font/google";
 import type { ReactNode } from "react";
 
 import "@/components/ui/tokens.css";
@@ -10,6 +10,14 @@ const manrope = Manrope({
   display: "swap",
   subsets: ["latin"],
   variable: "--font-manrope",
+});
+
+// Brukes kun av landingssidens scorekort-uttrykk.
+const plexMono = IBM_Plex_Mono({
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--font-plex-mono",
+  weight: ["500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -24,7 +32,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <html className={manrope.variable} data-scroll-behavior="smooth" lang="nb">
+    <html
+      className={`${manrope.variable} ${plexMono.variable}`}
+      data-scroll-behavior="smooth"
+      lang="nb"
+    >
       <body>
         <a className="nivaa-skip-link" href="#main-content">
           Hopp til hovedinnhold

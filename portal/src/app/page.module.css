@@ -1,0 +1,206 @@
+/*
+ * Landingssiden er en merkevareflate med eget scorekort-uttrykk og egne
+ * lokale tokens; appflatene innenfor følger Nivå-tokens som før.
+ */
+.page {
+  --score-paper: #f4f3ec;
+  --score-paper-hover: #eae9df;
+  --score-ink: #10221b;
+  --score-green: #39724e;
+  --score-muted: #5f6b65;
+  --score-subtle: #3d4c45;
+
+  display: grid;
+  min-height: 100vh;
+  align-content: start;
+  background: var(--score-paper);
+  color: var(--score-ink);
+}
+
+.head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1.25rem, 5vw, 3.5rem) 1.75rem;
+  border-bottom: 2px solid var(--score-ink);
+  gap: var(--nivaa-space-default);
+}
+
+.brand {
+  font-family: var(--font-plex-mono), "Courier New", monospace;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.demo {
+  padding: 0.25rem 0.625rem;
+  background: var(--score-ink);
+  color: var(--score-paper);
+  font-family: var(--font-plex-mono), "Courier New", monospace;
+  font-size: 0.6875rem;
+  white-space: nowrap;
+}
+
+.heroRow {
+  display: grid;
+  border-bottom: 2px solid var(--score-ink);
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+}
+
+.heroCell {
+  padding: clamp(2rem, 5vw, 2.75rem) clamp(1.25rem, 5vw, 3.5rem);
+}
+
+.heroCell h1 {
+  font-size: clamp(2.25rem, 6vw, 3.25rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+}
+
+.heroCell h1 em {
+  color: var(--score-green);
+  font-style: normal;
+}
+
+.lede {
+  max-width: 44ch;
+  margin: var(--nivaa-space-default) 0 0;
+  color: var(--score-subtle);
+  font-size: 0.96875rem;
+  line-height: 1.6;
+}
+
+.stat {
+  display: grid;
+  align-content: center;
+  padding: clamp(2rem, 5vw, 2.75rem) clamp(1.25rem, 5vw, 3.5rem);
+  border-left: 2px solid var(--score-ink);
+  gap: var(--nivaa-space-tight);
+}
+
+.stat b {
+  font-family: var(--font-plex-mono), "Courier New", monospace;
+  font-size: 2.75rem;
+  font-weight: 600;
+}
+
+.stat span {
+  color: var(--score-muted);
+  font-family: var(--font-plex-mono), "Courier New", monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rows {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rows li + li .row {
+  border-top: 2px solid var(--score-ink);
+}
+
+.row {
+  display: grid;
+  align-items: center;
+  padding: clamp(1.25rem, 3vw, 1.625rem) clamp(1.25rem, 5vw, 3.5rem);
+  gap: clamp(0.75rem, 2.5vw, 1.5rem);
+  grid-template-columns: minmax(4rem, 6.25rem) minmax(9rem, 1fr) minmax(
+      0,
+      1.2fr
+    ) auto;
+  color: inherit;
+  text-decoration: none;
+  transition: background-color var(--nivaa-transition-fast);
+}
+
+.row:hover {
+  background: var(--score-paper-hover);
+}
+
+.row:focus-visible {
+  outline: 3px solid var(--nivaa-focus);
+  outline-offset: -3px;
+}
+
+.hole {
+  color: var(--score-green);
+  font-family: var(--font-plex-mono), "Courier New", monospace;
+  font-size: clamp(1.75rem, 4vw, 2.375rem);
+  font-weight: 600;
+}
+
+.row h2 {
+  font-size: 1.375rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+.row h2 small {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--score-muted);
+  font-size: 0.8125rem;
+  font-weight: 450;
+  letter-spacing: 0;
+}
+
+.row p {
+  margin: 0;
+  color: var(--score-subtle);
+  font-size: 0.84375rem;
+  line-height: 1.5;
+}
+
+.go {
+  padding: 0.625rem 1.125rem;
+  border: 2px solid var(--score-ink);
+  font-family: var(--font-plex-mono), "Courier New", monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color var(--nivaa-transition-fast),
+    border-color var(--nivaa-transition-fast),
+    color var(--nivaa-transition-fast);
+}
+
+.row:hover .go,
+.row:focus-visible .go {
+  border-color: var(--score-green);
+  background: var(--score-green);
+  color: #ffffff;
+}
+
+.foot {
+  padding: 1.25rem clamp(1.25rem, 5vw, 3.5rem) 2.5rem;
+  border-top: 2px solid var(--score-ink);
+  color: var(--score-muted);
+  font-family: var(--font-plex-mono), "Courier New", monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 48rem) {
+  .heroRow {
+    grid-template-columns: 1fr;
+  }
+
+  .stat {
+    border-top: 2px solid var(--score-ink);
+    border-left: 0;
+  }
+
+  .row {
+    grid-template-columns: minmax(3rem, auto) minmax(0, 1fr);
+  }
+
+  .row p {
+    display: none;
+  }
+}
