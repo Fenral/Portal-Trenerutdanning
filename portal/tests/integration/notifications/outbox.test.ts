@@ -304,6 +304,76 @@ describe("outbox worker", () => {
     const event = await outboxEvent(eventId);
     expect(event.status).toBe("delivered");
   }, 30_000);
+
+  it("keeps the stored invitation token valid when the send fails", async () => {
+    const transport = new RecordingTransport();
+    const invitationId = randomUUID();
+    const originalToken = buildInvitationToken();
+    const invitation = await adminClient.from("invitations").insert({
+      id: invitationId,
+      normalized_email: `invite-${invitationId.slice(0, 8)}@nivaa.invalid`,
+      token_hash: originalToken.tokenHash,
+      course_run_id: courseRunId,
+      role: "student",
+      expires_at: new Date(Date.now() + 7 * 86_400_000).toISOString(),
+      created_by: adminProfileId,
+    });
+    assertNoError(invitation.error);
+    const eventId = await insertOutboxEvent({
+      eventType: "invitation.email",
+      idempotencyKey: `invitation.email:${invitationId}`,
+      payload: { invitationId },
+    });
+    transport.failuresRemaining = 1;
+    transport.failForCorrelationId = eventId;
+
+    await runWorker(transport);
+
+    // Feilet sending skal ikke etterlate en hash uten tilhørende token:
+    // forrige lenke må fortsatt være gyldig frem til en sending lykkes.
+    const stored = await adminClient
+      .from("invitations")
+      .select("token_hash")
+      .eq("id", invitationId)
+      .single();
+    assertNoError(stored.error);
+    expect((stored.data as { token_hash: string }).token_hash).toBe(
+      originalToken.tokenHash,
+    );
+    expect((await outboxEvent(eventId)).status).toBe("pending");
+
+    await runWorker(transport, () => new Date(Date.now() + 2 * 60_000));
+    expect((await outboxEvent(eventId)).status).toBe("delivered");
+  }, 30_000);
+
+  it("reclaims an event stuck in processing after a crashed worker", async () => {
+    const transport = new RecordingTransport();
+    const eventId = await insertOutboxEvent({
+      eventType: "notification.email",
+      idempotencyKey: `test-stale:${randomUUID()}`,
+      payload: { template: "due_reminder", enrollmentId: reminderEnrollmentId },
+    });
+
+    // Simuler krasj: claim uten complete/fail.
+    const bareClaim = await adminClient.rpc("claim_notification_events", {
+      target_event_types: ["notification.email", "invitation.email"],
+    });
+    assertNoError(bareClaim.error);
+    expect((await outboxEvent(eventId)).status).toBe("processing");
+
+    // Umiddelbar kjøring skal ikke stjele et aktivt claim.
+    await runWorker(transport);
+    expect(
+      transport.emails.filter((email) => email.correlationId === eventId),
+    ).toHaveLength(0);
+
+    // Etter reaper-vinduet skal hendelsen re-claimes og leveres.
+    await runWorker(transport, () => new Date(Date.now() + 30 * 60_000));
+    expect(
+      transport.emails.filter((email) => email.correlationId === eventId),
+    ).toHaveLength(1);
+    expect((await outboxEvent(eventId)).status).toBe("delivered");
+  }, 30_000);
 });
 
 describe("manual due reminder", () => {

@@ -116,15 +116,8 @@ async function sendInvitationEmail(
     return "not-sent:already-claimed";
   }
 
-  // Rå-token finnes kun i minnet her; databasen får bare den nye hashen,
-  // og forrige lenke blir ugyldig i samme operasjon.
+  // Rå-token finnes kun i minnet her; databasen får bare den nye hashen.
   const token = buildInvitationToken();
-  const rotation = await options.client.rpc("rotate_invitation_token", {
-    target_invitation_id: invitationId,
-    new_token_hash: token.tokenHash,
-  });
-  if (rotation.error) throwSupabaseError(rotation.error);
-
   const activationUrl = new URL(options.activationBaseUrl);
   activationUrl.searchParams.set("token", token.rawToken);
 
@@ -134,6 +127,17 @@ async function sendInvitationEmail(
     activationUrl: activationUrl.toString(),
     correlationId: event.id,
   });
+
+  // Roter hashen først ETTER vellykket sending: feiler sendingen beholder
+  // invitasjonen forrige gyldige token i stedet for en hash uten token —
+  // ellers kan 5 feilede forsøk brikke lenken permanent. Feiler selve
+  // rotasjonen etter sending, retryes hele hendelsen med et nytt token.
+  const rotation = await options.client.rpc("rotate_invitation_token", {
+    target_invitation_id: invitationId,
+    new_token_hash: token.tokenHash,
+  });
+  if (rotation.error) throwSupabaseError(rotation.error);
+
   return result.providerMessageId;
 }
 

@@ -25,7 +25,12 @@ function isAuthorizedCronRequest(
 export async function GET(request: Request): Promise<Response> {
   const secret = process.env.CRON_SECRET;
   if (!secret) {
-    return new Response(null, { status: 404 });
+    // Feil høyt: en deploy uten CRON_SECRET skal synes i logger/monitorering,
+    // ikke se ut som en rutefeil mens varsler stille aldri sendes.
+    console.error(
+      "CRON_SECRET is not configured; the notifications cron cannot run.",
+    );
+    return new Response("CRON_SECRET is not configured", { status: 503 });
   }
 
   if (!isAuthorizedCronRequest(request.headers.get("authorization"), secret)) {

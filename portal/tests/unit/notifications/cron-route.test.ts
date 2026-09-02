@@ -13,10 +13,15 @@ afterEach(() => {
 });
 
 describe("cron notifications route", () => {
-  it("returns 404 when no cron secret is configured", async () => {
+  it("fails loudly with 503 when no cron secret is configured", async () => {
     vi.stubEnv("CRON_SECRET", "");
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const response = await GET(request("Bearer anything"));
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(503);
+    expect(errorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("CRON_SECRET"),
+    );
+    errorSpy.mockRestore();
   });
 
   it("returns 401 for a wrong bearer token", async () => {
