@@ -401,10 +401,10 @@
 
 @media (max-width: 60rem) {
   .participantRow {
-    grid-template-columns: minmax(12rem, 1fr) auto auto;
+    grid-template-columns: minmax(12rem, 1fr) auto auto auto;
   }
 
-  .participantRow > span {
+  .participantRow > .rowArrow {
     display: none;
   }
 }

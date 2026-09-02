@@ -182,7 +182,8 @@ export function ParticipantAttendanceView({
           <span data-tone={attendance.meetsRequirement ? "success" : "danger"}>
             <small>Oppmøte</small>
             <strong aria-live="polite">
-              {attendance.percentage} % oppmøte
+              {attendance.percentage} % oppmøte –{" "}
+              {attendance.meetsRequirement ? "krav oppfylt" : "under kravet"}
             </strong>
           </span>
           <span>
