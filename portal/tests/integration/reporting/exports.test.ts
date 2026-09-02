@@ -11,10 +11,15 @@ import {
   canExportCourseReport,
   type ReportTable,
 } from "@/features/reporting/report-builders";
+import {
+  formatOsloDateTime,
+  reportMetaLines,
+} from "@/features/reporting/report-meta";
 
 const t3CourseRunId = "b1030000-0000-0000-0000-000000000001";
 const t1CourseRunId = "b1010000-0000-0000-0000-000000000001";
 const unknownCourseRunId = "b1990000-0000-0000-0000-000000000009";
+const adminProfileId = "c0000000-0000-0000-0000-000000000001";
 const leadT3ProfileId = "c0000000-0000-0000-0000-000000000004";
 const studentProfileId = "c0000000-0000-0000-0000-000000000005";
 const withdrawnProfileId = "c0000000-0000-0000-0000-000000000017";
@@ -43,6 +48,11 @@ function assertNoError(error: { message: string } | null): void {
 
 function worksheetXml(workbook: Uint8Array): string {
   return strFromU8(unzipSync(workbook)["xl/worksheets/sheet1.xml"]);
+}
+
+/** Meta-linjer + overskriftsrad + datarader. */
+function expectedRowCount(table: ReportTable): number {
+  return reportMetaLines(table).length + 1 + table.rows.length;
 }
 
 /** Trekker all tegnet tekst ut av en pdf-lib-generert PDF. */
@@ -168,19 +178,69 @@ describe.sequential("course report exports", () => {
     expect(table.columns).toContain("Progresjon (%)");
 
     const xml = worksheetXml(generateReportWorkbook(table));
-    expect(xml.match(/<row /g)?.length).toBe(table.rows.length + 1);
+    expect(xml.match(/<row /g)?.length).toBe(expectedRowCount(table));
     for (const row of table.rows) {
       expect(xml).toContain(String(row[0]));
     }
     expect(xml).toContain("Håkon Lie");
+    // Excel bærer samme proveniens som PDF-en: beskrivelse, filtre,
+    // kullsnitt, formelversjon og lesbart genereringstidspunkt.
+    expect(xml).toContain(table.definition.description);
+    expect(xml).toContain("Kullsnitt progresjon (ekskl. trukket):");
+    expect(xml).toContain("Definisjon (versjon 2026.1):");
+    expect(xml).toContain(`Generert: ${formatOsloDateTime(table.generatedAt)}`);
 
     const pdfText = pdfTextContent(await generateReportPdf(table));
     expect(pdfText).toContain("Kursstatus og progresjon");
     expect(pdfText).toContain("Trener 3");
     expect(pdfText).toContain("versjon 2026.1");
     expect(pdfText).toContain("Side 1 av");
+    expect(pdfText).toContain(
+      `Generert: ${formatOsloDateTime(table.generatedAt)}`,
+    );
     for (const row of table.rows) {
       expect(pdfText).toContain(String(row[0]).slice(0, 10));
+    }
+  });
+
+  it("counts approved submissions against the course's assignment count", async () => {
+    const assessments = await buildReport(
+      adminClient,
+      "assessments",
+      t3CourseRunId,
+    );
+    const totalMatch = /Antall arbeidskrav: (\d+)/.exec(
+      assessments.summary[0] ?? "",
+    );
+    if (!totalMatch) throw new Error("Expected assignment count in summary");
+    const totalAssignments = Number(totalMatch[1]);
+    expect(totalAssignments).toBeGreaterThan(0);
+
+    const table = await buildReport(
+      adminClient,
+      "course_progress",
+      t3CourseRunId,
+    );
+    const columnIndex = table.columns.indexOf("Innleveringer godkjent");
+    expect(columnIndex).toBeGreaterThanOrEqual(0);
+    const pattern = new RegExp(`^\\d+ av ${totalAssignments}$`);
+    for (const row of table.rows) {
+      expect(String(row[columnIndex])).toMatch(pattern);
+    }
+    // Deltakere uten innsendingsrad skal fortsatt vise full nevner.
+    expect(
+      table.rows.some((row) => row[columnIndex] === `0 av ${totalAssignments}`),
+    ).toBe(true);
+  });
+
+  it("formats deadline cells as Norwegian local time, not raw ISO", async () => {
+    const table = await buildReport(adminClient, "deadlines", t3CourseRunId);
+    const deadlineIndex = table.columns.indexOf("Frist");
+    expect(deadlineIndex).toBeGreaterThanOrEqual(0);
+    for (const row of table.rows) {
+      const value = String(row[deadlineIndex]);
+      expect(value).not.toMatch(/T\d{2}:\d{2}:\d{2}/);
+      expect(value).toMatch(/^(\d{2}\.\d{2}\.\d{4}, \d{2}:\d{2}|Ingen frist)$/);
     }
   });
 
@@ -235,10 +295,10 @@ describe.sequential("course report exports", () => {
 
     const xml = worksheetXml(generateReportWorkbook(table));
     expect(xml).toContain("Trukket");
-    expect(xml.match(/<row /g)?.length).toBe(table.rows.length + 1);
+    expect(xml.match(/<row /g)?.length).toBe(expectedRowCount(table));
   });
 
-  it("prefixes imported cell values that start with a formula character", async () => {
+  it("quote-prefixes imported cell values that start with a formula character", async () => {
     const update = await adminClient
       .from("profiles")
       .update({ club_name: '=HYPERLINK("https://ond.example")' })
@@ -251,8 +311,10 @@ describe.sequential("course report exports", () => {
       t3CourseRunId,
     );
     const xml = worksheetXml(generateReportWorkbook(table));
-    expect(xml).toContain("&apos;=HYPERLINK");
-    expect(xml).not.toMatch(/<is><t[^>]*>=HYPERLINK/);
+    expect(xml).toMatch(
+      /<c r="[A-Z]+\d+" s="2" t="inlineStr"><is><t xml:space="preserve">=HYPERLINK/,
+    );
+    expect(xml).not.toContain("&apos;=HYPERLINK");
   });
 
   it("builds and exports every report type without errors", async () => {
@@ -262,7 +324,7 @@ describe.sequential("course report exports", () => {
       expect(table.definition.id).toBe(type);
       expect(table.columns.length).toBeGreaterThan(0);
       const xml = worksheetXml(generateReportWorkbook(table));
-      expect(xml.match(/<row /g)?.length).toBe(table.rows.length + 1);
+      expect(xml.match(/<row /g)?.length).toBe(expectedRowCount(table));
       const pdfText = pdfTextContent(await generateReportPdf(table));
       expect(pdfText).toContain(table.definition.label);
     }
@@ -273,20 +335,63 @@ describe.sequential("course report exports", () => {
     const studentUserId = await userIdFor(adminClient, studentProfileId);
 
     await expect(
-      canExportCourseReport(adminClient, leadUserId, t3CourseRunId),
+      canExportCourseReport(
+        adminClient,
+        leadUserId,
+        t3CourseRunId,
+        "course_progress",
+      ),
     ).resolves.toBe(true);
     await expect(
-      canExportCourseReport(adminClient, leadUserId, t1CourseRunId),
+      canExportCourseReport(
+        adminClient,
+        leadUserId,
+        t1CourseRunId,
+        "course_progress",
+      ),
     ).resolves.toBe(false);
     await expect(
-      canExportCourseReport(adminClient, leadUserId, unknownCourseRunId),
+      canExportCourseReport(
+        adminClient,
+        leadUserId,
+        unknownCourseRunId,
+        "course_progress",
+      ),
     ).resolves.toBe(false);
     await expect(
-      canExportCourseReport(adminClient, studentUserId, t3CourseRunId),
+      canExportCourseReport(
+        adminClient,
+        studentUserId,
+        t3CourseRunId,
+        "course_progress",
+      ),
     ).resolves.toBe(false);
 
     await expect(
       buildReport(adminClient, "course_progress", unknownCourseRunId),
     ).rejects.toThrow("REPORT_COURSE_NOT_FOUND");
+  });
+
+  it("restricts the national t1_location_distribution report to administrators", async () => {
+    const adminUserId = await userIdFor(adminClient, adminProfileId);
+    const leadUserId = await userIdFor(adminClient, leadT3ProfileId);
+
+    await expect(
+      canExportCourseReport(
+        adminClient,
+        adminUserId,
+        t3CourseRunId,
+        "t1_location_distribution",
+      ),
+    ).resolves.toBe(true);
+    // Kursleder har rolle på kurset, men rapporten aggregerer nasjonalt.
+    await expect(
+      canExportCourseReport(
+        adminClient,
+        leadUserId,
+        t3CourseRunId,
+        "t1_location_distribution",
+      ),
+    ).resolves.toBe(false);
   });
 });

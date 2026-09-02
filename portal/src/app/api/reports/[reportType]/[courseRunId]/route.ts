@@ -49,7 +49,12 @@ export async function GET(request: Request, context: RouteContext) {
   const adminClient = createSupabaseAdminClient();
   if (
     !user ||
-    !(await canExportCourseReport(adminClient, user.id, courseRunId))
+    !(await canExportCourseReport(
+      adminClient,
+      user.id,
+      courseRunId,
+      reportType,
+    ))
   ) {
     notFound();
   }

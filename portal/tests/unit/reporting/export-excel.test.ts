@@ -3,9 +3,13 @@ import { describe, expect, it } from "vitest";
 
 import { reportDefinitions } from "@/features/reporting/definitions";
 import {
-  excelSafeText,
   generateReportWorkbook,
+  needsQuotePrefix,
 } from "@/features/reporting/export-excel";
+import {
+  formatOsloDateTime,
+  reportMetaLines,
+} from "@/features/reporting/report-meta";
 import type { ReportTable } from "@/features/reporting/report-builders";
 
 const table: ReportTable = {
@@ -22,34 +26,65 @@ const table: ReportTable = {
   ],
 };
 
-function sheetXml(workbook: Uint8Array): string {
+// Metadata + overskrift over dataradene: header-raden ligger rett under metaen.
+const metaCount = reportMetaLines(table).length;
+const headerRow = metaCount + 1;
+const lastRow = headerRow + table.rows.length;
+
+function fileXml(workbook: Uint8Array, path: string): string {
   const files = unzipSync(workbook);
-  return strFromU8(files["xl/worksheets/sheet1.xml"]);
+  return strFromU8(files[path]);
+}
+
+function sheetXml(workbook: Uint8Array): string {
+  return fileXml(workbook, "xl/worksheets/sheet1.xml");
 }
 
 describe("report Excel export", () => {
-  it("prefixes cell values starting with = + - @ with an apostrophe", () => {
-    expect(excelSafeText("=SUM(A1)")).toBe("'=SUM(A1)");
-    expect(excelSafeText("+47 900 00 000")).toBe("'+47 900 00 000");
-    expect(excelSafeText("-1")).toBe("'-1");
-    expect(excelSafeText("@handle")).toBe("'@handle");
-    expect(excelSafeText("Trygg tekst")).toBe("Trygg tekst");
+  it("flags cell values starting with = + - @ for quote-prefixing", () => {
+    expect(needsQuotePrefix("=SUM(A1)")).toBe(true);
+    expect(needsQuotePrefix("+47 900 00 000")).toBe(true);
+    expect(needsQuotePrefix("-1")).toBe(true);
+    expect(needsQuotePrefix("@handle")).toBe(true);
+    expect(needsQuotePrefix("Trygg tekst")).toBe(false);
   });
 
-  it("writes fixed headers, a frozen first row and injection-safe cells", () => {
+  it("writes injection-risky cells with a quotePrefix style, not a literal apostrophe", () => {
+    const workbook = generateReportWorkbook(table);
+    const xml = sheetXml(workbook);
+    const styles = fileXml(workbook, "xl/styles.xml");
+
+    expect(styles).toContain('quotePrefix="1"');
+    expect(xml).toMatch(
+      /<c r="A\d+" s="2" t="inlineStr"><is><t xml:space="preserve">=HYPERLINK/,
+    );
+    expect(xml).not.toContain("&apos;=HYPERLINK");
+    expect(xml).not.toContain("&apos;+47 Ola");
+    expect(xml).toContain("&quot;https://ond.example&quot;");
+  });
+
+  it("writes provenance metadata (description, filters, summary, formula, generated) above the table", () => {
+    const xml = sheetXml(generateReportWorkbook(table));
+
+    expect(xml).toContain(table.definition.description);
+    expect(xml).toContain("Filtre: Status: alle");
+    expect(xml).toContain("Kullsnitt progresjon (ekskl. trukket): 50 %");
+    expect(xml).toContain("Definisjon (versjon 2026.1):");
+    expect(xml).toContain(`Generert: ${formatOsloDateTime(table.generatedAt)}`);
+    expect(xml).not.toContain("2026-09-02T10:00:00.000Z");
+  });
+
+  it("freezes through the header row and filters the full data range", () => {
     const xml = sheetXml(generateReportWorkbook(table));
 
     expect(xml).toContain("Navn");
     expect(xml).toContain("Progresjon (%)");
-    expect(xml).toContain('ySplit="1"');
+    expect(xml).toContain(`ySplit="${headerRow}"`);
+    expect(xml).toContain(`topLeftCell="A${headerRow + 1}"`);
     expect(xml).toContain('state="frozen"');
-    expect(xml).toContain("Åse Sørbø");
-    expect(xml).toContain("&quot;https://ond.example&quot;");
-    expect(xml).toContain("&apos;=HYPERLINK");
-    expect(xml).toContain("&apos;+47 Ola");
-    expect(xml).toContain("&apos;-minus@example.no");
-    expect(xml).toContain("&apos;@krøll");
-    expect(xml).not.toMatch(/<is><t[^>]*>=HYPERLINK/);
+    expect(xml).toContain(`<autoFilter ref="A${headerRow}:D${lastRow}"/>`);
+    expect(xml).toContain(`<dimension ref="A1:D${lastRow}"/>`);
+    expect(xml.match(/<row /g)?.length).toBe(lastRow);
   });
 
   it("is deterministic and a valid zip", () => {

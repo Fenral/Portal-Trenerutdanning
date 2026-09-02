@@ -1,3 +1,8 @@
+import {
+  MAX_PLANNING_MINUTES,
+  REQUIRED_PRACTICE_MINUTES,
+} from "@/features/practice/totals";
+
 export const REPORT_TYPES = [
   "course_progress",
   "practice",
@@ -59,8 +64,7 @@ export const reportDefinitions: Readonly<Record<ReportType, ReportDefinition>> =
       id: "practice",
       label: "Praksis",
       description: "Registrerte praksistimer og praksisstatus per deltaker.",
-      formula:
-        "Praksistimer = sum av registrerte minutter delt på 60, fordelt på planlegging og gjennomføring. Krav: 45 timer totalt og maks 9 timer planlegging.",
+      formula: `Praksistimer = sum av registrerte minutter delt på 60, fordelt på planlegging og gjennomføring. Krav: ${REQUIRED_PRACTICE_MINUTES / 60} timer totalt og maks ${MAX_PLANNING_MINUTES / 60} timer planlegging.`,
       sourceTables: [
         "enrollments",
         "profiles",

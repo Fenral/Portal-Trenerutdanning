@@ -2,12 +2,17 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { calculateAttendance } from "@/features/attendance/percentage";
 import { evaluateCompletion } from "@/features/completion/evaluate-completion";
+import {
+  calculatePracticeTotals,
+  type PracticeEntryDuration,
+} from "@/features/practice/totals";
 
 import {
   reportDefinitions,
   type ReportDefinition,
   type ReportType,
 } from "./definitions";
+import { formatOsloDateTime } from "./report-meta";
 
 export type ReportCell = string | number;
 
@@ -59,12 +64,15 @@ function assertNoQueryError(
 /**
  * Server-side autorisasjon for rapporteksport: administrator, eller
  * course_teacher/course_lead med rolle på kurset eller kursmalen.
- * Ukjent kurs gir false, som ruten oversetter til 404.
+ * t1_location_distribution aggregerer på tvers av alle kurssteder og er
+ * derfor kun for administratorer. Ukjent kurs gir false, som ruten
+ * oversetter til 404.
  */
 export async function canExportCourseReport(
   adminClient: SupabaseClient,
   userId: string,
   courseRunId: string,
+  reportType: ReportType,
 ): Promise<boolean> {
   const account = await adminClient
     .from("user_accounts")
@@ -95,8 +103,9 @@ export async function canExportCourseReport(
   return (roles.data ?? []).some(
     (assignment) =>
       assignment.role === "administrator" ||
-      assignment.course_run_id === courseRunId ||
-      assignment.course_template_id === templateId,
+      (reportType !== "t1_location_distribution" &&
+        (assignment.course_run_id === courseRunId ||
+          assignment.course_template_id === templateId)),
   );
 }
 
@@ -187,6 +196,7 @@ function cohortAverage(
   definition: ReportDefinition,
   base: ParticipantBase,
   valueByEnrollment: ReadonlyMap<string, number>,
+  decimals = 0,
 ): number {
   const included = base.enrollments.filter(
     (enrollment) => !definition.excludeStatuses.includes(enrollment.status),
@@ -196,7 +206,8 @@ function cohortAverage(
     (sum, enrollment) => sum + (valueByEnrollment.get(enrollment.id) ?? 0),
     0,
   );
-  return Math.round(total / included.length);
+  const factor = 10 ** decimals;
+  return Math.round((total / included.length) * factor) / factor;
 }
 
 async function latestPracticeStatusByEnrollment(
@@ -280,38 +291,42 @@ async function buildCourseProgressReport(
 ): Promise<ReportTable> {
   const base = await loadParticipantBase(adminClient, courseRunId);
   const enrollmentIds = base.enrollments.map((enrollment) => enrollment.id);
-  const [progressResult, submissionsResult, attendanceByEnrollment, practice] =
-    await Promise.all([
-      enrollmentIds.length
-        ? adminClient
-            .from("enrollment_progress")
-            .select(
-              "enrollment_id,percentage,completed_required_count,total_required_count",
-            )
-            .in("enrollment_id", enrollmentIds)
-        : Promise.resolve({ data: [], error: null }),
-      enrollmentIds.length
-        ? adminClient
-            .from("assignment_submissions")
-            .select("enrollment_id,status")
-            .in("enrollment_id", enrollmentIds)
-        : Promise.resolve({ data: [], error: null }),
-      attendancePercentageByEnrollment(adminClient, enrollmentIds),
-      latestPracticeStatusByEnrollment(adminClient, enrollmentIds),
-    ]);
+  const [
+    progressResult,
+    submissionsResult,
+    attendanceByEnrollment,
+    practice,
+    assignmentActivities,
+  ] = await Promise.all([
+    enrollmentIds.length
+      ? adminClient
+          .from("enrollment_progress")
+          .select(
+            "enrollment_id,percentage,completed_required_count,total_required_count",
+          )
+          .in("enrollment_id", enrollmentIds)
+      : Promise.resolve({ data: [], error: null }),
+    enrollmentIds.length
+      ? adminClient
+          .from("assignment_submissions")
+          .select("enrollment_id,status")
+          .in("enrollment_id", enrollmentIds)
+      : Promise.resolve({ data: [], error: null }),
+    attendancePercentageByEnrollment(adminClient, enrollmentIds),
+    latestPracticeStatusByEnrollment(adminClient, enrollmentIds),
+    loadAssignmentActivities(adminClient, courseRunId),
+  ]);
   assertNoQueryError(progressResult.error);
   assertNoQueryError(submissionsResult.error);
 
   const progressByEnrollment = new Map(
     (progressResult.data ?? []).map((row) => [row.enrollment_id, row]),
   );
+  // Nevneren er antall arbeidskrav i kurset (samme kilde som
+  // vurderingsrapporten), ikke antall innsendingsrader per deltaker.
+  const totalAssignmentCount = assignmentActivities.length;
   const approvedAssignments = new Map<string, number>();
-  const totalAssignments = new Map<string, number>();
   for (const row of submissionsResult.data ?? []) {
-    totalAssignments.set(
-      row.enrollment_id,
-      (totalAssignments.get(row.enrollment_id) ?? 0) + 1,
-    );
     if (row.status === "approved" || row.status === "graded") {
       approvedAssignments.set(
         row.enrollment_id,
@@ -336,7 +351,7 @@ async function buildCourseProgressReport(
       progress?.percentage ?? 0,
       progress?.completed_required_count ?? 0,
       progress?.total_required_count ?? 0,
-      `${approvedAssignments.get(enrollment.id) ?? 0} av ${totalAssignments.get(enrollment.id) ?? 0}`,
+      `${approvedAssignments.get(enrollment.id) ?? 0} av ${totalAssignmentCount}`,
       attendanceByEnrollment.get(enrollment.id) ?? 0,
       PRACTICE_STATUS_LABELS[practice.get(enrollment.id) ?? ""] ??
         "Ikke innsendt",
@@ -383,42 +398,39 @@ async function buildPracticeReport(
   ]);
   assertNoQueryError(entriesResult.error);
 
-  const minutesByEnrollment = new Map<
-    string,
-    { delivery: number; planning: number }
-  >();
+  const entriesByEnrollment = new Map<string, PracticeEntryDuration[]>();
   for (const row of entriesResult.data ?? []) {
-    const totals = minutesByEnrollment.get(row.enrollment_id) ?? {
-      delivery: 0,
-      planning: 0,
-    };
-    if (row.category === "planning") totals.planning += row.minutes;
-    else totals.delivery += row.minutes;
-    minutesByEnrollment.set(row.enrollment_id, totals);
+    const entries = entriesByEnrollment.get(row.enrollment_id) ?? [];
+    entries.push({ minutes: row.minutes, category: row.category });
+    entriesByEnrollment.set(row.enrollment_id, entries);
   }
+  const totalsByEnrollment = new Map(
+    base.enrollments.map((enrollment) => [
+      enrollment.id,
+      calculatePracticeTotals(entriesByEnrollment.get(enrollment.id) ?? []),
+    ]),
+  );
 
   const hours = (minutes: number) => Math.round((minutes / 60) * 10) / 10;
   const totalHoursByEnrollment = new Map(
-    base.enrollments.map((enrollment) => {
-      const totals = minutesByEnrollment.get(enrollment.id) ?? {
-        delivery: 0,
-        planning: 0,
-      };
-      return [enrollment.id, hours(totals.delivery + totals.planning)];
-    }),
+    base.enrollments.map((enrollment) => [
+      enrollment.id,
+      hours(totalsByEnrollment.get(enrollment.id)?.totalMinutes ?? 0),
+    ]),
   );
   const rows = base.enrollments.map((enrollment) => {
     const identity = participantIdentity(base, enrollment.profile_id);
-    const totals = minutesByEnrollment.get(enrollment.id) ?? {
-      delivery: 0,
-      planning: 0,
+    const totals = totalsByEnrollment.get(enrollment.id) ?? {
+      totalMinutes: 0,
+      deliveryMinutes: 0,
+      planningMinutes: 0,
     };
     return [
       identity.name,
       identity.email,
-      hours(totals.delivery + totals.planning),
-      hours(totals.delivery),
-      hours(totals.planning),
+      hours(totals.totalMinutes),
+      hours(totals.deliveryMinutes),
+      hours(totals.planningMinutes),
       PRACTICE_STATUS_LABELS[practice.get(enrollment.id) ?? ""] ??
         "Ikke innsendt",
       ENROLLMENT_STATUS_LABELS[enrollment.status],
@@ -427,7 +439,7 @@ async function buildPracticeReport(
 
   return tableFor(reportDefinitions.practice, base, generatedAt, {
     summary: [
-      `Kullsnitt praksistimer (ekskl. trukket): ${cohortAverage(reportDefinitions.practice, base, totalHoursByEnrollment)}`,
+      `Kullsnitt praksistimer (ekskl. trukket): ${cohortAverage(reportDefinitions.practice, base, totalHoursByEnrollment, 1)}`,
     ],
     columns: [
       "Navn",
@@ -490,7 +502,7 @@ async function buildAttendanceReport(
 
   return tableFor(reportDefinitions.attendance, base, generatedAt, {
     summary: [
-      `Kullsnitt oppmøte (ekskl. trukket): ${cohortAverage(reportDefinitions.course_progress, base, percentageByEnrollment)} %`,
+      `Kullsnitt oppmøte (ekskl. trukket): ${cohortAverage(reportDefinitions.attendance, base, percentageByEnrollment)} %`,
     ],
     columns: [
       "Navn",
@@ -629,7 +641,7 @@ async function buildDeadlinesReport(
     const deadline = deadlineByActivity.get(activity.id);
     return [
       activity.title,
-      deadline ? new Date(deadline).toISOString() : "Ingen frist",
+      deadline ? formatOsloDateTime(deadline) : "Ingen frist",
       submitted,
       Math.max(activeEnrollmentIds.size - submitted, 0),
     ];

@@ -42,6 +42,15 @@ describe("generateDiploma", () => {
     expect(pdf.getSubject()).toContain("Trener 3 2027");
   });
 
+  it("renders recipients with characters outside WinAnsi without throwing", async () => {
+    const bytes = await generateDiploma({
+      ...diplomaInput,
+      displayName: "Michał Woźniak",
+    });
+
+    expect(new TextDecoder().decode(bytes.slice(0, 8))).toMatch(/^%PDF-/);
+  });
+
   it("rejects a certificate without a supported trainer level", () => {
     expect(() => diplomaTemplateForCourse("Etterutdanning 2027")).toThrow(
       "DIPLOMA_LEVEL_NOT_SUPPORTED",

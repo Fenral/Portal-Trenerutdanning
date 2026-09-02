@@ -6,7 +6,10 @@ import {
   type PDFPage,
 } from "pdf-lib";
 
+import { winAnsiSafe } from "@/lib/win-ansi";
+
 import type { ReportTable } from "./report-builders";
+import { reportMetaLines } from "./report-meta";
 
 const A4_LANDSCAPE: [number, number] = [841.89, 595.28];
 const MARGIN = 40;
@@ -16,11 +19,12 @@ const INK = rgb(16 / 255, 34 / 255, 27 / 255);
 const MUTED = rgb(95 / 255, 107 / 255, 101 / 255);
 
 function fitText(
-  text: string,
+  rawText: string,
   font: PDFFont,
   size: number,
   maxWidth: number,
 ): string {
+  const text = winAnsiSafe(rawText);
   if (font.widthOfTextAtSize(text, size) <= maxWidth) return text;
   let cut = text;
   while (cut.length > 1 && font.widthOfTextAtSize(`${cut}…`, size) > maxWidth) {
@@ -35,7 +39,7 @@ function wrapText(
   size: number,
   maxWidth: number,
 ): string[] {
-  const words = text.split(" ");
+  const words = winAnsiSafe(text).split(" ");
   const lines: string[] = [];
   let current = "";
   for (const word of words) {
@@ -113,13 +117,9 @@ export async function generateReportPdf(
 
   newPage();
 
-  const metaLines = [
-    table.definition.description,
-    `Filtre: ${table.filters.join(" · ")}`,
-    ...table.summary,
-    `Definisjon (versjon ${table.definition.formulaVersion}): ${table.definition.formula}`,
-    `Generert: ${table.generatedAt}`,
-  ].flatMap((line) => wrapText(line, regular, 9.5, usableWidth));
+  const metaLines = reportMetaLines(table).flatMap((line) =>
+    wrapText(line, regular, 9.5, usableWidth),
+  );
   for (const line of metaLines) {
     page?.drawText(line, {
       x: MARGIN,

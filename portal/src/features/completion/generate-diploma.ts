@@ -3,6 +3,8 @@ import path from "node:path";
 
 import { PDFDocument, StandardFonts, type PDFFont, rgb } from "pdf-lib";
 
+import { winAnsiSafe } from "@/lib/win-ansi";
+
 export type DiplomaInput = Readonly<{
   templateVersion: string;
   displayName: string;
@@ -162,9 +164,11 @@ export async function generateDiploma(input: DiplomaInput) {
 
   page.drawImage(background, { x: 0, y: 0, width, height });
 
-  const recipientSize = fitSize(content.recipient, bold, 21, 14, width - 145);
-  page.drawText(content.recipient, {
-    x: centeredX(content.recipient, bold, recipientSize, width),
+  // Helvetica er WinAnsi-kodet; navn utenfor CP1252 må saniteres før tegning.
+  const recipient = winAnsiSafe(content.recipient);
+  const recipientSize = fitSize(recipient, bold, 21, 14, width - 145);
+  page.drawText(recipient, {
+    x: centeredX(recipient, bold, recipientSize, width),
     y: template.recipientY,
     size: recipientSize,
     font: bold,
