@@ -9,6 +9,7 @@ vi.mock("@/lib/supabase/admin", () => ({ createSupabaseAdminClient: vi.fn() }));
 import { canEditCmsItem, requireCmsStaff } from "@/features/cms/server/auth";
 import {
   cmsDownloadDisposition,
+  downloadCmsAttachment,
   validateCmsAttachment,
 } from "@/features/cms/server/attachments";
 import { assertCmsQuery, cmsErrorResponse } from "@/features/cms/server/errors";
@@ -181,5 +182,41 @@ describe("CMS original files", () => {
     expect(disposition).not.toContain("\r");
     expect(disposition).not.toContain("\n");
     expect(disposition).toContain("filename*=UTF-8''");
+  });
+  it("authorizes before issuing a private download without proxying file bytes", async () => {
+    const maybeSingle = vi.fn().mockResolvedValue({ data: null, error: null });
+    const createSignedUrl = vi
+      .fn()
+      .mockResolvedValue({
+        data: { signedUrl: "https://storage.example/signed-original" },
+        error: null,
+      });
+    const session = {
+      client: {
+        from: () => ({ select: () => ({ eq: () => ({ maybeSingle }) }) }),
+      },
+      admin: { storage: { from: () => ({ createSignedUrl }) } },
+    } as unknown as CmsSession;
+    await expect(downloadCmsAttachment(session, itemId)).rejects.toMatchObject({
+      status: 404,
+    });
+    expect(createSignedUrl).not.toHaveBeenCalled();
+    maybeSingle.mockResolvedValue({
+      data: {
+        storage_path: "original/path",
+        original_filename: "foreleser.pdf",
+      },
+      error: null,
+    });
+    const response = await downloadCmsAttachment(session, itemId);
+    expect(response.status).toBe(307);
+    expect(response.headers.get("Cache-Control")).toBe("private, no-store");
+    expect(response.headers.get("Location")).toBe(
+      "https://storage.example/signed-original",
+    );
+    expect(await response.text()).toBe("");
+    expect(createSignedUrl).toHaveBeenCalledWith("original/path", 60, {
+      download: "foreleser.pdf",
+    });
   });
 });

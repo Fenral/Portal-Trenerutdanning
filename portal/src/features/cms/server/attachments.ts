@@ -369,19 +369,20 @@ export async function downloadCmsAttachment(
       "Vedlegget finnes ikke eller er ikke tilgjengelig for deg.",
     );
   const row = attachment.data as AttachmentRow;
+  // Send the authorized browser directly to Storage: original files may be
+  // larger than the hosting platform's serverless response limit.
   const download = await session.admin.storage
     .from("cms-attachments")
-    .download(row.storage_path);
+    .createSignedUrl(row.storage_path, 60, { download: row.original_filename });
   assertCmsQuery(download.error);
-  if (!download.data) throw new CmsError(404, "Originalfilen finnes ikke.");
-  return new Response(download.data, {
+  if (!download.data?.signedUrl)
+    throw new CmsError(404, "Originalfilen finnes ikke.");
+  return new Response(null, {
+    status: 307,
     headers: {
-      "Content-Type": row.mime_type,
-      "Content-Disposition": cmsDownloadDisposition(row.original_filename),
-      "Content-Length": String(download.data.size),
+      Location: download.data.signedUrl,
       "Cache-Control": "private, no-store",
-      "X-Content-Type-Options": "nosniff",
-      "Content-Security-Policy": "sandbox; default-src 'none'",
+      "Referrer-Policy": "no-referrer",
     },
   });
 }
