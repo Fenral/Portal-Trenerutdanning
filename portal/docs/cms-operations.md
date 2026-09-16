@@ -45,6 +45,6 @@ Et tydelig merket eksempel er opprettet: «Planlegg for utvikling · eksempel»,
 
 AI-koden er ferdig og har automatiserte tester, men ingen ekte modellforespørsel er verifisert. AI er utsatt etter brukerens valg. Ingen nøkkel er opprettet, eksponert eller lagt inn på deres vegne.
 
-Publisert forhåndsvisning (READY): https://trenerloftet-demo-91voiaaj8-sivert-s-projects.vercel.app. Deployment-ID: `dpl_DP8fZqCnnY9YYcTyc9tX7f4EZ9jT`, kildecommit `3c238e6`. Vercel-innlogging gir varig tilgang; en midlertidig testlenke er gitt direkte til brukeren og lagres ikke i repoet. Produksjonsbygg på Vercel er bestått. Den siste endringen for signert nedlasting har 11 beståtte backendtester samt en virkelig autorisert PDF-nedlasting.
+Publisert forhåndsvisning (READY): https://trenerloftet-demo-kb3a9725j-sivert-s-projects.vercel.app. Deployment-ID: `dpl_2ykR8oaJW2Per6TP1jaqD7VmG8KM`, kildecommit `11bec3b`. Vercel-innlogging gir varig tilgang; en midlertidig testlenke er gitt direkte til brukeren og lagres ikke i repoet. Produksjonsbygg på Vercel er bestått. Endringen for oppstart uten AI-nøkkel har bestått typekontroll og målrettet ESLint. Signert nedlasting har 11 beståtte backendtester samt en virkelig autorisert PDF-nedlasting.
 
 Vercel-forhåndsvisningen bruker eksisterende demokontoer og database. Behold Vercel-tilgangsbeskyttelsen mens `DEMO_MODE=true`; demoens rollebytte gir skrivetilgang. Før bruk med faktiske kursdata skal demomodus slås av og administratorer bruke personlige, tildelte kontoer via `/login`.
