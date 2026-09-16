@@ -1,0 +1,135 @@
+.moduleFrame {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-surface);
+}
+
+.presentation {
+  display: grid;
+  min-width: 0;
+  min-height: min(48rem, 85svh);
+  overflow: auto;
+  border: 1px solid var(--nivaa-border);
+  border-radius: var(--nivaa-radius-surface);
+  background: var(--nivaa-canvas);
+  grid-template-rows: auto 1fr auto;
+}
+
+.presentation:fullscreen {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+
+.toolbar,
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--nivaa-space-default) var(--nivaa-space-comfortable);
+  background: var(--nivaa-surface);
+  flex-wrap: wrap;
+  gap: var(--nivaa-space-default);
+}
+
+.toolbar {
+  border-bottom: 1px solid var(--nivaa-border);
+}
+
+.controls {
+  border-top: 1px solid var(--nivaa-border);
+}
+
+.title {
+  max-width: 60ch;
+  margin: 0;
+  font-weight: 700;
+}
+
+.tools,
+.paging {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--nivaa-space-tight);
+}
+
+.stage {
+  width: min(100%, 70rem);
+  margin: auto;
+  padding: clamp(1.5rem, 5vw, 4rem);
+}
+
+.slide {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.slide h2 {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+}
+
+.slide h3 {
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+.slide p {
+  font-size: clamp(1rem, 2.3vw, 1.3rem);
+  white-space: pre-wrap;
+}
+
+.speakerNotes {
+  margin-top: var(--nivaa-space-section);
+  padding: var(--nivaa-space-comfortable);
+  border-radius: var(--nivaa-radius-inner);
+  background: var(--nivaa-warning-soft);
+}
+
+.speakerNotes h2 {
+  font-size: var(--nivaa-font-size-body);
+}
+
+.speakerNotes p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.counter,
+.hint {
+  margin: 0;
+  color: var(--nivaa-text-muted);
+  font-size: var(--nivaa-font-size-body-sm);
+}
+
+.counter {
+  color: var(--nivaa-on-surface);
+  font-weight: 700;
+}
+
+.progress {
+  width: 10rem;
+  height: 0.5rem;
+  accent-color: var(--nivaa-primary);
+}
+
+@media (max-width: 36rem) {
+  .toolbar,
+  .controls,
+  .stage {
+    padding: var(--nivaa-space-default);
+  }
+
+  .tools,
+  .paging {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .presentation {
+    min-height: 80svh;
+  }
+}

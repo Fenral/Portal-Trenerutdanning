@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { loadStudentContent } from "@/features/content/student-data";
-import { ContentRenderer } from "@/features/learning/ContentRenderer";
+import { PublishedContent } from "@/features/cms/PublishedContent";
 import { loadStudentActivity } from "@/features/learning/student-learning-data";
 import { StudentResources } from "@/features/learning/StudentResources";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -140,7 +140,7 @@ export default async function StudentActivityPage({
         <div className={styles.mainColumn}>
           {content ? (
             <article className={styles.lesson}>
-              <ContentRenderer document={content.document} />
+              <PublishedContent content={content} />
             </article>
           ) : (
             <section className={styles.verifiedActivity}>

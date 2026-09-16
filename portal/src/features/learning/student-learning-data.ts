@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { resolveCourseContent } from "@/features/cms/server/data";
+
 import {
   getActivityAccess,
   type ActivityAccess,
@@ -72,11 +74,6 @@ type ProgressRow = Readonly<{
   percentage: number;
   completed_required_count: number;
   total_required_count: number;
-}>;
-
-type ContentBindingRow = Readonly<{
-  content_item_id: string;
-  content_revision_id: string;
 }>;
 
 export type StudentLearningActivity = Readonly<{
@@ -184,7 +181,6 @@ export async function loadStudentLearningPath(
     prerequisitesResult,
     completionsResult,
     progressResult,
-    bindingsResult,
   ] = await Promise.all([
     client
       .from("modules")
@@ -212,10 +208,6 @@ export async function loadStudentLearningPath(
       .eq("enrollment_id", enrollment.id)
       .eq("learning_path_id", path.id)
       .maybeSingle(),
-    client
-      .from("course_content_bindings")
-      .select("content_item_id,content_revision_id")
-      .eq("course_run_id", enrollment.course_run_id),
   ]);
 
   for (const result of [
@@ -224,7 +216,6 @@ export async function loadStudentLearningPath(
     prerequisitesResult,
     completionsResult,
     progressResult,
-    bindingsResult,
   ]) {
     assertNoQueryError(result.error);
   }
@@ -238,11 +229,22 @@ export async function loadStudentLearningPath(
       (completion) => completion.activity_id,
     ),
   );
+  const contentItemIds = [
+    ...new Set(
+      activities.flatMap((activity) =>
+        activity.content_item_id ? [activity.content_item_id] : [],
+      ),
+    ),
+  ];
+  const resolvedContent = await Promise.all(
+    contentItemIds.map((contentItemId) =>
+      resolveCourseContent(client, enrollment.course_run_id, contentItemId),
+    ),
+  );
   const revisionByContentItem = new Map(
-    ((bindingsResult.data ?? []) as ContentBindingRow[]).map((binding) => [
-      binding.content_item_id,
-      binding.content_revision_id,
-    ]),
+    resolvedContent.flatMap((resolved) =>
+      resolved ? [[resolved.sourceItemId, resolved.revisionId] as const] : [],
+    ),
   );
   const titleByActivityId = new Map(
     activities.map((activity) => [activity.id, activity.title]),

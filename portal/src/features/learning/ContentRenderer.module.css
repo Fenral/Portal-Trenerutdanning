@@ -159,6 +159,24 @@
   color: #d9e4dd;
 }
 
+.metadata {
+  padding-top: var(--nivaa-space-comfortable);
+  border-top: 1px solid var(--nivaa-border);
+}
+
+.metadata h2 {
+  font-size: var(--nivaa-font-size-h3);
+}
+
+.metadata li + li {
+  margin-top: var(--nivaa-space-tight);
+}
+
+.metadata a {
+  color: var(--nivaa-primary);
+  text-underline-offset: 0.2rem;
+}
+
 @media (max-width: 32rem) {
   .mediaBlock,
   .callout,

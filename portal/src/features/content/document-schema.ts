@@ -1,9 +1,19 @@
 import { z } from "zod";
 
+import { CodeModule, DesignSystem } from "@/features/cms/module-schema";
+
 const DatabaseId = z
   .string()
   .trim()
   .regex(/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i);
+
+const WebUrl = z
+  .string()
+  .url()
+  .refine(
+    (value) => ["https:", "http:"].includes(new URL(value).protocol),
+    "Bruk en nettadresse som starter med https:// eller http://",
+  );
 
 const Heading = z.object({
   type: z.literal("heading"),
@@ -31,7 +41,7 @@ const File = z.object({
 
 const ExternalLink = z.object({
   type: z.literal("external_link"),
-  url: z.string().url(),
+  url: WebUrl,
   label: z.string().trim().min(1).max(120),
 });
 
@@ -54,9 +64,13 @@ const Video = z
   .object({
     type: z.literal("video"),
     provider: z.enum(["youtube", "trackman", "uploaded"]),
-    url: z.string().url().optional(),
+    url: WebUrl.optional(),
     assetId: DatabaseId.optional(),
     required: z.boolean(),
+    hasAudio: z.boolean().optional(),
+    captionsAssetId: DatabaseId.optional(),
+    captionsConfirmedAtProvider: z.boolean().optional(),
+    transcript: z.string().max(50_000).optional(),
   })
   .superRefine((value, context) => {
     if (value.provider === "uploaded") {
@@ -149,12 +163,27 @@ export const ContentBlock = z.discriminatedUnion("type", [
   Video,
   Callout,
   InteractiveSequence,
+  CodeModule,
 ]);
+
+export type ContentBlock = z.infer<typeof ContentBlock>;
 
 export const ContentDocument = z.object({
   locale: z.literal("nb-NO"),
   format: z.enum(["short_page", "scroll_story"]),
   blocks: z.array(ContentBlock).min(1).max(200),
+  attachmentIds: z.array(DatabaseId).max(100).optional(),
+  sources: z
+    .array(
+      z.object({
+        title: z.string().trim().min(1).max(300),
+        url: WebUrl.optional(),
+      }),
+    )
+    .max(100)
+    .optional(),
+  speakerNotes: z.array(z.string().max(20_000)).max(200).optional(),
+  designSystem: DesignSystem.optional(),
 });
 
 export type ContentDocument = z.infer<typeof ContentDocument>;

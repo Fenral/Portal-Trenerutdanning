@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { logoutAction } from "@/app/(auth)/login/actions";
 import { DemoRoleSwitcher } from "./DemoRoleSwitcher";
 import styles from "./AdminShell.module.css";
 
@@ -20,7 +21,7 @@ const navigationItems: readonly NavigationItem[] = [
   { label: "Oversikt", icon: "chart" },
   { label: "Kurs", icon: "courses", href: "/admin/courses" },
   { label: "Deltakere", icon: "people" },
-  { label: "Innhold", icon: "content", href: "/editor/content" },
+  { label: "Innhold", icon: "content", href: "/editor/studio" },
   { label: "Rapporter", icon: "reports", href: "/admin/reports" },
   { label: "Innstillinger", icon: "settings" },
 ];
@@ -97,22 +98,29 @@ export function AdminShell({
   children: ReactNode;
   demoMode?: boolean;
   userName: string;
-  roleLabel?: "Administrator" | "Redaktør";
+  roleLabel?: "Administrator" | "Redaktør" | "Kurslærer";
   contextLabel?: string;
   topbarLabel?: string;
 }) {
   const pathname = usePathname();
-  const availableNavigationItems = navigationItems.map((item) =>
-    roleLabel === "Redaktør" &&
-    (item.label === "Kurs" || item.label === "Rapporter")
+  const availableNavigationItems = navigationItems.map((item) => {
+    const unavailableForEditor =
+      roleLabel === "Redaktør" &&
+      (item.label === "Kurs" || item.label === "Rapporter");
+    const unavailableForTeacher =
+      roleLabel === "Kurslærer" && item.label !== "Innhold";
+    return unavailableForEditor || unavailableForTeacher
       ? { ...item, href: undefined }
-      : item,
-  );
+      : item;
+  });
 
   return (
     <div className={styles.frame}>
       <aside className={styles.sidebar}>
-        <Link className={styles.brand} href="/admin/courses">
+        <Link
+          className={styles.brand}
+          href={roleLabel === "Kurslærer" ? "/editor/studio" : "/admin/courses"}
+        >
           <span aria-hidden="true" className={styles.brandMark}>
             T
           </span>
@@ -177,16 +185,25 @@ export function AdminShell({
             <span>Trenerutdanning</span>
             <span aria-hidden="true">/</span>
             <strong>{contextLabel}</strong>
-            <span className={styles.demoBadge}>DEMO · fiktive data</span>
+            {demoMode ? (
+              <span className={styles.demoBadge}>DEMO · fiktive data</span>
+            ) : null}
           </div>
           <div className={styles.topbarMeta}>
             <span>
               <NavigationIcon name="courses" />
               {topbarLabel}
             </span>
-            <span className={styles.userIcon} title={userName}>
-              {initialsFor(userName)}
-            </span>
+            <form action={logoutAction}>
+              <button
+                aria-label={`Logg ut ${userName}`}
+                className={styles.userIcon}
+                title="Logg ut"
+                type="submit"
+              >
+                {initialsFor(userName)}
+              </button>
+            </form>
           </div>
         </header>
         <div className={styles.content}>{children}</div>

@@ -1,6 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import {
+  loadCmsReadableAttachments,
+  resolveCourseContent,
+} from "@/features/cms/server/data";
+import type { CmsAttachment } from "@/features/cms/server/types";
+
+import {
   ContentDocument,
   type ContentDocument as ContentDocumentValue,
 } from "./document-schema";
@@ -85,6 +91,7 @@ export type StudentContentView = Readonly<{
   publishedAt: string | null;
   courseTitle: string;
   resources: readonly StudentResourceView[];
+  attachments: readonly CmsAttachment[];
 }>;
 
 function assertNoQueryError(
@@ -146,21 +153,52 @@ export async function loadStudentContentCatalog(
   const bindings = (bindingData ?? []) as ContentBindingRow[];
   if (!bindings.length) return [];
 
-  const itemIds = [
-    ...new Set(bindings.map((binding) => binding.content_item_id)),
-  ];
-  const revisionIds = [
-    ...new Set(bindings.map((binding) => binding.content_revision_id)),
-  ];
   const courseRunIds = [
     ...new Set(bindings.map((binding) => binding.course_run_id)),
   ];
+  const overridesResult = await client
+    .from("cms_course_overrides")
+    .select("course_run_id,source_item_id,local_item_id")
+    .in("course_run_id", courseRunIds);
+  assertNoQueryError(overridesResult.error);
+  const overrides = (overridesResult.data ?? []) as Array<{
+    course_run_id: string;
+    source_item_id: string;
+    local_item_id: string;
+  }>;
+  const overrideByLocal = new Map(
+    overrides.map((row) => [
+      `${row.course_run_id}:${row.local_item_id}`,
+      row.source_item_id,
+    ]),
+  );
+  const resolvedBindings = await Promise.all(
+    bindings.map(async (binding) => {
+      const sourceItemId =
+        overrideByLocal.get(
+          `${binding.course_run_id}:${binding.content_item_id}`,
+        ) ?? binding.content_item_id;
+      return resolveCourseContent(client, binding.course_run_id, sourceItemId);
+    }),
+  );
+  const resolved = resolvedBindings.filter(
+    (value): value is NonNullable<typeof value> => Boolean(value),
+  );
+  if (!resolved.length) return [];
+  const resolvedItemIds = [...new Set(resolved.map((value) => value.itemId))];
+  const resolvedRevisionIds = [
+    ...new Set(resolved.map((value) => value.revisionId)),
+  ];
+
   const [itemsResult, revisionsResult, coursesResult] = await Promise.all([
-    client.from("content_items").select("id,kind,title").in("id", itemIds),
+    client
+      .from("content_items")
+      .select("id,kind,title")
+      .in("id", resolvedItemIds),
     client
       .from("content_revisions")
       .select("id,content_item_id,revision_number,document,published_at")
-      .in("id", revisionIds),
+      .in("id", resolvedRevisionIds),
     client.from("course_runs").select("id,title").in("id", courseRunIds),
   ]);
 
@@ -185,26 +223,26 @@ export async function loadStudentContentCatalog(
   );
   const seenItems = new Set<string>();
 
-  return bindings.flatMap((binding) => {
-    if (seenItems.has(binding.content_item_id)) return [];
+  return resolved.flatMap((binding) => {
+    if (seenItems.has(binding.sourceItemId)) return [];
 
-    const item = itemById.get(binding.content_item_id);
-    const revision = revisionById.get(binding.content_revision_id);
+    const item = itemById.get(binding.itemId);
+    const revision = revisionById.get(binding.revisionId);
     if (!item || !revision) return [];
 
-    seenItems.add(binding.content_item_id);
+    seenItems.add(binding.sourceItemId);
     const document = ContentDocument.parse(revision.document);
     const summary = textSummary(document);
 
     return [
       {
-        id: item.id,
+        id: binding.sourceItemId,
         title: item.title,
         kind: item.kind,
         revisionNumber: revision.revision_number,
         heading: summary.heading,
         introduction: summary.introduction,
-        courseTitle: courseById.get(binding.course_run_id) ?? "Aktivt kurs",
+        courseTitle: courseById.get(binding.courseRunId) ?? "Aktivt kurs",
       },
     ];
   });
@@ -215,44 +253,68 @@ export async function loadStudentContent(
   itemId: string,
   courseRunId?: string,
 ): Promise<StudentContentView | null> {
-  let bindingQuery = client
-    .from("course_content_bindings")
-    .select("course_run_id,content_item_id,content_revision_id")
-    .eq("content_item_id", itemId)
-    .limit(1);
+  let sourceItemId = itemId;
+  let resolvedCourseRunId = courseRunId;
 
-  if (courseRunId) {
-    bindingQuery = bindingQuery.eq("course_run_id", courseRunId);
+  if (!resolvedCourseRunId) {
+    const bindingResult = await client
+      .from("course_content_bindings")
+      .select("course_run_id,content_item_id,content_revision_id")
+      .eq("content_item_id", itemId)
+      .limit(1)
+      .maybeSingle();
+    assertNoQueryError(bindingResult.error);
+    if (bindingResult.data) {
+      resolvedCourseRunId = bindingResult.data.course_run_id;
+      const localOverride = await client
+        .from("cms_course_overrides")
+        .select("source_item_id")
+        .eq("course_run_id", resolvedCourseRunId)
+        .eq("local_item_id", itemId)
+        .maybeSingle();
+      assertNoQueryError(localOverride.error);
+      sourceItemId = localOverride.data?.source_item_id ?? itemId;
+    } else {
+      const sourceOverride = await client
+        .from("cms_course_overrides")
+        .select("course_run_id")
+        .eq("source_item_id", itemId)
+        .limit(1)
+        .maybeSingle();
+      assertNoQueryError(sourceOverride.error);
+      resolvedCourseRunId = sourceOverride.data?.course_run_id;
+    }
   }
 
-  const { data: bindingData, error: bindingError } =
-    await bindingQuery.maybeSingle();
-  assertNoQueryError(bindingError);
-
-  if (!bindingData) return null;
-  const binding = bindingData as ContentBindingRow;
+  if (!resolvedCourseRunId) return null;
+  const binding = await resolveCourseContent(
+    client,
+    resolvedCourseRunId,
+    sourceItemId,
+  );
+  if (!binding) return null;
 
   const [itemResult, revisionResult, courseResult, resourceBindingsResult] =
     await Promise.all([
       client
         .from("content_items")
         .select("id,kind,title")
-        .eq("id", itemId)
+        .eq("id", binding.itemId)
         .maybeSingle(),
       client
         .from("content_revisions")
         .select("id,content_item_id,revision_number,document,published_at")
-        .eq("id", binding.content_revision_id)
+        .eq("id", binding.revisionId)
         .maybeSingle(),
       client
         .from("course_runs")
         .select("id,title")
-        .eq("id", binding.course_run_id)
+        .eq("id", binding.courseRunId)
         .maybeSingle(),
       client
         .from("course_resource_bindings")
         .select("course_run_id,resource_item_id,resource_revision_id")
-        .eq("course_run_id", binding.course_run_id),
+        .eq("course_run_id", binding.courseRunId),
     ]);
 
   assertNoQueryError(itemResult.error);
@@ -278,7 +340,7 @@ export async function loadStudentContent(
       client
         .from("resource_items")
         .select("id,title,description")
-        .eq("content_item_id", itemId)
+        .eq("content_item_id", binding.sourceItemId)
         .in("id", resourceItemIds),
       client
         .from("resource_revisions")
@@ -334,13 +396,19 @@ export async function loadStudentContent(
   }
 
   const revision = revisionResult.data as ContentRevisionRow;
+  const document = ContentDocument.parse(revision.document);
+  const attachments = await loadCmsReadableAttachments(
+    client,
+    document.attachmentIds ?? [],
+  );
 
   return {
     item: itemResult.data as ContentItemRow,
     revisionNumber: revision.revision_number,
-    document: ContentDocument.parse(revision.document),
+    document,
     publishedAt: revision.published_at,
     courseTitle: courseResult.data?.title ?? "Aktivt kurs",
     resources,
+    attachments,
   };
 }

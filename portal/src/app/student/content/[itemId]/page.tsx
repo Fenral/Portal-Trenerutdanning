@@ -2,9 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { loadStudentContent } from "@/features/content/student-data";
+import { PublishedContent } from "@/features/cms/PublishedContent";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-import { ContentBlocks } from "./ContentBlocks";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -67,7 +67,7 @@ export default async function StudentContentPage({ params }: PageProps) {
 
       <div className={styles.contentGrid}>
         <article className={styles.lesson}>
-          <ContentBlocks document={content.document} />
+          <PublishedContent content={content} />
         </article>
 
         <aside className={styles.resources} aria-labelledby="resources-title">

@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import { ModuleFrame } from "@/features/cms/ModuleFrame";
+import { safeWebUrl } from "@/features/cms/module-frame";
 import type { ContentDocument } from "@/features/content/document-schema";
 
 import styles from "./ContentRenderer.module.css";
@@ -130,6 +132,8 @@ export function ContentRenderer({
           }
 
           case "external_link":
+            if (!safeWebUrl(block.url))
+              return <p key={key}>{block.label} (ugyldig lenke)</p>;
             return (
               <a
                 className={styles.externalLink}
@@ -185,10 +189,49 @@ export function ContentRenderer({
               </section>
             );
 
+          case "code_module":
+            return <ModuleFrame key={key} module={block} />;
+
           default:
             return assertNever(block);
         }
       })}
+      {document.sources?.length ? (
+        <section aria-label="Kilder" className={styles.metadata}>
+          <h2>Kilder</h2>
+          <ol>
+            {document.sources.map((source, index) => (
+              <li key={`${source.title}-${index}`}>
+                {source.url && safeWebUrl(source.url) ? (
+                  <a
+                    href={source.url}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    {source.title}
+                  </a>
+                ) : (
+                  source.title
+                )}
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
+      {document.attachmentIds?.length ? (
+        <section aria-label="Vedlegg" className={styles.metadata}>
+          <h2>Vedlegg</h2>
+          <ul>
+            {document.attachmentIds.map((assetId, index) => (
+              <li key={assetId}>
+                <a href={`/resources/${assetId}?download=1`}>
+                  Last ned vedlegg {index + 1}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </div>
   );
 }

@@ -11,12 +11,12 @@
 ## Execution
 
 - [x] Inspect existing portal and create `.worktrees/cms-system` from `codex/portal-v1`; install locked dependencies.
-- [ ] Implement the module document schema, isolated renderer, templates, self-check and presentation/export components in `portal/src/features/cms/`; integrate existing ContentRenderer.
-- [ ] Implement additive migration, scoped CMS repository and `/api/cms` routes for catalog, creating, saving, publishing, restoring, variants and original attachments. Preserve course bindings and detect concurrent edits.
-- [ ] Implement authenticated AI proposals with configured provider, bounded requests and schema validation in `portal/src/features/cms/ai/` and `/api/cms/ai`.
-- [ ] Build `/editor/studio` library and `/editor/studio/[itemId]` workbench using the approved visual direction. Integrate navigation and course/student consumption.
-- [ ] Apply migrations to the relevant existing database; configure available runtime services and start the system.
-- [ ] Run `pnpm typecheck`, targeted CMS unit tests and `pnpm build`; exercise create → edit → publish → read plus original-file upload/download. Fix concrete failures once per change.
+- [x] Implement the module document schema, isolated renderer, templates, self-check and presentation/export components in `portal/src/features/cms/`; integrate existing ContentRenderer.
+- [x] Implement additive migration, scoped CMS repository and `/api/cms` routes for catalog, creating, saving, publishing, restoring, variants and original attachments. Preserve course bindings and detect concurrent edits.
+- [x] Implement authenticated AI proposals with configured provider, bounded requests and schema validation in `portal/src/features/cms/ai/` and `/api/cms/ai`. Live credentials remain an external prerequisite.
+- [x] Build `/editor/studio` library and `/editor/studio/[itemId]` workbench using the approved visual direction. Integrate navigation and course/student consumption.
+- [x] Apply migrations to the relevant existing database; configure available runtime services and start the system.
+- [x] Run `pnpm typecheck`, targeted CMS unit tests and `pnpm build`; exercise create → edit → publish → read plus original-file upload/download. Fix concrete failures once per change.
 - [ ] Commit the completed code, deploy to the existing portal host when available, and record exact tested state and any external configuration requirement in `portal/docs/cms-operations.md`.
 
 ## API boundary

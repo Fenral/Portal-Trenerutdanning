@@ -1,11 +1,9 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { AdminShell } from "@/components/shell/AdminShell";
-import { getContentManagerIdentity } from "@/features/access/require-content-manager";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { requireCmsSession } from "@/features/cms/server/auth";
 import { isDemoMode } from "@/lib/supabase/environment";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function displayNameFor(user: {
   email?: string;
@@ -23,24 +21,42 @@ function displayNameFor(user: {
 export default async function EditorLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
-  const serverClient = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await serverClient.auth.getUser();
-  const adminClient = createSupabaseAdminClient();
-  const identity = user
-    ? await getContentManagerIdentity(user.id, adminClient)
-    : null;
-
-  if (!user || !identity) {
+  const session = await requireCmsSession().catch(() => null);
+  if (!session) redirect("/login");
+  if (!session.isGlobalManager && !session.courseIds.length) {
     notFound();
   }
+
+  const {
+    data: { user },
+  } = await session.client.auth.getUser();
+
+  if (!user) {
+    notFound();
+  }
+
+  const globalRoles = session.isGlobalManager
+    ? await session.admin
+        .from("role_assignments")
+        .select("role")
+        .eq("profile_id", session.profileId)
+        .is("course_run_id", null)
+        .is("course_template_id", null)
+        .is("revoked_at", null)
+    : null;
+  const roleLabel = !session.isGlobalManager
+    ? "Kurslærer"
+    : globalRoles?.data?.some(
+          (assignment) => assignment.role === "administrator",
+        )
+      ? "Administrator"
+      : "Redaktør";
 
   return (
     <AdminShell
       contextLabel="Innhold"
       demoMode={isDemoMode()}
-      roleLabel={identity.role === "editor" ? "Redaktør" : "Administrator"}
+      roleLabel={roleLabel}
       topbarLabel="Pensum · Bokmål"
       userName={displayNameFor(user)}
     >

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { logoutAction } from "@/app/(auth)/login/actions";
 import { DemoRoleSwitcher } from "./DemoRoleSwitcher";
 import styles from "./StudentShell.module.css";
 
@@ -64,6 +65,11 @@ export function TeacherShell({
       icon: "people" as const,
     },
     { label: "Vurderinger", href: "/teacher", icon: "review" as const },
+    {
+      label: "Pensumverksted",
+      href: "/editor/studio",
+      icon: "review" as const,
+    },
   ];
 
   return (
@@ -83,12 +89,14 @@ export function TeacherShell({
             {navigation.map((item) => {
               const current = Boolean(
                 item.href &&
-                (item.label === "Deltakere"
-                  ? pathname.startsWith("/teacher/participants")
-                  : item.label === "Vurderinger"
-                    ? pathname.startsWith("/teacher/assignments") ||
-                      pathname.startsWith("/teacher/practice")
-                    : pathname === item.href),
+                (item.label === "Pensumverksted"
+                  ? pathname.startsWith("/editor/studio")
+                  : item.label === "Deltakere"
+                    ? pathname.startsWith("/teacher/participants")
+                    : item.label === "Vurderinger"
+                      ? pathname.startsWith("/teacher/assignments") ||
+                        pathname.startsWith("/teacher/practice")
+                      : pathname === item.href),
               );
 
               return (
@@ -137,12 +145,22 @@ export function TeacherShell({
             <span>Trenerutdanning</span>
             <span aria-hidden="true">/</span>
             <strong>Lærer</strong>
-            <span className={styles.demoBadge}>DEMO · fiktive data</span>
+            {demoMode ? (
+              <span className={styles.demoBadge}>DEMO · fiktive data</span>
+            ) : null}
           </div>
           <div className={styles.courseContext}>
             <Icon name="review" />
             <span>{courseTitle}</span>
           </div>
+          <form action={logoutAction}>
+            <button
+              className="nivaa-button nivaa-button--secondary"
+              type="submit"
+            >
+              Logg ut
+            </button>
+          </form>
         </header>
         <div className={styles.content}>{children}</div>
       </div>
