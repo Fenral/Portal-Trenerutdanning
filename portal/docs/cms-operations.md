@@ -10,7 +10,7 @@ Lagring bruker atomisk compare-and-swap på kladdens `updatedAt`. Ved konflikt m
 
 Redigeringsfeltene dekker vanlige tekstblokker, lenker/kilder, presentasjon og kode-moduler (HTML, CSS og JavaScript). Presentasjonsvisningen har piltaster, fullskjerm og notater. Kode kjøres i en sandbox-iframe med `allow-scripts`; den har ikke nettverk eller tilgang til samme origin.
 
-Originalvedlegg lastes opp direkte med signert URL, er private og kan være opptil 20 MB. De kan lastes ned av autoriserte brukere; systemet utfører format-/metadata-kontroll, men filene blir ikke automatisk skannet for skadevare. Standalone HTML-eksport inkluderer tekst og kode-moduler. Eksterne medier og vedlegg krever fortsatt tilgang og nettverk, og er derfor ikke en komplett offline-kopi.
+Originalvedlegg lastes opp direkte med signert URL, er private og kan være opptil 20 MB. Nedlasting kontrollerer brukerens tilgang og videresender til Storage med en signert lenke som varer i 60 sekunder, slik at store filer ikke sendes gjennom Vercels svargrense. Systemet utfører format-/metadata-kontroll, men filene blir ikke automatisk skannet for skadevare. Standalone HTML-eksport inkluderer tekst og kode-moduler. Eksterne medier og vedlegg krever fortsatt tilgang og nettverk, og er derfor ikke en komplett offline-kopi.
 
 ## 3. AI-tjenesten
 
@@ -42,5 +42,7 @@ Typekontroll, ESLint og produksjonsbygg er bestått. Enhetstester: 32 filer / 15
 Et tydelig merket eksempel er opprettet: «Planlegg for utvikling · eksempel», publisert som v2 til demokurset Trener 2 · 2026, med et fiktivt PDF-vedlegg fra «Demoforeleser». Det ligger en ny kladd v3 klar.
 
 AI-koden er ferdig og har automatiserte tester, men ingen ekte modellforespørsel er verifisert: `OPENAI_API_KEY` mangler. Brukeren er bedt om valg av sikkert nøkkeloppsett. Ingen nøkkel er opprettet, eksponert eller lagt inn på deres vegne.
+
+Publisert forhåndsvisning (READY): https://trenerloftet-demo-91voiaaj8-sivert-s-projects.vercel.app. Deployment-ID: `dpl_DP8fZqCnnY9YYcTyc9tX7f4EZ9jT`, kildecommit `3c238e6`. Vercel-innlogging gir varig tilgang; en midlertidig testlenke er gitt direkte til brukeren og lagres ikke i repoet. Produksjonsbygg på Vercel er bestått. Den siste endringen for signert nedlasting har 11 beståtte backendtester samt en virkelig autorisert PDF-nedlasting.
 
 Vercel-forhåndsvisningen bruker eksisterende demokontoer og database. Behold Vercel-tilgangsbeskyttelsen mens `DEMO_MODE=true`; demoens rollebytte gir skrivetilgang. Før bruk med faktiske kursdata skal demomodus slås av og administratorer bruke personlige, tildelte kontoer via `/login`.

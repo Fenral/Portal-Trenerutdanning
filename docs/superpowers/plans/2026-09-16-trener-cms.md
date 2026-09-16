@@ -17,7 +17,11 @@
 - [x] Build `/editor/studio` library and `/editor/studio/[itemId]` workbench using the approved visual direction. Integrate navigation and course/student consumption.
 - [x] Apply migrations to the relevant existing database; configure available runtime services and start the system.
 - [x] Run `pnpm typecheck`, targeted CMS unit tests and `pnpm build`; exercise create → edit → publish → read plus original-file upload/download. Fix concrete failures once per change.
-- [ ] Commit the completed code, deploy to the existing portal host when available, and record exact tested state and any external configuration requirement in `portal/docs/cms-operations.md`.
+- [x] Commit the completed code, deploy to the existing portal host when available, and record exact tested state and any external configuration requirement in `portal/docs/cms-operations.md`. Preview READY on Vercel; existing production alias preserved.
+
+## External follow-up
+
+- [ ] Complete secure OpenAI key setup after the user's explicit choice, configure server runtime and verify a real proposal. Key setup question is pending; the UI accurately shows AI as disconnected.
 
 ## API boundary
 
