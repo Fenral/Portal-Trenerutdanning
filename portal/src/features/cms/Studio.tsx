@@ -21,15 +21,21 @@ import styles from "./studio.module.css";
 
 type Mode = "build" | "edit" | "publish";
 
-export function Studio({ itemId }: { itemId: string }) {
+export function Studio({
+  itemId,
+  aiAvailable,
+}: {
+  itemId: string;
+  aiAvailable: boolean;
+}) {
   const router = useRouter();
   const [editor, setEditor] = useState<CmsEditor | null>(null);
   const [document, setDocument] = useState<DocumentValue | null>(null);
   const [title, setTitle] = useState("");
-  const [mode, setMode] = useState<Mode>("build");
+  const [mode, setMode] = useState<Mode>(aiAvailable ? "build" : "edit");
   const [pane, setPane] = useState("controls");
   const [view, setView] = useState("read");
-  const [showCode, setShowCode] = useState(false);
+  const [showCode, setShowCode] = useState(!aiAvailable);
   const [proposal, setProposal] = useState<DocumentValue | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -403,7 +409,7 @@ export function Studio({ itemId }: { itemId: string }) {
                   aria-pressed={pane === "controls"}
                   onClick={() => setPane("controls")}
                 >
-                  AI-samtale
+                  {aiAvailable ? "AI-samtale" : "Verktøy"}
                 </button>
                 <button
                   aria-pressed={pane === "preview"}
@@ -415,15 +421,31 @@ export function Studio({ itemId }: { itemId: string }) {
             </div>
             <div className={styles.buildGrid} data-pane={pane}>
               <div className={styles.buildControls}>
-                <AiPanel
-                  itemId={itemId}
-                  document={document}
-                  onPreview={(value) => {
-                    setProposal(value);
-                    if (value) setPane("preview");
-                  }}
-                  onApply={change}
-                />
+                {aiAvailable ? (
+                  <AiPanel
+                    itemId={itemId}
+                    document={document}
+                    onPreview={(value) => {
+                      setProposal(value);
+                      if (value) setPane("preview");
+                    }}
+                    onApply={change}
+                  />
+                ) : (
+                  <section aria-label="Bygg med kode">
+                    <h2>Bygg med kode</h2>
+                    <p className={styles.muted}>
+                      Tilpass HTML, CSS og interaksjoner med designsystemet.
+                      Vanlige tekstendringer gjør du i Rediger.
+                    </p>
+                    <button
+                      className={styles.plainButton}
+                      onClick={() => setMode("edit")}
+                    >
+                      Gå til redigerbare felt
+                    </button>
+                  </section>
+                )}
                 <div className={styles.sources}>
                   <button
                     className={styles.plainButton}

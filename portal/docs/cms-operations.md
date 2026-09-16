@@ -14,7 +14,9 @@ Originalvedlegg lastes opp direkte med signert URL, er private og kan være oppt
 
 ## 3. AI-tjenesten
 
-CMS kaller OpenAI Responses API gjennom serverruten `/api/cms/ai`. `OPENAI_API_KEY` er påkrevd på serveren; `CMS_AI_MODEL` er valgfri og standard er `gpt-5.6-terra`. Uten nøkkel viser CMS-et eksplisitt at AI er utilgjengelig og lager ikke et falskt svar. API-nøkkelen skal settes i sikker deploy-/miljøkonfigurasjon, aldri limes inn i chat eller commit.
+Brukeren har valgt å starte uten API-nøkkel. Uten nøkkel åpner Studio i **Rediger**, **Bygg** viser kodeverktøy, og AI-panelet er skjult. Maler, vanlige felt, kode, vedlegg, publisering og undervisning fungerer uten AI. Ingen nøkkeloppretting eller aktivering avventer brukeren.
+
+Ved eventuell senere aktivering kaller CMS OpenAI Responses API gjennom serverruten `/api/cms/ai`. `OPENAI_API_KEY` settes på serveren; `CMS_AI_MODEL` er valgfri og standard er `gpt-5.6-terra`. API-nøkkelen skal settes i sikker deploy-/miljøkonfigurasjon, aldri limes inn i chat eller commit.
 
 AI-endepunktet krever innlogget CMS-tilgang, validerer emnet og begrenser forespørsler prosess-lokalt. Rate limit deles derfor ikke mellom flere instanser eller prosesser.
 
@@ -41,7 +43,7 @@ Typekontroll, ESLint og produksjonsbygg er bestått. Enhetstester: 32 filer / 15
 
 Et tydelig merket eksempel er opprettet: «Planlegg for utvikling · eksempel», publisert som v2 til demokurset Trener 2 · 2026, med et fiktivt PDF-vedlegg fra «Demoforeleser». Det ligger en ny kladd v3 klar.
 
-AI-koden er ferdig og har automatiserte tester, men ingen ekte modellforespørsel er verifisert: `OPENAI_API_KEY` mangler. Brukeren er bedt om valg av sikkert nøkkeloppsett. Ingen nøkkel er opprettet, eksponert eller lagt inn på deres vegne.
+AI-koden er ferdig og har automatiserte tester, men ingen ekte modellforespørsel er verifisert. AI er utsatt etter brukerens valg. Ingen nøkkel er opprettet, eksponert eller lagt inn på deres vegne.
 
 Publisert forhåndsvisning (READY): https://trenerloftet-demo-91voiaaj8-sivert-s-projects.vercel.app. Deployment-ID: `dpl_DP8fZqCnnY9YYcTyc9tX7f4EZ9jT`, kildecommit `3c238e6`. Vercel-innlogging gir varig tilgang; en midlertidig testlenke er gitt direkte til brukeren og lagres ikke i repoet. Produksjonsbygg på Vercel er bestått. Den siste endringen for signert nedlasting har 11 beståtte backendtester samt en virkelig autorisert PDF-nedlasting.
 

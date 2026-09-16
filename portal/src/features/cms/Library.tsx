@@ -332,9 +332,9 @@ export function Library({ isGlobalManager }: { isGlobalManager: boolean }) {
       <div className={styles.libraryNote}>
         <strong>Fra idé til undervisning</strong>
         <p>
-          Bygg med AI eller kode, gjør vanlige endringer i Rediger, og publiser
-          en bestemt versjon til valgte kurs. Eksterne presentasjoner legges ved
-          som originalfiler.
+          Start med en mal, gjør vanlige endringer i Rediger, og tilpass
+          interaksjoner med kode under Bygg. Publiser en bestemt versjon til
+          valgte kurs. Eksterne presentasjoner legges ved som originalfiler.
         </p>
       </div>
     </main>

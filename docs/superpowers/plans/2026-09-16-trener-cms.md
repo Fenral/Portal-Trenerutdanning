@@ -19,9 +19,9 @@
 - [x] Run `pnpm typecheck`, targeted CMS unit tests and `pnpm build`; exercise create → edit → publish → read plus original-file upload/download. Fix concrete failures once per change.
 - [x] Commit the completed code, deploy to the existing portal host when available, and record exact tested state and any external configuration requirement in `portal/docs/cms-operations.md`. Preview READY on Vercel; existing production alias preserved.
 
-## External follow-up
+## Agreed startup mode
 
-- [ ] Complete secure OpenAI key setup after the user's explicit choice, configure server runtime and verify a real proposal. Key setup question is pending; the UI accurately shows AI as disconnected.
+The user chose to start without an API key. No key setup is pending for this release. With no server-side key, Studio opens in Rediger, Bygg exposes code tools, and the AI panel stays hidden. Templates, editing, attachments, publication and teaching work normally. AI activation is an optional later enhancement.
 
 ## API boundary
 
