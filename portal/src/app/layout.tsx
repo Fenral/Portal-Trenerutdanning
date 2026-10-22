@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Manrope } from "next/font/google";
+import { Barlow, Barlow_Condensed, Manrope } from "next/font/google";
 import type { ReactNode } from "react";
 
 import "@/components/ui/tokens.css";
@@ -12,11 +12,18 @@ const manrope = Manrope({
   variable: "--font-manrope",
 });
 
-// Brukes kun av landingssidens scorekort-uttrykk.
-const plexMono = IBM_Plex_Mono({
+// Brukes kun av forsiden (rollevelgeren).
+const barlow = Barlow({
   display: "swap",
   subsets: ["latin"],
-  variable: "--font-plex-mono",
+  variable: "--font-barlow",
+  weight: ["400", "500", "600"],
+});
+
+const barlowCondensed = Barlow_Condensed({
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--font-barlow-condensed",
   weight: ["500", "600"],
 });
 
@@ -33,7 +40,7 @@ export default function RootLayout({
 }: Readonly<{ children: ReactNode }>) {
   return (
     <html
-      className={`${manrope.variable} ${plexMono.variable}`}
+      className={`${manrope.variable} ${barlow.variable} ${barlowCondensed.variable}`}
       data-scroll-behavior="smooth"
       lang="nb"
     >
