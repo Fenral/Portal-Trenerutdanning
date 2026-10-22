@@ -9,10 +9,10 @@ describe("portal landing page", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "Test den nye trenerportalen. Velg rolle.",
+        name: "Velg hvordan du vil inn",
       }),
     ).toBeVisible();
-    expect(screen.getByText("DEMO · FIKTIVE DATA")).toBeVisible();
+    expect(screen.getByText("Norges Golfforbund · Demo")).toBeVisible();
     expect(screen.getByRole("link", { name: /Student/ })).toHaveAttribute(
       "href",
       "/test-login?as=student-selma",
